@@ -59,3 +59,9 @@ verification/proofs/agda|Wager/Trans/Target.agda|gated|Stage 4: the target signa
 verification/proofs/agda|Wager/Trans/Nominal.agda|gated|Stage 4: a nominal coercion of the source becomes conversion in the target
 verification/proofs/agda|Wager/Trans/Coercion.agda|gated|Stage 4: translation of coercions (trope transitions and functorial maps) and of terms; erasure of the target
 verification/proofs/agda|Wager/Trans/TwoState.agda|gated|Stage 4: what a translation of types must keep; two-state tropes (definitions only)
+verification/proofs/agda|Wager/Grade/Trivial.agda|gated|Stage 4: the one-point grade algebra (no usage discipline)
+verification/proofs/agda|Wager/Trans/Typing.agda|gated|Stage 4 (T5): the translation preserves typing; a coercion is a typed term in each grade algebra
+verification/proofs/agda|Wager/Trans/Simulation.agda|gated|Stage 4 (T3, T5): an erased coercion is observationally the identity; erased source and erased target agree
+verification/proofs/agda|Wager/Trans/RoleCorrespondence.agda|gated|Stage 4: the inferred source role is the least grade that target kinding accepts; the target signature is valid
+verification/proofs/agda|Wager/Trans/TwoStateProofs.agda|gated|Stage 4: the tagged signature has no translation with two-state tropes (checked counterexample)
+verification/proofs/agda|Wager/Examples/Stage4.agda|gated|Stage 4: accepted and rejected closed examples

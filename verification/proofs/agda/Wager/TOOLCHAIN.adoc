@@ -265,3 +265,30 @@ A clean build of `Wager/Everything.agda` (51 modules) takes about 28 seconds and
 |===
 
 The third test shows that the proofs for the classic program depend on the function `F`, which maps `Age` and `Int` to different types.
+
+=== Gate watch at the end of Stage 4
+
+A clean build of `Wager/Everything.agda` (64 modules) takes about 35 seconds and prints no warning.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/Trans/TwoStateProofs.agda`: a false lemma (no function of the tagged signature looks at the argument of a newtype), with the proof `refl`
+| `[UnequalTerms] fNt₁E F N != inl bUnit`
+| FAIL
+
+| `Wager/Trans/TwoStateProofs.agda`: `postulate s4-by-fiat : …`
+| `[SafeFlagPostulate] Cannot postulate s4-by-fiat with safe flag`. `scan-dangerous.sh` also fails.
+| FAIL
+
+| `Wager/Trans/Coercion.agda`: the map of a sum exchanges the two injections
+| `[UnequalTerms] uinl … != uinr …` in `Wager/Trans/Simulation.agda`. `Wager/Trans/Typing.agda` also fails.
+| FAIL
+
+| All changes removed
+| None
+| PASS, 64 files
+|===
+
+The third test shows that the proofs of T3 and T5 depend on the terms that the translation gives.

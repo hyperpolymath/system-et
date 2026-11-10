@@ -70,29 +70,29 @@ private
   RelV-sum rep p q = cong₂ esum p q
   RelV-sum nom p q = cong₂ vsum p q
 
-  -- Three facts about the composition `nominal · _` of the lawful table.
-  nomZ-l : ∀ a b → leR (mulZ nom a) (mulZ nom (maxR a b)) ≡ true
-  nomZ-l ph  b   = refl
-  nomZ-l rep ph  = refl
-  nomZ-l rep rep = refl
-  nomZ-l rep nom = refl
-  nomZ-l nom b   = refl
+-- Three facts about the composition `nominal · _` of the lawful table.
+nomZ-l : ∀ a b → leR (mulZ nom a) (mulZ nom (maxR a b)) ≡ true
+nomZ-l ph  b   = refl
+nomZ-l rep ph  = refl
+nomZ-l rep rep = refl
+nomZ-l rep nom = refl
+nomZ-l nom b   = refl
 
-  nomZ-r : ∀ a b → leR (mulZ nom b) (mulZ nom (maxR a b)) ≡ true
-  nomZ-r ph  ph  = refl
-  nomZ-r ph  rep = refl
-  nomZ-r ph  nom = refl
-  nomZ-r rep ph  = refl
-  nomZ-r rep rep = refl
-  nomZ-r rep nom = refl
-  nomZ-r nom ph  = refl
-  nomZ-r nom rep = refl
-  nomZ-r nom nom = refl
+nomZ-r : ∀ a b → leR (mulZ nom b) (mulZ nom (maxR a b)) ≡ true
+nomZ-r ph  ph  = refl
+nomZ-r ph  rep = refl
+nomZ-r ph  nom = refl
+nomZ-r rep ph  = refl
+nomZ-r rep rep = refl
+nomZ-r rep nom = refl
+nomZ-r nom ph  = refl
+nomZ-r nom rep = refl
+nomZ-r nom nom = refl
 
-  nomZ-idem : ∀ a → mulZ nom (mulZ nom a) ≡ mulZ nom a
-  nomZ-idem ph  = refl
-  nomZ-idem rep = refl
-  nomZ-idem nom = refl
+nomZ-idem : ∀ a → mulZ nom (mulZ nom a) ≡ mulZ nom a
+nomZ-idem ph  = refl
+nomZ-idem rep = refl
+nomZ-idem nom = refl
 
 ------------------------------------------------------------------------
 -- A body respects the inferred role of its parameter.

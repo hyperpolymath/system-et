@@ -1,8 +1,6 @@
 {-# OPTIONS --cubical --safe #-}
 -- Forced by cubical-0.9 (InfectiveImport). No coinduction is used.
 {-# OPTIONS --guardedness #-}
--- DESIGN-CHOICES.adoc, DC-0.3: matches on kinded syntax.
-{-# OPTIONS -WnoUnsupportedIndexedMatch #-}
 -- SPDX-License-Identifier: MPL-2.0
 --
 -- Nominal equality of the source becomes conversion in the target

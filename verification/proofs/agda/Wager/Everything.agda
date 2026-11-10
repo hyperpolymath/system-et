@@ -63,3 +63,9 @@ import Wager.Trans.Target
 import Wager.Trans.Nominal
 import Wager.Trans.Coercion
 import Wager.Trans.TwoState
+import Wager.Grade.Trivial
+import Wager.Trans.Typing
+import Wager.Trans.Simulation
+import Wager.Trans.RoleCorrespondence
+import Wager.Trans.TwoStateProofs
+import Wager.Examples.Stage4

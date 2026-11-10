@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: relation ledger
-Status: Stage 3. Each later stage adds its entries in the same commit as its rules.
+Status: Stage 4. Each later stage adds its entries in the same commit as its rules.
 :toc: left
 :sectnums:
 
@@ -21,7 +21,7 @@ Each entry has one class:
 | source | The relation belongs to the source calculus (the fragment of System FC). The target calculus does not have it. It does not count against the wager.
 |===
 
-An ADDED entry counts against the wager. *Stages 1, 2 and 3 have no ADDED entry.*
+An ADDED entry counts against the wager. *Stages 1, 2, 3 and 4 have no ADDED entry.*
 The ledger has one "baseline, changed" entry (R1). The owner decides how it counts.
 
 == Judgement forms of the target calculus
@@ -149,8 +149,36 @@ Stage 3 defines the source calculus. It adds no rule and no relation to the targ
 | What a coercion at each role must keep: the nominal value (nominal), the erased type (representational), nothing (phantom).
 |===
 
+== Relations of the translation (Stage 4)
+
+Stage 4 defines the translation. It adds no rule and no relation to the target calculus.
+The translated terms use the rules of Stage 1 only: the rule `t-step` types each trope transition, and the rule `t-conv` types the translation of a nominal coercion.
+
+[cols="1,3,2,5",options="header"]
+|===
+| Id | Agda identifier | Class | Notes
+
+| R18
+| `𝒱`, `𝒞`, `ℰ` and `FO` in `Wager.Erased.LogRel`
+| specification only
+| Observational equality of untyped values at an erased type (a logical relation), and the first-order types.
+  The statements of T3 and of T5 use them. No typing rule and no kinding rule uses them.
+
+| R19
+| `Translation` and `TwoState` in `Wager.Trans.TwoState`
+| specification only
+| What a translation of types must keep, and the two-state form. The statement `No-Two-State-Translation` uses them.
+
+| R20
+| `TyTr`, `IsoTyped` in `Wager.Trans.Typing`; `CoRel`, `CoRelIso` in `Wager.Trans.Simulation`
+| proof-internal
+| A term transformer keeps typing, and a term transformer keeps the erased behaviour.
+|===
+
+`StateScheme` (`Wager.Trans.Scheme`) is data of the translation: an index type and a table. It is not a relation.
+
 == What is absent
 
-* The target calculus has no coercion relation and no cast judgement. The coercion relation `Co` (R14) is in the source calculus only.
+* The target calculus has no coercion relation and no cast judgement. The coercion relation `Co` (R14) is in the source calculus only. The translation of Stage 4 makes each representational coercion a term of the target, with no new judgement.
 * Representational equivalence exists as "specification only" (R11). It is not a judgement of the calculus.
 * There is no subtyping relation between types.

@@ -67,6 +67,11 @@ open import Wager.FC.Signature
 import Wager.FC.RoleSoundness
 import Wager.FC.Erasure
 import Wager.FC.ClassicProofs
+import Wager.Trans.Scheme
+import Wager.Trans.Typing
+import Wager.Trans.Simulation
+import Wager.Trans.RoleCorrespondence
+import Wager.Trans.TwoStateProofs
 
 module _ where
   open T1-Statements
@@ -188,3 +193,55 @@ module _ where
 
   classic-nominal-no-coercion : Good.Classic-Nominal-No-Coercion
   classic-nominal-no-coercion = SP.Good.age~int , SP.Good.no-coercion
+
+------------------------------------------------------------------------
+-- STAGE 4
+------------------------------------------------------------------------
+
+module _ (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+         {R : Type} (A : GradeAlgebra R) where
+  open Translation-Statements SS Sc A
+  private
+    module TY = Wager.Trans.Typing SS Sc A
+    module SI = Wager.Trans.Simulation SS Sc (GradeAlgebra.ops A)
+    module RC = Wager.Trans.RoleCorrespondence SS Sc (GradeAlgebra.ops A)
+
+  coercion-is-a-term : Coercion-Is-A-Term
+  coercion-is-a-term wr γ Γ = TY.coerce-typed wr γ Γ
+
+  t3 : T3
+  t3 wr γ = SI.coerce-identity wr γ
+
+  t3-first-order : T3-First-Order
+  t3-first-order wr γ = SI.coerce-identity-fo wr γ
+
+  t5-typing : T5-Typing
+  t5-typing wr u0 u2 e = TY.tr-typed wr u0 u2 e
+
+  t5-behaviour : T5-Behaviour
+  t5-behaviour wr e = SI.behaviour wr e
+
+  t5-behaviour-first-order : T5-Behaviour-First-Order
+  t5-behaviour-first-order wr e = SI.behaviour-fo wr e
+
+  target-signature-valid : Target-Signature-Valid
+  target-signature-valid = RC.target-valid
+
+  role-correspondence : Role-Correspondence
+  role-correspondence = RC.role-correspondence
+
+  role-check-is-kinding : Role-Check-Is-Kinding
+  role-check-is-kinding = RC.role-check-is-kinding
+
+module _ where
+  open Two-State-Statements
+  private module TS = Wager.Trans.TwoStateProofs
+
+  row-translation-exists : ∀ SS {R} (ops : GradeOps R) → Row-Translation-Exists SS ops
+  row-translation-exists SS ops = TS.row-translation SS ops
+
+  two-state-translation-exists : ∀ SS {R} (ops : GradeOps R) → Two-State-Translation-Exists SS ops
+  two-state-translation-exists SS ops = TS.two-state-translation SS ops
+
+  no-two-state-translation : No-Two-State-Translation
+  no-two-state-translation = TS.no-two-state

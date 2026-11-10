@@ -61,3 +61,21 @@ inv-k-lam : {γ : KUsage Γ} {b : Ty (k ∷ Γ) j} → γ ⊢ᵏ lam {g = g} b �
 inv-k-lam (k-lam d)    = _ , d , ≼ᵏ-refl _
 inv-k-lam (k-sub d le) =
   let (γ' , d' , le') = inv-k-lam d in γ' , d' , ≼ᵏ-trans le' le
+
+inv-k-arr : ∀ {γ : KUsage Γ} {q} {A B : Ty Γ ★} → γ ⊢ᵏ arr q A B →
+            Σ[ δ ∈ KUsage Γ ] Σ[ ε ∈ KUsage Γ ] (δ ⊢ᵏ A) × (ε ⊢ᵏ B) × ((δ ⊕ᵏ ε) ≼ᵏ γ)
+inv-k-arr (k-arr d e)  = _ , _ , d , e , ≼ᵏ-refl _
+inv-k-arr (k-sub d le) =
+  let (δ , ε , d' , e' , le') = inv-k-arr d in δ , ε , d' , e' , ≼ᵏ-trans le' le
+
+inv-k-prod : ∀ {γ : KUsage Γ} {A B : Ty Γ ★} → γ ⊢ᵏ (A ⊗ B) →
+             Σ[ δ ∈ KUsage Γ ] Σ[ ε ∈ KUsage Γ ] (δ ⊢ᵏ A) × (ε ⊢ᵏ B) × ((δ ⊕ᵏ ε) ≼ᵏ γ)
+inv-k-prod (k-prod d e) = _ , _ , d , e , ≼ᵏ-refl _
+inv-k-prod (k-sub d le) =
+  let (δ , ε , d' , e' , le') = inv-k-prod d in δ , ε , d' , e' , ≼ᵏ-trans le' le
+
+inv-k-sum : ∀ {γ : KUsage Γ} {A B : Ty Γ ★} → γ ⊢ᵏ (A ⊕ B) →
+            Σ[ δ ∈ KUsage Γ ] Σ[ ε ∈ KUsage Γ ] (δ ⊢ᵏ A) × (ε ⊢ᵏ B) × ((δ ⊕ᵏ ε) ≼ᵏ γ)
+inv-k-sum (k-sum d e)  = _ , _ , d , e , ≼ᵏ-refl _
+inv-k-sum (k-sub d le) =
+  let (δ , ε , d' , e' , le') = inv-k-sum d in δ , ε , d' , e' , ≼ᵏ-trans le' le

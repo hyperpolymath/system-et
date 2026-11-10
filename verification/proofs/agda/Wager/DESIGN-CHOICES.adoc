@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: design choices
-Status: entries of Stage 0, Stage 1, Stage 2 and Stage 3.
+Status: entries of Stage 0, Stage 1, Stage 2, Stage 3 and Stage 4.
 :toc: left
 :sectnums!:
 
@@ -36,7 +36,7 @@ Agda 2.8.0 then rejects an import from a module without the flag (`InfectiveImpo
 The stock library makes that rule impossible to obey.
 
 *Decision.* The owner accepted alternative 1 on 2026-11-10.
-At the end of each stage a search for `coinductive` in `Wager/` checks the intent of the rule. The search found nothing at the end of Stage 1, of Stage 2 and of Stage 3.
+At the end of each stage a search for `coinductive` in `Wager/` checks the intent of the rule. The search found nothing at the end of Stage 1, of Stage 2, of Stage 3 and of Stage 4.
 
 *Alternatives.*
 
@@ -68,6 +68,8 @@ A match that needs K is an error, not a warning.
 Thus the Lean proofs that use `castNf_diag` (an equality on `Δ = Δ` closed by `rfl`) cannot be copied directly.
 
 *Alternative.* Leave the warning on. This is honest but makes the output hard to read.
+
+*Audit at the end of Stage 4.* 35 of the 64 files have the line. A test of the 13 new files without the line found the warning in 6 of them. It found no other warning, and it found 2 new files that had the line and did not need it. The line was removed from them. The other 5 new files compile without a warning.
 
 *Audit at the end of Stage 3.* 29 of the 51 files have the line. A test of the 10 new files without the line found the warning in each of the 6 new files that have the line. It found no other warning. The other 4 new files compile without a warning.
 
@@ -331,3 +333,112 @@ The erasure of a source term (`eraseTm`) removes each cast. No other change is m
 The module does not depend on the source calculus. Stage 4 can erase the target calculus into the same untyped calculus and compare the two results there.
 
 *Not proved here.* Stage 3 does not prove that a typed untyped term evaluates to a value of its erased type. It proves that erasure preserves typing (`Wager.Proofs.erasure-preserves-typing`).
+
+== Stage 4
+
+[[DC-4.1]]
+=== DC-4.1: a newtype is a trope state on its representation, and a state scheme gives the number of states
+
+*Choice.* The translation (`Wager.Trans`) makes the source type `N τ` the target type `A@s`: the carrier `A` is the translation of the representation of `N τ`, and `s` is a state.
+A state scheme (`Wager.Trans.Scheme.StateScheme`) says which state. The state of `N τ` is the pair of `N` and an index. The index keeps what a type-level function can see of the argument τ.
+
+Two schemes exist:
+
+* `rowScheme`: the index is the row of the results of all the type-level functions on `N τ`. It exists for each source signature.
+* `twoState`: there is one index. The newtype is a two-state trope (raw, wrapped), as in Stage 2. It exists when no type-level function looks at the argument of a newtype.
+
+*Reason.* Stage 2 made a newtype a two-state trope. This is not enough for a newtype with a phantom parameter and a function that looks at that parameter (`Wager.Proofs.no-two-state-translation`).
+`Tag Int` and `Tag Bool` have one representation, and the function tells them apart. They need two states of one carrier.
+
+*Finite state sets.* Document 07 says that a trope has a finite set of states. The index type of the row scheme is `Fam → Base`.
+It is finite when the signature has a finite number of functions and of base types. Agda did not check this sentence. The Agda signature type has no finiteness condition.
+
+*Limit that this result depends on.* The result of a type-level function is a base type (DC-1.1, DC-3.4). A function that returns a part of its argument, such as `F (Tag a) = a`, is outside the fragment.
+For such a function a row has no finite bound. This development proves nothing about it.
+
+[[DC-4.2]]
+=== DC-4.2: the target signature of the translation
+
+*Choice.* `Wager.Trans.Target` builds the target signature from the source signature and the state scheme:
+
+* the base types and the literals of the source;
+* one state for each newtype with no parameter, and one state for each newtype with a parameter and each index. Each state has the grade representational;
+* one primitive for each type-level function. Each primitive has the grade nominal. On a state, a primitive reads its result from the index. It does not look at the carrier.
+
+A function type `τ → σ` becomes `arr 𝟙 (T τ) (T σ)`.
+
+*Consequence.* The target signature respects its declared grades (`Wager.Proofs.target-signature-valid`). The hypothesis `Valid` of T2 thus holds for each signature that the translation gives.
+No state has a phantom parameter. A phantom parameter of the source is not a type argument in the target: it is in the name of the state.
+
+[[DC-4.3]]
+=== DC-4.3: the trope operations are wrap and unwrap, for each instance
+
+*Choice.* The term signature has two operations for each instance of a newtype: `wrap : A → A@s` and `unwrap : A@s → A`.
+
+*Reason.* The carrier of an operation is a closed type (DC-1.4). An operation for each instance is the form of one polymorphic operation in a calculus with no type variable in terms.
+The set of operations is thus not finite. Document 07 says that the set of API operations of a trope is finite. This development gives no finite bound for the operations.
+
+[[DC-4.4]]
+=== DC-4.4: a coercion is a pair of term transformers
+
+*Choice.* `Wager.Trans.Coercion.coI` translates a coercion to a pair of transformers `Tm n → Tm n` (forwards, backwards). The blocks are:
+
+* wrap and unwrap (the newtype rules);
+* the map of a function, of a pair and of a sum (congruence);
+* unwrap, the map of the body, wrap (congruence for a newtype);
+* composition (transitivity), exchange of the two directions (symmetry), and the identity.
+
+A nominal coercion is the identity transformer. Its typing uses rule `t-conv`, because the two translated types are convertible (`Wager.Trans.Nominal.nominal-defeq`).
+`coerceT γ` is the function `λx. (transformer of γ) x`. The translation of `cast γ e` is the transformer of γ on the translation of `e`.
+
+*No cast.* The target has no cast judgement and no cast term. Each transformer is built from the term formers of Stage 1.
+
+*Detail.* The map of a function is `(λf. λx. g (f (h x))) t`. It keeps a β-redex, so that `t` is not moved under a binder.
+
+*Lemma that Stage 5 states as a theorem.* `nominal-defeq` is the content of T6. Stage 4 needs it for the typing of a cast, so its proof is in Stage 4. Stage 5 puts the statement of T6 in `Statements.agda`.
+
+[[DC-4.5]]
+=== DC-4.5: which grade algebra types the translation
+
+*Choice.* Two results, with two conditions:
+
+* A translated coercion is typed in EACH grade algebra (`Wager.Proofs.coercion-is-a-term`). It uses each variable one time, and each binder has the grade 𝟙.
+* A translated program is typed in each grade algebra in which the grade 𝟙 is unrestricted: `𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙` (`Wager.Proofs.t5-typing`). The one-point algebra `Wager.Grade.Trivial` is an example.
+
+*Reason.* System FC has no usage discipline: a source term can drop a variable and can use it two times.
+The rules of Stage 1 bind the two components of a pair and the variable of a `case` branch at the grade 𝟙, as the anytype checker does. A source term can drop a component. Thus 𝟙 itself must allow this.
+
+*Consequence.* In the algebra `Affine` (systemet order) the grade 1 is linear. The translation of a source function that drops its argument has no type there (`Wager.Examples.Stage4.Coercions-In-Affine.const-rejected`).
+The two conditions name the grades 𝟘 and 𝟙 only. They are hypotheses of a theorem. They are not side conditions of a rule.
+
+[[DC-4.6]]
+=== DC-4.6: observational equality is a logical relation on untyped values
+
+*Choice.* `Wager.Erased.LogRel.𝒱 a` relates two untyped values at the erased type `a`: one literal at a base type, related components for a pair, one injection and related contents for a sum, and for two function values related results on related arguments.
+T3 and the behaviour part of T5 are stated with it. On a first-order type (no function) the relation is equality of values.
+
+*The erasure of the target.* `eraseT` removes each trope transition and each type annotation. No other change is made.
+
+*Not proved here.* This development does not define contextual equivalence, and it does not prove that `𝒱` agrees with it.
+It also does not prove that the reduction of the target (`_⟶_`, Stage 1) agrees with the evaluation of the erased target term.
+
+[[DC-4.7]]
+=== DC-4.7: the form of the role correspondence
+
+*Choice.* The body of a newtype `N` is the type-level function `bodyFun N g` of the target, with the grade `g` for its parameter.
+The correspondence says: graded kinding, with the lawful role table, accepts `g` exactly when the inferred source role is at most `g` (`Wager.Proofs.role-correspondence`).
+
+*Reason.* The task says: "the source assigns the role ρ to a parameter if and only if the target kinding assigns the matching grade".
+Kinding has a subusage rule, so it accepts each grade above the least one. "The matching grade" is thus the least accepted grade.
+
+*Limit.* The correspondence is about the body. In the translation the newtype `N` itself is not a type-level function of the target, because the state depends on the index of the argument.
+
+[[DC-4.8]]
+=== DC-4.8: what "no translation" means
+
+*Choice.* `Wager.Trans.TwoState.Translation` says what a translation of types must keep: a nominal coercion becomes conversion, a type-level function becomes a type-level function of the target, and two different base types stay different.
+`TwoState` adds: each newtype with a parameter is one state on the translation of its representation.
+`Wager.Proofs.no-two-state-translation` says that the signature `taggedS rep` has no such translation, into any target signature.
+
+*Reason.* "This program has no translation" needs a definition of "translation". The three conditions are properties that claim W asks for. The fourth condition is the form of Stage 2.
+The translation with the row scheme meets the three conditions (`Wager.Proofs.row-translation-exists`), so the conditions are not empty.

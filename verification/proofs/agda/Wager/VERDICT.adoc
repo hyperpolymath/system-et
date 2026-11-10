@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: verdict
-Status: DRAFT after Stage 3. This file becomes final after the last stage.
+Status: DRAFT after Stage 4. This file becomes final after the last stage.
 :toc: left
 :sectnums:
 
@@ -31,15 +31,32 @@ Status: DRAFT after Stage 3. This file becomes final after the last stage.
   The signature of Stage 2 with `proxy` declared representational satisfies the hypothesis (`Wager.Proofs.rep-constant-valid`).
   Without the hypothesis T2 is false: `Wager.Proofs.t2-phantom-fails-without-valid` is a checked counterexample.
 
-| T3 | NOT ATTEMPTED | Stage 4 is not started.
+| T3
+| PROVED
+| `Wager.Proofs.t3`: for a signature that passes the role check, the erasure of each translated coercion evaluates to a function value, and this value is observationally equal to the identity function at the erased type.
+  `Wager.Proofs.t3-first-order`: at a first-order type the erased coercion gives its argument back.
+  `Wager.Proofs.coercion-is-a-term`: the translated coercion is an ordinary typed term of the target, in each grade algebra. No cast judgement exists.
+  "Observationally equal" is the logical relation `𝒱` of `Wager.Erased.LogRel` (DC-4.6).
 
 | T4
 | PROVED
 | `Wager.Proofs.t4-kinding-rejects`: the classic function has no kinding derivation at the grade representational, and none at the grade phantom.
   `Wager.Proofs.t4-not-equivalent`: `Age ≈ Int`, and the results of the function on `Age` and on `Int` are not equivalent.
 
-| T5 | NOT ATTEMPTED | Stage 4 is not started.
-| T6 | NOT ATTEMPTED | Stage 5 is not started.
+| T5
+| PROVED WITH CHANGE (class: signature primitive)
+| `Wager.Proofs.t5-typing`: the translation of a term of the type τ has the type `T τ`.
+  `Wager.Proofs.t5-behaviour`: the erased source program and the erased translation evaluate to observationally equal values. `Wager.Proofs.t5-behaviour-first-order`: at a first-order type they evaluate to one value.
+  Each holds for each source signature that passes the role check, and for each state scheme.
+
+  *The change.* A newtype with a parameter is not a two-state trope. It needs one wrapped state for each index of a state scheme (DC-4.1).
+  With two-state tropes T5 is false for a program of the fragment: `Wager.Proofs.no-two-state-translation` is a checked counterexample.
+  The row scheme exists for each signature (`Wager.Proofs.row-translation-exists`). The two-state scheme exists when no type-level function looks at the argument of a newtype (`Wager.Proofs.two-state-translation-exists`).
+
+  *A condition on the grade algebra.* `t5-typing` needs a grade algebra in which the grade `𝟙` is unrestricted: `𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙` (DC-4.5). System FC has no usage discipline.
+  In `Affine` the translation of a source function that drops its argument has no type.
+
+| T6 | NOT ATTEMPTED | Stage 5 is not started. The lemma that T6 needs is proved, because T5 uses it: `Wager.Trans.Nominal.nominal-defeq` (DC-4.4). Stage 5 states T6.
 | T7 | NOT ATTEMPTED | Stage 6 is not started.
 |===
 
@@ -92,25 +109,82 @@ The limits of the fragment are in DC-3.1 and DC-3.2. Two limits matter most for 
 * The body of a newtype cannot mention a declared newtype.
 
 Not proved in Stage 3: evaluation of a typed erased term gives a value of its erased type (DC-3.6).
+Stage 4 proves a part of it: the erasure of each closed source term evaluates to a value (`Wager.Proofs.t5-behaviour`).
+
+== Results of Stage 4: the translation
+
+Stage 4 defines the translation of the source calculus into the target calculus (`Wager.Trans`, DC-4.1 to DC-4.8). T3 and T5 are in the table of theorems. The other results:
+
+[cols="3,1,5",options="header"]
+|===
+| Statement (`Wager.Statements`) | Status | Evidence and reading
+
+| `Role-Correspondence`
+| PROVED
+| `Wager.Proofs.role-correspondence`. The body of a newtype is a type-level function of the target.
+  Graded kinding, with the lawful role table, accepts the grade `g` for its parameter exactly when the inferred source role is at most `g`.
+
+| `Role-Check-Is-Kinding`
+| PROVED
+| `Wager.Proofs.role-check-is-kinding`. The source role check holds exactly when target kinding accepts the declared role of each newtype.
+
+| `Target-Signature-Valid`
+| PROVED
+| `Wager.Proofs.target-signature-valid`. Each target signature that the translation gives respects its declared grades. The hypothesis of T2 holds for it.
+
+| `Row-Translation-Exists`
+| PROVED
+| `Wager.Proofs.row-translation-exists`. For each source signature, the translation with the row scheme keeps the three properties of `Translation` (DC-4.8).
+
+| `Two-State-Translation-Exists`
+| PROVED
+| `Wager.Proofs.two-state-translation-exists`. When no type-level function looks at the argument of a newtype, the translation with two-state tropes exists.
+
+| `No-Two-State-Translation`
+| PROVED
+| `Wager.Proofs.no-two-state-translation`. The checked counterexample: the signature `taggedS rep` has no translation with two-state tropes, into any target signature.
+|===
+
+=== The source program with no two-state translation
+
+[source,haskell]
+----
+newtype Tag a = MkTag Int
+type family G a where { G Int = Bool ; G Bool = Char }
+type family F a where { F (Tag a) = G a }
+----
+
+`Tag Int` and `Tag Bool` have one representation, `Int`. A two-state translation gives them one target type, `Int@tag`.
+The function `F` gives `Bool` on the first type and `Char` on the second type. A nominal coercion becomes conversion, so `Bool` and `Char` become convertible.
+The source role check accepts this program (`Wager.Examples.Stage3.Role-Check.wr-rep`). The three declarations are written as Haskell with type families. This development did not run GHC on them.
+
+The translation with the row scheme gives the two types two states of the carrier `Int`. The two target types are not convertible, and the phantom coercion between them is a typed term with two trope transitions (`Wager.Examples.Stage4.Coercions-In-Affine.tag-typed`, `tag-states-differ`).
+
+=== Not proved in Stage 4
+
+* Contextual equivalence is not defined. "Observationally equal" is the logical relation `𝒱` (DC-4.6).
+* No theorem relates the reduction of the target (`_⟶_`) to the evaluation of the erased target term.
+* No theorem says that a role-rejected `coerce` has no translation. The source calculus has no term for such a `coerce` (DC-3.5), and the role correspondence is about kinding.
+* The row scheme has a finite index type for a finite signature. Agda did not check this sentence (DC-4.1).
 
 == Overall result
 
-Not available. W is not decided after Stage 3.
+Not available. W is not decided after Stage 4. T6 and T7 are not attempted.
 
-One result of Stage 2 bears on W (finding F8).
-In the target, `Proxy Int` and `Proxy Bool` are not representationally equivalent when `Proxy` is a generative constant.
-GHC accepts a coercion between them, because the parameter of `Proxy` is phantom.
-Stage 4 must show whether this gives a source program with no translation.
+Results that bear on W after Stage 4:
 
-Stage 3 gives the source side of this question (finding F10).
-The source calculus accepts a newtype `Tag` with a phantom parameter, accepts the coercion `Tag Int ~R Tag Bool`, and has a type-level function `F` with `F (Tag Int) = Bool` and `F (Tag Bool) = Char`.
-The signature passes the role check (`Wager.Examples.Stage3`).
+* Parts (a) and (b) of W hold for the fragment, for each source signature that passes the role check: T5. They hold with one change (a newtype with a parameter needs more than one wrapped state) and one condition (an unrestricted grade `𝟙` for whole programs).
+* Part (c) of W holds in the sense of T3: each erased coercion is observationally the identity. It is not the empty term (finding F14).
+* Part (d) of W has the form of the role correspondence (DC-4.7).
+* The target calculus has the judgement forms of Stage 1 only. No relation is added and no rule is added.
+* T2 is "PROVED WITH CHANGE", so the condition "T2 to T6 are PROVED" of the task does not hold as written. The hypothesis of T2 holds for each signature that the translation gives (`target-signature-valid`).
 
-== Ledgers after Stage 3
+== Ledgers after Stage 4
 
 * `RELATION-LEDGER.adoc`: no ADDED entry. One entry is "baseline, changed": the kinding judgement has a graded context (R1). Stage 2 added two "specification only" entries (`≈`, and the observers with `Valid`).
-  Stage 3 added the relations of the source calculus with the class "source" (the coercion relation `Co` is one of them), and the evaluation and the typing of erased terms as "specification only". Stage 3 added nothing to the target calculus.
-* `RULE-DIFF-LEDGER.adoc`: empty. Stage 2 and Stage 3 added no rule to the target calculus.
+  Stage 3 added the relations of the source calculus with the class "source" (the coercion relation `Co` is one of them), and the evaluation and the typing of erased terms as "specification only".
+  Stage 4 added observational equality (`𝒱`) and the definition of a translation as "specification only". Stage 3 and Stage 4 added nothing to the target calculus.
+* `RULE-DIFF-LEDGER.adoc`: empty. Stages 2, 3 and 4 added no rule to the target calculus.
 
 == Answers of Stage 1
 
@@ -208,7 +282,8 @@ Stage 2 proved the laws of the candidate only. It did not prove that the candida
 | F8
 | With `Proxy` declared representational the signature is valid, and `Proxy Age ≈ Proxy Int` holds.
   But `Proxy Int` and `Proxy Bool` are not related by `≈` (`Wager.Proofs.no-phantom-coercion`). GHC accepts a coercion between them.
-  This result is about the relation `≈` only. It does not show that no term of the target calculus can do this coercion. Stage 4 decides that.
+  This result is about the relation `≈` only. It does not show that no term of the target calculus can do this coercion.
+  Stage 4 decided the question (finding F12): a phantom coercion between two instances of a newtype is a typed term of the target.
 
 | F9
 | Two notions of use. A 4-point structure with a separate grade "absent" for `0` has all 15 law fields and the GHC rule `nominal · phantom = nominal` (`Wager.Proofs.role4-lawful`, `Wager.Proofs.role4-has-ghc-rule`).
@@ -226,6 +301,25 @@ Stage 2 proved the laws of the candidate only. It did not prove that the candida
 | Role inference of the source (`roleOf`) uses the lawful entry `nominal · phantom = phantom`: a parameter that does not occur below a type-level function is phantom. `Source-Role-Soundness` is proved with it.
   This is sound only because a body of this fragment cannot mention a declared newtype (DC-3.2). The fragment cannot declare `newtype N a = MkN (F (Tag a))`.
   For that body the lawful entry gives phantom, and example `f-sees-phantom` shows that phantom is wrong there. Stage 3 has no Agda proof about such a body.
+
+| F12
+| Two-state tropes are not enough for a newtype with a phantom parameter and a type-level function that looks at that parameter (`Wager.Proofs.no-two-state-translation`).
+  One wrapped state for each row of function results is enough (`rowScheme`, T5).
+  The phantom parameter is then in the name of the state. It is not a type argument of a constant, so findings F7 and F8 do not apply to it.
+  The phantom coercion is two trope transitions: unwrap from one state, wrap to the other state.
+
+| F13
+| A source program has no usage discipline. Its translation needs a grade algebra in which the grade `𝟙` is unrestricted (DC-4.5).
+  The rules of Stage 1 bind the components of a pair and the variable of a `case` branch at the grade `𝟙`. In `Affine` a source function that drops its argument has no translated type.
+  A translated coercion is different: it uses each variable one time, and it is typed in each grade algebra.
+
+| F14
+| After erasure a translated coercion is not the empty term. The trope transitions vanish, and the maps of functions, pairs and sums stay (`Wager.Examples.Stage4.Programs.prog-erased`).
+  The coercion is observationally the identity (T3). It is zero-cost only when the coercion has no map, or after a later optimisation that this development does not have.
+
+| F15
+| In this fragment the result of a type-level function is a base type. For this reason a finite number of states for each newtype is enough (DC-4.1).
+  A function that returns a part of its argument is outside the fragment, in the source and in the target. This development proves nothing about it.
 |===
 
 == Changes to theorem statements
@@ -237,10 +331,11 @@ T2 was written with the hypothesis `Valid` from the start of Stage 2. The task t
 Process note: the statement `L1-Equality` was put in `Statements.agda` after its proof was complete. It is the statement that the task gives.
 The statements of T0, T1, T2 and T4 were put in `Statements.agda`, and committed, before their proofs.
 The statements of Stage 3 were put in `Statements.agda`, and committed, before their proofs.
+The statements of Stage 4 were put in `Statements.agda`, and committed, before their proofs. One proof was complete at that time: the lemma `nominal-defeq`, which is not a statement of Stage 4.
 
 == Trust base
 
 * Agda 2.8.0 with `--cubical --safe`, and `agda/cubical` v0.9 (`TOOLCHAIN.adoc`).
 * No `postulate`, no hole, no termination pragma, no positivity pragma.
 * `--guardedness` is on in each file (DC-0.2). No file uses coinduction.
-* One warning is silenced, in 29 of the 51 files: `UnsupportedIndexedMatch` (DC-0.3).
+* One warning is silenced, in 35 of the 64 files: `UnsupportedIndexedMatch` (DC-0.3).

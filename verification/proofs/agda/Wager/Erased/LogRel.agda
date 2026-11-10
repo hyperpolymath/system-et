@@ -1,8 +1,6 @@
 {-# OPTIONS --cubical --safe #-}
 -- Forced by cubical-0.9 (InfectiveImport). No coinduction is used.
 {-# OPTIONS --guardedness #-}
--- DESIGN-CHOICES.adoc, DC-0.3: matches on values.
-{-# OPTIONS -WnoUnsupportedIndexedMatch #-}
 -- SPDX-License-Identifier: MPL-2.0
 --
 -- Observational equality of untyped values, at an erased type
