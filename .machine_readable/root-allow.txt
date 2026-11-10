@@ -17,6 +17,7 @@ AUDIT.adoc
 EXPLAINME.adoc
 AFFIRMATION.adoc           # dated/signed honesty snapshot (README/EXPLAINME/AFFIRMATION trio)
 0-AI-MANIFEST.a2ml         # thin pointer to .machine_readable/0.1-AI-MANIFEST.a2ml
+systemet_chora.deed        # DRAFT (Slice-2 prep): the canonical <repo>_chora.deed root home per the estate deed model. Carries the RULED-family translation (CLADE, AGENTIC/NEUROSYM/PLAYBOOK) of the 6a2 descriptiles; lint-clean against standards deed.abnf. Inert — the 6a2 a2ml stays authoritative until the migration wave + kyX land.
 GOVERNANCE.adoc            # governance model (validator accepts root or docs/governance/)
 MAINTAINERS.adoc           # maintainer roster
 CONTRIBUTING.md            # REQUIRED AT ROOT by scorecard-enforcer/openssf-compliance/quality CI (test -f, no .github fallback). The fuller copy in .github/ is GitHub's auto-discovery convention; dedupe is an owner decision (would need those CI checks updated to accept .github/).
