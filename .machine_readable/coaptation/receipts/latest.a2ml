@@ -5,14 +5,14 @@
 
 [receipt]
 schema = "hyperpolymath.coaptation/1"
-repo = "rsr-template-repo"
-band = "amber"
-proposed-action = "advisory — soft drift within bands (posture/intend). Open an advisory issue; no re-anchor."
+repo = "systemet"
+band = "green"
+proposed-action = "none — the descriptile self-model coapts with the contractile set-point within tolerance."
 
 [coverage]
-clauses-total = 50
-descriptile-witnessed = 3
-probe-deferred-to-hunt = 22
+clauses-total = 40
+descriptile-witnessed = 4
+probe-deferred-to-hunt = 16
 must-trust-unmeasured-gaps = 0
 note = "Yard sees descriptile evidence only; probe-deferred obligations need a Hunt-tier run for a full hard-gate."
 
@@ -21,13 +21,13 @@ grade = "boolean_gate / boolean_gate_provenance"
 witnessed = 3
 refuted = 0
 unmeasured-gaps = 0
-probe-deferred = 22
+probe-deferred = 16
 gate = "pass"
 
 [reading.adjust]
 grade = "posture (advisory; accessibility / inclusive design)"
-satisfied = "0/1"
-posture-ok = false
+satisfied = "1/1"
+posture-ok = true
 
 [reading.intend]
 grade = "tropical (min-plus distance-to-north-star; wishes excluded)"
@@ -47,10 +47,6 @@ items = 7
 intend.repo-initialization = intent:done
 intend.contractile-completeness = intent:in_progress
 intend.automation-scripts = intent:in_progress
-intend.cross-repo-validation = wish:declared
-intend.automated-substitution = wish:declared
-intend.formal-verification = wish:declared
-intend.ecosystem-visualization = wish:declared
 must.license-present = probe-deferred
 must.readme-present = probe-deferred
 must.security-policy = probe-deferred
@@ -67,16 +63,10 @@ must.no-placeholder-values = probe-deferred
 must.template-readonly = probe-deferred
 must.no-untracked-contractiles = probe-deferred
 must.signed-commits = probe-deferred
-trust.no-secrets-committed = probe-deferred
-trust.no-private-keys = probe-deferred
-trust.no-tokens-in-source = probe-deferred
-trust.author-correct = probe-deferred
-trust.license-content = probe-deferred
+trust.Secrets = probe-deferred
 trust.template-files-readonly = probe-deferred
 trust.trust-deny-areas = probe-deferred
-trust.container-images-pinned = probe-deferred
-trust.no-dockerfile = probe-deferred
-adjust.placeholder-drift = refuted
+adjust.placeholder-drift = witnessed
 adjust.template-version-drift = unmeasured
 adjust.readme-completeness = unmeasured
 adjust.example-accuracy = unmeasured
@@ -96,5 +86,5 @@ bust.sync-drift-between-repos = latent
 bust.contractile-parse-error = latent
 
 [provenance]
-contractiles = "intend@b5248bb14c9b must@33da3ab3f01b trust@32805d174f53 adjust@8faad9ca0650 dust@8ce4f3c1efa0 bust@dd6a53e1fc9b"
-descriptiles = "clade@b974798d108a state@9fbef88c72f8 ecosystem@1c30abd8f618 agentic@d72859864bbe anchor@8b66b03d7736"
+contractiles = "intend@b5248bb14c9b must@fbbcf90bc87f trust@32805d174f53 adjust@8faad9ca0650 dust@e51524e429fe bust@dd6a53e1fc9b"
+descriptiles = "clade@013d0d082ec8 deed@a51b6a2a6e3f ecosystem@76e3322ff788 agentic@d72859864bbe anchor@8ba91a3c1fd1"
