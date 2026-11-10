@@ -97,7 +97,7 @@ Not proved in Stage 3: evaluation of a typed erased term gives a value of its er
 
 Not available. W is not decided after Stage 3.
 
-One result of Stage 2 already limits W (finding F8).
+One result of Stage 2 bears on W (finding F8).
 In the target, `Proxy Int` and `Proxy Bool` are not representationally equivalent when `Proxy` is a generative constant.
 GHC accepts a coercion between them, because the parameter of `Proxy` is phantom.
 Stage 4 must show whether this gives a source program with no translation.
@@ -161,12 +161,15 @@ With the lawful table the result is unsound: kinding accepts the grade phantom f
 With the GHC table the same function is rejected at each grade below nominal (`Wager.Proofs.ghc-rejects-deep`).
 
 *Part 3: the decision.*
-The lawful table is the sound table for systemet, under one condition: no generative constant has a phantom parameter.
+The lawful table is the sound table for systemet, for a signature that satisfies `Valid`: each constant and each primitive respects its declared grade.
+`Wager.Role.Lawful.valid-lawful` gives a sufficient condition with 2 parts: no generative constant has a phantom parameter, and each primitive has the grade nominal.
+The first part alone is not proved to be sufficient, because `Valid` also has a condition on each primitive.
 Conversion sees the argument of a generative constant, so the parameter is used. The grade `0` means "not used".
-With this condition, systemet cannot type some phantom coercions (finding F8).
+With `Proxy` declared representational, `Proxy Int` and `Proxy Bool` are not related by `≈` (finding F8).
 
 The law set does not need a change.
-The third finding that the task names, two notions of use, is the smallest change that gives the phantom coercions back (finding F9).
+The third finding that the task names, two notions of use, is a candidate for the phantom coercions (finding F9).
+Stage 2 proved the laws of the candidate only. It did not prove that the candidate gives the phantom coercions back, and it did not prove that no smaller change exists.
 
 == Findings
 
@@ -198,17 +201,18 @@ The third finding that the task names, two notions of use, is the smallest chang
   It is false in `Affine` with the systemet order (`0 ≤ 0 + 1` is false).
 
 | F7
-| A generative constant cannot have a phantom parameter in a signature that respects its grades (`Wager.Proofs.phantom-constant-not-valid`).
+| The signature of Stage 2 with `Proxy` declared phantom does not respect its grades (`Wager.Proofs.phantom-constant-not-valid`).
   A nominal observer tells `Proxy Int` from `Proxy Bool`.
+  The same argument applies to each generative constant with a phantom parameter. Agda checked this one signature only.
 
 | F8
-| systemet cannot type some phantom coercions.
-  With `Proxy` declared representational the signature is valid, and `Proxy Age ≈ Proxy Int` holds.
-  But `Proxy Int` and `Proxy Bool` are not equivalent (`Wager.Proofs.no-phantom-coercion`).
+| With `Proxy` declared representational the signature is valid, and `Proxy Age ≈ Proxy Int` holds.
+  But `Proxy Int` and `Proxy Bool` are not related by `≈` (`Wager.Proofs.no-phantom-coercion`). GHC accepts a coercion between them.
+  This result is about the relation `≈` only. It does not show that no term of the target calculus can do this coercion. Stage 4 decides that.
 
 | F9
 | Two notions of use. A 4-point structure with a separate grade "absent" for `0` has all 15 law fields and the GHC rule `nominal · phantom = nominal` (`Wager.Proofs.role4-lawful`, `Wager.Proofs.role4-has-ghc-rule`).
-  This is the candidate that gives the phantom coercions back without a change of the law set.
+  This is a candidate for the phantom coercions without a change of the law set. Stage 2 did not prove that it gives them back.
   It needs a larger `≈` (a constant with a phantom parameter ignores its argument) and a weaker phantom part of T2 (`≈` in place of `≡`).
   Stage 2 proved the laws only. It did not build kinding or noninterference for this structure. The owner decides.
 
