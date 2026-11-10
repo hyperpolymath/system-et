@@ -92,3 +92,8 @@ verification/proofs/agda|Wager/Poly/Role.agda|gated|Stage 8: noninterference for
 verification/proofs/agda|Wager/Poly/IdentityStatements.agda|gated|Stage 8: 2 statements about the identity family and open types (types only)
 verification/proofs/agda|Wager/Poly/IdentityRigid.agda|gated|Stage 8: in the signature with an identity family, no open type with 1 type variable has the evidence types or the GADT data type as its instances
 verification/proofs/agda|Wager/Examples/Stage8.agda|gated|Stage 8: accepted and rejected examples for open terms, open coercions, the role of a type variable and the identity family
+verification/proofs/agda|Wager/Top/Translation.agda|gated|Side item after Stage 8: the translation of Stage 4 with a grade q on each arrow and each binder of a source function (definitions only)
+verification/proofs/agda|Wager/Top/Statements.agda|gated|Side item after Stage 8: 7 statements about the variant with a grade q; one is the candidate of the owner, to prove or to refute (types only)
+verification/proofs/agda|Wager/Top/AffineStatements.agda|gated|Side item after Stage 8: 2 statements in the algebra {0,1,omega} with q = omega (types only)
+verification/proofs/agda|Wager/Top/Proofs.agda|gated|Side item after Stage 8: a coercion is typed for each q; a term with no pair elimination and no case is typed for a top grade q; one erasure with Stage 4, so T5 behaviour and T6 hold for the variant
+verification/proofs/agda|Wager/Top/Affine.agda|gated|Side item after Stage 8: in {0,1,omega} with q = omega the candidate is false for the whole fragment (checked counterexample); accepted and rejected examples

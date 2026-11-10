@@ -81,6 +81,8 @@ import Wager.Poly.Proofs
 import Wager.Poly.CoercionProofs
 import Wager.Poly.Role
 import Wager.Poly.IdentityRigid
+import Wager.Top.Proofs
+import Wager.Top.Affine
 
 module _ where
   open T1-Statements
@@ -411,3 +413,40 @@ module _ (B₀ L₀ : Type) (ty₀ : L₀ → B₀) {R : Type} (ops : GradeOps R
 
   t8-gadt-not-open : T8-Gadt-Not-Open
   t8-gadt-not-open = IR.t8-gadt-not-open
+
+------------------------------------------------------------------------
+-- SIDE ITEM AFTER STAGE 8
+------------------------------------------------------------------------
+
+module _ (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+         {R : Type} (ops : GradeOps R) (q : R) where
+  open Top-Statements SS Sc ops q
+  private module TP = Wager.Top.Proofs SS Sc ops q
+
+  top-coercion-typed : Top-Coercion-Typed
+  top-coercion-typed = TP.top-coercion-typed
+
+  top-coerce-typed : Top-Coerce-Typed
+  top-coerce-typed = TP.top-coerce-typed
+
+  top-typing : Top-Typing
+  top-typing = TP.top-typing
+
+  top-same-erasure : Top-Same-Erasure
+  top-same-erasure = TP.top-same-erasure
+
+  top-behaviour : Top-Behaviour
+  top-behaviour = TP.top-behaviour
+
+  top-nominal : Top-Nominal
+  top-nominal = TP.top-nominal
+
+module _ where
+  open Top-Affine-Statements
+
+  omega-is-top : Omega-Is-Top
+  omega-is-top = Wager.Top.Affine.omega-is-top
+
+  -- The candidate `Top-Typing-All` is false in the algebra {0, 1, ω}.
+  top-typing-all-fails : Top-Typing-All-Fails
+  top-typing-all-fails = Wager.Top.Affine.top-typing-all-fails

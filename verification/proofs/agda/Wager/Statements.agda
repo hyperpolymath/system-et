@@ -62,6 +62,8 @@ import Wager.Poly.Statements
 import Wager.Poly.CoercionStatements
 import Wager.Poly.RoleStatements
 import Wager.Poly.IdentityStatements
+import Wager.Top.Statements
+import Wager.Top.AffineStatements
 
 ------------------------------------------------------------------------
 -- STAGE 1
@@ -891,3 +893,27 @@ module T8-Identity-Statements
   (B₀ L₀ : Type) (ty₀ : L₀ → B₀) {R : Type} (ops : GradeOps R) (b₀ : B₀) where
   open Wager.Poly.IdentityStatements B₀ L₀ ty₀ ops b₀ public
     using (Gᵍ; T8-Evidence-Rigid; T8-Gadt-Not-Open)
+
+------------------------------------------------------------------------
+-- SIDE ITEM AFTER STAGE 8: a top grade in the place of an unrestricted 𝟙
+------------------------------------------------------------------------
+
+-- The variant of the translation of Stage 4 with a grade q on each
+-- arrow and on each binder of a source function (`Wager/Top`). The
+-- statements are in `Wager.Top.Statements`, each with its
+-- plain-English reading. This section adds no statement.
+--
+-- English: `Top-Typing-All` is the candidate "a top grade q is enough
+-- for each program". It is a statement to refute, and
+-- `Top-Typing-All-Fails` is its negation in the algebra {0, 1, ω} with
+-- q = ω. `Top-Typing` is the candidate for a term with no elimination
+-- of a pair and no `case`.
+module Top-Statements
+  (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+  {R : Type} (ops : GradeOps R) (q : R) where
+  open Wager.Top.Statements SS Sc ops q public
+    using ( IsTop; Top-Coercion-Typed; Top-Coerce-Typed; Top-Typing-All; Top-Typing
+          ; Top-Same-Erasure; Top-Behaviour; Top-Nominal )
+
+module Top-Affine-Statements where
+  open Wager.Top.AffineStatements public using (Omega-Is-Top; Top-Typing-All-Fails)

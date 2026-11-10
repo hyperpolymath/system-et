@@ -96,3 +96,8 @@ import Wager.Poly.Role
 import Wager.Poly.IdentityStatements
 import Wager.Poly.IdentityRigid
 import Wager.Examples.Stage8
+import Wager.Top.Translation
+import Wager.Top.Statements
+import Wager.Top.AffineStatements
+import Wager.Top.Proofs
+import Wager.Top.Affine

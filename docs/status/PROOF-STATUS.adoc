@@ -13,7 +13,7 @@ summary from the per-prover MANIFESTs and fails if this file disagrees.
 // Machine-readable ground-truth markers — checked by scripts/check-proof-status.sh.
 // Do not edit by hand without changing the MANIFEST accordingly.
 // gate:lean4 gated=20 quarantined=0
-// gate:agda gated=91 quarantined=0
+// gate:agda gated=96 quarantined=0
 
 == Summary
 
@@ -211,6 +211,15 @@ no file uses coinduction. One warning class is silenced
   signature with an identity family, no open type with 1 type variable has
   the data type of the GADT program as its instances. There is no source
   program with type variables and no theorem as T5 for one
+
+| 8, side item
+| A variant of the translation with a grade q on each arrow and each
+  binder of a source function. `Wager.Proofs.top-typing`,
+  `top-coercion-typed`, `top-same-erasure`, `top-behaviour`, `top-nominal`,
+  `top-typing-all-fails`
+| *Proven* for a top grade q and a source term with no elimination of a
+  pair and no `case`. *Refuted* for the whole fragment: a checked
+  counterexample in the algebra `{0, 1, ω}` with q = ω
 |===
 
 == Mechanization slots
