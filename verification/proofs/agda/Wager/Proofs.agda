@@ -77,6 +77,10 @@ import Wager.Local.Separation
 import Wager.Identity.Family
 import Wager.Identity.Soundness
 import Wager.Univalent.CrossCheck
+import Wager.Poly.Proofs
+import Wager.Poly.CoercionProofs
+import Wager.Poly.Role
+import Wager.Poly.IdentityRigid
 
 module _ where
   open T1-Statements
@@ -334,3 +338,76 @@ module _ (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
 
   coerce-function-is-transport : Coerce-Function-Is-Transport
   coerce-function-is-transport = CC.coerce-function-is-transport
+
+------------------------------------------------------------------------
+-- STAGE 8
+------------------------------------------------------------------------
+
+module _ (S : Sig) (TS : Wager.L2.Signature.TSig S) (ops : GradeOps (Sig.TG S)) where
+  open T8-Statements S TS ops
+  private module P = Wager.Poly.Proofs S TS ops
+
+  t8-conv : T8-Conv
+  t8-conv = P.t8-conv
+
+  t8-inst : T8-Inst
+  t8-inst = P.t8-inst
+
+  t8-closed : T8-Closed
+  t8-closed = P.t8-closed
+
+  t8-closed-instance : T8-Closed-Instance
+  t8-closed-instance = P.t8-closed-instance
+
+  -- Progress uses the operations only, and no law.
+  t8-instance-progress : T8-Instance-Progress
+  t8-instance-progress = P.t8-instance-progress
+
+  t8-instance-preservation : T8-Instance-Preservation
+  t8-instance-preservation = P.t8-instance-preservation
+
+module _ (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+         {R : Type} (ops : GradeOps R) where
+  open T8-Coercion-Statements SS Sc ops
+  private module CP8 = Wager.Poly.CoercionProofs SS Sc ops
+
+  t8-type-instance : T8-Type-Instance
+  t8-type-instance = CP8.t8-type-instance
+
+  t8-coercion-typed : T8-Coercion-Typed
+  t8-coercion-typed = CP8.t8-coercion-typed
+
+  t8-coercion-instance : T8-Coercion-Instance
+  t8-coercion-instance = CP8.t8-coercion-instance
+
+  t8-ops-rigid : T8-Ops-Rigid
+  t8-ops-rigid = CP8.t8-ops-rigid
+
+  t8-no-uniform-unwrap : T8-No-Uniform-Unwrap
+  t8-no-uniform-unwrap = CP8.t8-no-uniform-unwrap
+
+module _ (RS : RoleSig) where
+  open T8-Role-Statements RS
+  private module PR = Wager.Poly.Role RS
+
+  t8-role : (T : RoleTable) → ForTable.T8-Role T
+  t8-role T = PR.ForTableProofs.t8-role T
+
+  t8-role-representational : T8-Role-Representational
+  t8-role-representational = PR.LawfulProofs.t8-role-representational
+
+  t8-role-phantom : T8-Role-Phantom
+  t8-role-phantom = PR.LawfulProofs.t8-role-phantom
+
+  t8-role-nominal : T8-Role-Nominal
+  t8-role-nominal = PR.LawfulProofs.t8-role-nominal
+
+module _ (B₀ L₀ : Type) (ty₀ : L₀ → B₀) {R : Type} (ops : GradeOps R) (b₀ : B₀) where
+  open T8-Identity-Statements B₀ L₀ ty₀ ops b₀
+  private module IR = Wager.Poly.IdentityRigid B₀ L₀ ty₀ ops b₀
+
+  t8-evidence-rigid : T8-Evidence-Rigid
+  t8-evidence-rigid = IR.t8-evidence-rigid
+
+  t8-gadt-not-open : T8-Gadt-Not-Open
+  t8-gadt-not-open = IR.t8-gadt-not-open

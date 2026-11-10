@@ -84,3 +84,15 @@ import Wager.Examples.Stage6Identity
 import Wager.Univalent.Model
 import Wager.Univalent.CrossCheck
 import Wager.Examples.Stage7
+import Wager.Poly.Term
+import Wager.Poly.Typing
+import Wager.Poly.Statements
+import Wager.Poly.Proofs
+import Wager.Poly.Coercion
+import Wager.Poly.CoercionStatements
+import Wager.Poly.CoercionProofs
+import Wager.Poly.RoleStatements
+import Wager.Poly.Role
+import Wager.Poly.IdentityStatements
+import Wager.Poly.IdentityRigid
+import Wager.Examples.Stage8

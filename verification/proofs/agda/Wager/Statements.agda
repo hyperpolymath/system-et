@@ -58,6 +58,10 @@ import Wager.Local.Gadt
 import Wager.Identity.Family
 import Wager.Identity.Typing
 import Wager.Univalent.Model
+import Wager.Poly.Statements
+import Wager.Poly.CoercionStatements
+import Wager.Poly.RoleStatements
+import Wager.Poly.IdentityStatements
 
 ------------------------------------------------------------------------
 -- STAGE 1
@@ -839,3 +843,51 @@ module Stage7-Statements
   Coerce-Function-Is-Transport =
     (wr : WellRoled) → ∀ {τ σ} (γ : Co rep τ σ) {n} {ρ : UEnv n} →
     Real (arr 𝟙 (T τ) (T σ)) ρ (eraseT (coerceT γ)) (transport (pathOf wr γ))
+
+------------------------------------------------------------------------
+-- STAGE 8
+------------------------------------------------------------------------
+
+-- Stage 8 gives a term of the target a context Δ of type variables.
+-- There is no quantifier. The statements are in the 4 statement modules
+-- of `Wager/Poly`, each with its plain-English reading. This section
+-- gives them their place in this file. It adds no statement.
+
+-- English: conversion is stable under a substitution of types; each
+-- instance of a typed open term is typed; a typed term with no type
+-- variable is a typed term of the target of stages 1 to 5; so each
+-- closed instance is a typed term of the target, and progress and
+-- preservation (T0) apply to it.
+module T8-Statements
+  (S : Sig) (TS : Wager.L2.Signature.TSig S) (ops : GradeOps (Sig.TG S)) where
+  open Wager.Poly.Statements S TS ops public
+    using ( T8-Conv; T8-Inst; T8-Closed
+          ; T8-Closed-Instance; T8-Instance-Progress; T8-Instance-Preservation )
+
+-- English: the translation of an open coercion is one typed open
+-- function; each closed instance of it is the closed coercion function
+-- of Stage 4; instantiation does not change a trope operation, so no
+-- open term is the unwrap of a newtype at each instance of a type
+-- variable.
+module T8-Coercion-Statements
+  (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+  {R : Type} (ops : GradeOps R) where
+  open Wager.Poly.CoercionStatements SS Sc ops public
+    using ( T8-Type-Instance; T8-Coercion-Typed; T8-Coercion-Instance
+          ; T8-Ops-Rigid; T8-No-Uniform-Unwrap )
+
+-- English: noninterference (T2) for a type with free type variables,
+-- at the grade of each variable in the kinding context.
+module T8-Role-Statements (RS : RoleSig) where
+  module ForTable (T : RoleTable) where
+    open Wager.Poly.RoleStatements.ForTable RS T public using (T8-Role)
+  open Wager.Poly.RoleStatements.Lawful RS public
+    using (T8-Role-Representational; T8-Role-Phantom; T8-Role-Nominal)
+
+-- English: in the signature with an identity family, no open type with
+-- one type variable has the evidence types, or the data type of the
+-- GADT program, as its instances.
+module T8-Identity-Statements
+  (B₀ L₀ : Type) (ty₀ : L₀ → B₀) {R : Type} (ops : GradeOps R) (b₀ : B₀) where
+  open Wager.Poly.IdentityStatements B₀ L₀ ty₀ ops b₀ public
+    using (Gᵍ; T8-Evidence-Rigid; T8-Gadt-Not-Open)
