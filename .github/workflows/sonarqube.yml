@@ -1,12 +1,22 @@
-# This workflow is managed by gh actions-lock.
 # SPDX-License-Identifier: MPL-2.0
+# This workflow is managed by gh actions-lock.
 # This workflow is managed by gh actions-lock.
 # This workflow is managed by gh actions-lock.
 # SonarQube Cloud (SonarCloud) static analysis. Analysis scope + exclusions live
 # in sonar-project.properties. Requires the SONAR_TOKEN repository secret
 # (Settings -> Secrets and variables -> Actions) and a SonarCloud project:
-# https://sonarcloud.io/project/overview?id=hyperpolymath_rsr-template-repo
+# https://sonarcloud.io/project/overview?id=hyperpolymath_systemet
 # Mirrors the boj-server arrangement.
+#
+# The token guard is the guard of `sonarqube.yml` in the estate template
+# (hyperpolymath/rsr-template-repo, added there on 2026-07-28).
+# With no SONAR_TOKEN secret, `secrets.SONAR_TOKEN` is the empty string, and the
+# scanner fails with "Not authorized or organization not found". That failure
+# says nothing about the code: the scan did not run.
+# With the guard, the job says that the scan is not configured, and it exits
+# with 0. When a SONAR_TOKEN secret exists, the scan runs, with no edit of this
+# file. The automatic analysis of SonarCloud (the check "SonarCloud Code
+# Analysis") does not use this workflow.
 name: SonarQube
 on:
   push:
@@ -25,11 +35,33 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - name: Report configuration state
+        id: cfg
+        # A job-level `if:` cannot read a secret. This step reads the token
+        # and gives the result to the steps after it. The token is in the
+        # environment of this step and of the scan step only.
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        # The script of this step is Bash. `shell: bash` says so in the step:
+        # a default shell or a runner with a different shell cannot change it.
+        shell: bash
+        run: |
+          if [ -z "${SONAR_TOKEN}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::SONAR_TOKEN is not configured for this repository - skipping the CI-based scan."
+            echo "SonarCloud automatic analysis (check: 'SonarCloud Code Analysis') is unaffected."
+            echo "To enable this scan: Settings > Secrets and variables > Actions > new secret SONAR_TOKEN."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "SONAR_TOKEN present - running the CI-based scan."
+          fi
       - name: Checkout
+        if: steps.cfg.outputs.configured == 'true'
         uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0   # full history for accurate new-code detection
       - name: SonarQube Scan
+        if: steps.cfg.outputs.configured == 'true'
         uses: SonarSource/sonarqube-scan-action@v8.4.1
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
