@@ -122,7 +122,7 @@ m%"
 
 [receipt]
 schema = "hyperpolymath.coaptation/1"
-repo = "rsr-template-repo"
+repo = "%{(lookup "clade.canonical-name").value}"
 band = "%{band}"
 proposed-action = "%{action}"
 
