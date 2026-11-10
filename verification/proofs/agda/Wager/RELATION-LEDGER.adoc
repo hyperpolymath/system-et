@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: relation ledger
-Status: Stage 6, part 2. Each later stage adds its entries in the same commit as its rules.
+Status: Stage 7 (the last stage). Each stage added its entries in the same commit as its rules.
 :toc: left
 :sectnums:
 
@@ -231,6 +231,20 @@ EQUALITY EVIDENCE IS NOW A TERM (DC-6.5).
 
 `keepⁱ` and `eraseⁱ` (`Wager.Identity.Term`) are functions. They are not relations.
 The statements of T7, part 2 use the evaluation of untyped terms (R16) and observational equality (R18).
+== Stage 7 (the optional cross-check)
+
+[cols="1,3,2,5",options="header"]
+|===
+| Id | Agda identifier | Class | Notes
+
+| R25
+| `𝓡`, `Real` and `Denotes` in `Wager.Univalent.Model` (with `RLit`, `RFun`, `RPair`, `RSum`)
+| specification only
+| Realisability: an untyped value realises an element of the interpretation of a closed target type in the cubical universe. `Denotes` says that a term transformer denotes a function of the model.
+  No typing rule and no kinding rule uses these relations. They are in the statements of Stage 7 only.
+|===
+
+`⟦_⟧`, `pathOf` and `unboxEquiv` (`Wager.Univalent.Model`) are a function, a path and an equivalence. They are not relations.
 == What is absent
 
 * The target calculus has no coercion relation and no cast judgement. The coercion relation `Co` (R14) is in the source calculus only. The translation of Stage 4 makes each representational coercion a term of the target, with no new judgement.

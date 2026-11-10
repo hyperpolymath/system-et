@@ -76,6 +76,7 @@ import Wager.Trans.Nominal
 import Wager.Local.Separation
 import Wager.Identity.Family
 import Wager.Identity.Soundness
+import Wager.Univalent.CrossCheck
 
 module _ where
   open T1-Statements
@@ -313,3 +314,23 @@ module _ (S : Sig) (TS : Wager.L2.Signature.TSig S) (ops : GradeOps (Sig.TG S))
 
   t7-assumption : T7-Assumption
   t7-assumption = Snd.assumption
+
+------------------------------------------------------------------------
+-- STAGE 7
+------------------------------------------------------------------------
+
+module _ (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+         {R : Type} (A : GradeAlgebra R)
+         (El : SSig.Base SS → Type)
+         (elLit : (ℓ : SSig.Lit SS) → El (SSig.litTy SS ℓ)) where
+  open Stage7-Statements SS Sc A El elLit
+  private module CC = Wager.Univalent.CrossCheck SS Sc A El elLit
+
+  coercion-denotes-transport : Coercion-Denotes-Transport
+  coercion-denotes-transport = CC.coercion-denotes-transport
+
+  coercion-denotes-transport-back : Coercion-Denotes-Transport-Back
+  coercion-denotes-transport-back = CC.coercion-denotes-transport-back
+
+  coerce-function-is-transport : Coerce-Function-Is-Transport
+  coerce-function-is-transport = CC.coerce-function-is-transport

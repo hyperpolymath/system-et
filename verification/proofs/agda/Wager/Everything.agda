@@ -82,3 +82,5 @@ import Wager.Identity.Soundness
 import Wager.Identity.Instance
 import Wager.Examples.Stage6Identity
 import Wager.Univalent.Model
+import Wager.Univalent.CrossCheck
+import Wager.Examples.Stage7

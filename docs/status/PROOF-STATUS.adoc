@@ -13,7 +13,7 @@ summary from the per-prover MANIFESTs and fails if this file disagrees.
 // Machine-readable ground-truth markers — checked by scripts/check-proof-status.sh.
 // Do not edit by hand without changing the MANIFEST accordingly.
 // gate:lean4 gated=20 quarantined=0
-// gate:agda gated=77 quarantined=0
+// gate:agda gated=79 quarantined=0
 
 == Summary
 
@@ -24,7 +24,7 @@ summary from the per-prover MANIFESTs and fails if this file disagrees.
 | ET obligations (DOM — the theory itself) | 15 | 2 | 2 | 11
 | MECH-1: L1 conversion, Lean4 (covers ET-1, ET-2, part of ET-3) | 1 | — | in progress | —
 | MECH-2: L2 grade algebras, Lean4 (covers ET-4, ET-5) | 1 | 1 | — | —
-| WAGER: the wager experiment for coercions and roles, Cubical Agda (claims no ET obligation) | 1 | - | in progress | -
+| WAGER: the wager experiment for coercions and roles, Cubical Agda (claims no ET obligation; stages 0 to 7 are done; 2 decisions are with the owner) | 1 | 1 | - | -
 |===
 
 The Done/In-progress claims above are scoped to the *mechanized core
@@ -183,8 +183,15 @@ no file uses coinduction. One warning class is silenced
   The owner decides if it is inside the wager
 
 | 7
-| the optional cross-check
-| not attempted
+| The optional univalent cross-check. `Wager.Proofs.coercion-denotes-transport`,
+  `coercion-denotes-transport-back`, `coerce-function-is-transport` : in a
+  realisability model of the target types in the cubical universe, where a
+  newtype instance is a wrapper that is equivalent to its content, the
+  translation of each representational coercion denotes transport along a
+  path made with `ua`
+| *Proven*, for each source signature that passes the role check. The
+  denotation is by realisers: the development has no denotation of each
+  typed term
 |===
 
 == Mechanization slots

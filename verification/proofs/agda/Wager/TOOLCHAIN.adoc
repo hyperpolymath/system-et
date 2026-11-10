@@ -388,3 +388,39 @@ The second and the third test show that the proof of `T7-Erasure` depends on the
 
 The fourth test has a second part. With the grade `𝟙` in the rule, sections 1 to 4 of `Wager.Identity.Soundness` were checked alone: they pass. These are the embedding of the target, `intro`, `fund`, `erasure-sound`, `erasure-sound-fo` and `canonicity`. Section 5 (`cast-free`, `assumption`) does not pass.
 The behaviour statements of part 2 thus do not depend on the grade of the rule, and the grade statements do (DC-6.7).
+
+=== Gate watch at the end of Stage 7 (the optional cross-check)
+
+A clean build of `Wager/Everything.agda` (79 modules) takes about 48 seconds and prints no warning.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/Examples/Stage7.agda`: a false lemma (transport along the path of `Age ~ Int` gives 8 from `box 7`)
+| `[UnequalTerms]` in `age-transport`
+| FAIL
+
+| `Wager/Univalent/Model.agda`: a wrapper has no realiser
+| `[UnequalTerms]` in `Wager.Univalent.CrossCheck.step-den`
+| FAIL
+
+| `Wager/Univalent/Model.agda`: the path of a pair coercion uses the path of its first part two times
+| `[UnequalTerms]` in `pathAt`
+| FAIL
+
+| `Wager/Examples/Stage7.agda`: the model gives the number 8 to the literal `ℓint`
+| `[UnequalTerms]` in `age-literal`
+| FAIL
+
+| `Wager/Univalent/CrossCheck.agda`: `postulate cross-check-bad : ⊥`
+| `[SafeFlagPostulate]`. `scan-dangerous.sh` also fails.
+| FAIL
+
+| All changes removed
+| None
+| PASS, 79 files
+|===
+
+The second test shows that the proof depends on the rule "a wrapper is not seen at run time".
+The third test fails in the model, before the proof: a wrong path does not have the type of a path between the two interpretations.

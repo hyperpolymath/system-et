@@ -132,3 +132,7 @@ The difference between the target and the extension:
 
 `T7-Grade` and `T7-Assumption` have the hypothesis `GradeLaws`. Their proofs use the laws `zero-mul`, `add-comm` and `add-zero`. It is a hypothesis of a theorem and not a side condition of a rule, so it is not an entry of this ledger.
 The other statements of part 2 hold for each set of grade operations.
+
+== Stage 7
+
+Stage 7 adds no typing rule and no kinding rule to the target calculus. The cross-check is a statement about a model of the target of Stage 4.
