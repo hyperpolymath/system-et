@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: rule-diff ledger
-Status: Stage 1. *The ledger is empty.*
+Status: Stage 2. *The ledger is empty.*
 :toc: left
 :sectnums:
 
@@ -54,3 +54,14 @@ The evidence is structural, and Agda checks it.
 They are data of the signature, not of a rule.
 A later stage chooses these entries for a specific algebra.
 If a theorem then needs a condition on the entries, `VERDICT.adoc` records the condition with the class "signature primitive".
+
+== Stage 2
+
+Stage 2 adds no typing rule and no kinding rule. The kinding judgement of Stage 1 is used with the role tables as it is.
+
+The signature of Stage 2 (`Wager.Role.Classic`) has entries that name grades: each primitive has the grade `nom`, the newtype state `age` has the grade `rep`.
+These are signature entries, not rules.
+
+T2 needs a condition on the entries: the predicate `Valid` of `Wager.Role.Validity`.
+`VERDICT.adoc` records this condition with the class "signature primitive".
+It is not an entry of this ledger, because no rule has a side condition.

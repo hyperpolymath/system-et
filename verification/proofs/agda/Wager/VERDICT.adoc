@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: verdict
-Status: DRAFT after Stage 1. This file becomes final after the last stage.
+Status: DRAFT after Stage 2. This file becomes final after the last stage.
 :toc: left
 :sectnums:
 
@@ -17,10 +17,27 @@ Status: DRAFT after Stage 1. This file becomes final after the last stage.
   Each holds for each signature, each term signature and each `GradeAlgebra` on the term grades.
   The statements are in `Wager.Statements.T0-Statements`. No statement changed.
 
-| T1 | NOT ATTEMPTED | Stage 2 is not started.
-| T2 | NOT ATTEMPTED | Stage 2 is not started.
+| T1
+| PROVED
+| Lawful table (`nominal · phantom = phantom`): all 15 law fields hold, `Wager.Proofs.t1-lawful`.
+  GHC table (`nominal · phantom = nominal`): 14 law fields hold, `Wager.Proofs.t1-ghc-other-laws`.
+  The law `a · 0 = 0` is false, `Wager.Proofs.t1-ghc-mul-zero-fails`, and it fails at `nominal` only, `Wager.Proofs.t1-ghc-fails-at-nominal-only`.
+  The two results of the preliminary check are confirmed.
+
+| T2
+| PROVED WITH CHANGE (class: signature primitive)
+| `Wager.Proofs.t2-representational`, `Wager.Proofs.t2-phantom`, from `Wager.Proofs.noninterference`.
+  The change: T2 has the hypothesis `Valid`. Each constant and each primitive of the signature must respect its declared grade.
+  The signature of Stage 2 with `proxy` declared representational satisfies the hypothesis (`Wager.Proofs.rep-constant-valid`).
+  Without the hypothesis T2 is false: `Wager.Proofs.t2-phantom-fails-without-valid` is a checked counterexample.
+
 | T3 | NOT ATTEMPTED | Stage 4 is not started.
-| T4 | NOT ATTEMPTED | Stage 2 is not started.
+
+| T4
+| PROVED
+| `Wager.Proofs.t4-kinding-rejects`: the classic function has no kinding derivation at the grade representational, and none at the grade phantom.
+  `Wager.Proofs.t4-not-equivalent`: `Age ≈ Int`, and the results of the function on `Age` and on `Int` are not equivalent.
+
 | T5 | NOT ATTEMPTED | Stage 4 is not started.
 | T6 | NOT ATTEMPTED | Stage 5 is not started.
 | T7 | NOT ATTEMPTED | Stage 6 is not started.
@@ -31,12 +48,17 @@ Stage 1 also proved the L1 equivalence that the task asks for:
 
 == Overall result
 
-Not available. W is not decided after Stage 1.
+Not available. W is not decided after Stage 2.
 
-== Ledgers after Stage 1
+One result of Stage 2 already limits W (finding F8).
+In the target, `Proxy Int` and `Proxy Bool` are not representationally equivalent when `Proxy` is a generative constant.
+GHC accepts a coercion between them, because the parameter of `Proxy` is phantom.
+Stage 4 must show whether this gives a source program with no translation.
 
-* `RELATION-LEDGER.adoc`: no ADDED entry. One entry is "baseline, changed": the kinding judgement has a graded context (R1).
-* `RULE-DIFF-LEDGER.adoc`: empty.
+== Ledgers after Stage 2
+
+* `RELATION-LEDGER.adoc`: no ADDED entry. One entry is "baseline, changed": the kinding judgement has a graded context (R1). Stage 2 added two "specification only" entries (`≈`, and the observers with `Valid`).
+* `RULE-DIFF-LEDGER.adoc`: empty. Stage 2 added no rule.
 
 == Answers of Stage 1
 
@@ -52,6 +74,47 @@ The proof of progress uses no law.
 A checker that computes a usage vector is a different matter.
 For `case` it must find one vector that is above the two branch vectors.
 The law set has no operation for this. This development has no such checker and proves nothing about one.
+
+== Answers of Stage 2
+
+=== Which role table is sound in systemet?
+
+The question has three parts.
+
+*Part 1: a signature that respects its grades.*
+Noninterference holds for the lawful table and for the GHC table (`Wager.Proofs.noninterference`).
+The proof does not use the law `a · 0 = 0`.
+The two tables then differ in three points.
+
+[cols="2,3,3",options="header"]
+|===
+| Point | Lawful table | GHC table
+
+| Law set
+| All 15 law fields. T0 applies.
+| `a · 0 = 0` fails. The structure is not a grade algebra.
+
+| A parameter that does not occur, under a nominal function
+| The grade phantom is accepted.
+| The grade phantom is rejected (`Wager.Proofs.ghc-rejects-unused-parameter`). GHC itself gives phantom to such a parameter.
+
+| What the grade phantom gives
+| Equal normal forms for all arguments (`t2-phantom`).
+| Equivalent normal forms only (`Wager.Examples.Stage2.GHC-Examples.ghc-phantom`).
+|===
+
+*Part 2: a generative constant with a parameter that is declared phantom (`Proxy`).*
+Such a signature does not respect its grades, with either table.
+With the lawful table the result is unsound: kinding accepts the grade phantom for `λa. deep (Proxy a)`, and this function maps `Age` and `Int` to types that are not equivalent (`Wager.Proofs.lawful-unsound-with-phantom-constant`).
+With the GHC table the same function is rejected at each grade below nominal (`Wager.Proofs.ghc-rejects-deep`).
+
+*Part 3: the decision.*
+The lawful table is the sound table for systemet, under one condition: no generative constant has a phantom parameter.
+Conversion sees the argument of a generative constant, so the parameter is used. The grade `0` means "not used".
+With this condition, systemet cannot type some phantom coercions (finding F8).
+
+The law set does not need a change.
+The third finding that the task names, two notions of use, is the smallest change that gives the phantom coercions back (finding F9).
 
 == Findings
 
@@ -69,7 +132,7 @@ The law set has no operation for this. This development has no such checker and 
 
 | F3
 | T0 uses the law `a · 0 = 0` (`mul-zero`), in the product of a usage vector with a matrix.
-  A structure that fails this law is outside T0. Stage 2 examines such a structure.
+  The GHC role table fails this law (T1), so T0 does not apply to it.
 
 | F4
 | The stock cubical v0.9 library forces `--guardedness` on each importer (DC-0.2).
@@ -77,18 +140,39 @@ The law set has no operation for this. This development has no such checker and 
 | F5
 | Resolved on 2026-11-10. The owner asked for the repository update, so `docs/status/PROOF-STATUS.adoc` now has the marker line for Agda and a section for the experiment.
   `scripts/check-proof-status.sh` passes. The proofs workflow has an `agda` job, so CI runs the Agda gate.
+
+| F6
+| Noninterference needs `a ≤ a + b`. This holds for roles, because `+` is the maximum. It is not one of the 15 law fields.
+  It is false in `Affine` with the systemet order (`0 ≤ 0 + 1` is false).
+
+| F7
+| A generative constant cannot have a phantom parameter in a signature that respects its grades (`Wager.Proofs.phantom-constant-not-valid`).
+  A nominal observer tells `Proxy Int` from `Proxy Bool`.
+
+| F8
+| systemet cannot type some phantom coercions.
+  With `Proxy` declared representational the signature is valid, and `Proxy Age ≈ Proxy Int` holds.
+  But `Proxy Int` and `Proxy Bool` are not equivalent (`Wager.Proofs.no-phantom-coercion`).
+
+| F9
+| Two notions of use. A 4-point structure with a separate grade "absent" for `0` has all 15 law fields and the GHC rule `nominal · phantom = nominal` (`Wager.Proofs.role4-lawful`, `Wager.Proofs.role4-has-ghc-rule`).
+  This is the candidate that gives the phantom coercions back without a change of the law set.
+  It needs a larger `≈` (a constant with a phantom parameter ignores its argument) and a weaker phantom part of T2 (`≈` in place of `≡`).
+  Stage 2 proved the laws only. It did not build kinding or noninterference for this structure. The owner decides.
 |===
 
 == Changes to theorem statements
 
-None.
+None after a statement was put in `Statements.agda`.
+
+T2 was written with the hypothesis `Valid` from the start of Stage 2. The task text has no such hypothesis. The status of T2 records this.
 
 Process note: the statement `L1-Equality` was put in `Statements.agda` after its proof was complete. It is the statement that the task gives.
-The three T0 statements were put in `Statements.agda`, and committed, before their proofs.
+The statements of T0, T1, T2 and T4 were put in `Statements.agda`, and committed, before their proofs.
 
 == Trust base
 
 * Agda 2.8.0 with `--cubical --safe`, and `agda/cubical` v0.9 (`TOOLCHAIN.adoc`).
 * No `postulate`, no hole, no termination pragma, no positivity pragma.
 * `--guardedness` is on in each file (DC-0.2). No file uses coinduction.
-* One warning is silenced, in 18 files: `UnsupportedIndexedMatch` (DC-0.3).
+* One warning is silenced, in 23 of the 41 files: `UnsupportedIndexedMatch` (DC-0.3).

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: design choices
-Status: entries of Stage 0 and Stage 1.
+Status: entries of Stage 0, Stage 1 and Stage 2.
 :toc: left
 :sectnums!:
 
@@ -68,6 +68,8 @@ A match that needs K is an error, not a warning.
 Thus the Lean proofs that use `castNf_diag` (an equality on `Δ = Δ` closed by `rfl`) cannot be copied directly.
 
 *Alternative.* Leave the warning on. This is honest but makes the output hard to read.
+
+*Audit at the end of Stage 2.* 23 of the 41 files have the line. A test without the line found the warning in each of the 23 files, found no other warning, and found 2 new files that did not need the line.
 
 *Audit at the end of Stage 1.* 18 of the 29 files have the line. A test without the line found the warning in each of the 18 files and found no other warning.
 The test also found 2 files that had the line and did not need it. The line was removed from them.
@@ -190,3 +192,57 @@ On 2026-11-10 the owner asked for the push and for the updates that put the repo
 *Not changed.* `docs/theory/OBLIGATIONS.adoc`, `AFFIRMATION.adoc` and each `.a2ml` file. A new obligation needs an ADR from the owner.
 
 *Reason.* The drift gate compares `PROOF-STATUS.adoc` with the manifests, and the repository rule says that a gated proof must run in CI.
+
+== Stage 2
+
+[[DC-2.1]]
+=== DC-2.1: representational equivalence is on closed normal types
+
+*Choice.* `≈` (`Wager.Role.RepEq`) relates closed normal types of kind `★`.
+It is the least congruence that contains newtype unfolding: `A@s ≈ A` when `s` is a newtype state.
+A role signature (`RoleSig`) says which unary constants are newtype states (`isNewtype`).
+For two types `A` and `B`, "A ≈ B" means `nf A ≈ nf B`.
+
+*Reason.* The task states T2 on normal forms. On normal forms no rule for conversion is needed.
+
+*Consequence.* The congruence rule holds for each constant, also for one that is not a newtype state.
+`Proxy A ≈ Proxy B` thus holds exactly when `A ≈ B`.
+
+[[DC-2.2]]
+=== DC-2.2: observers, and the hypothesis `Valid` of T2
+
+*Choice.* T2 is proved by a relation with an observer role. A nominal observer sees the identity of a type, a representational observer sees a type up to `≈`, a phantom observer sees nothing.
+T2 has the hypothesis `Valid`: each constant and each primitive of the signature respects its declared grade.
+
+*Reason.* The task says that the graded kind of a primitive is declared in the signature, not in a rule.
+A declaration can be wrong. A theorem about kinding must then assume that the declarations are right.
+`Wager.Role.Lawful.valid-lawful` gives a simple sufficient condition: no constant has the grade phantom, and each primitive has the grade nominal.
+
+*Consequence.* `VERDICT.adoc` gives T2 the status "PROVED WITH CHANGE", class "signature primitive".
+
+[[DC-2.3]]
+=== DC-2.3: the composition table is a parameter of noninterference
+
+*Choice.* `Wager.Role.Noninterference` takes a `RoleTable`: a composition with associativity, a right unit and monotonicity.
+The lawful table and the GHC table are instances.
+
+*Reason.* Step 3 of Stage 2 asks which table is sound. One proof for the two tables answers the question for both.
+The proof also uses `a ≤ a + b`. This holds because `+` is the maximum. It is not one of the 15 law fields.
+
+[[DC-2.4]]
+=== DC-2.4: the concrete signature of Stage 2
+
+*Choice.* `Wager.Role.Classic` has the base types Int, Bool, Char, Unit, the newtype state `age` (so `Int@age` is `Age`), the generative constant `proxy`, and two primitives.
+`isAge` tells `Int@age` from `Int`. `deep` inspects the argument of `proxy` with `isAge`.
+The declared grade of the parameter of `proxy` is a parameter of the signature.
+
+*Reason.* The task asks for a test with a generative constant with an unused parameter, below a function that inspects its argument.
+A primitive that inspects the head only cannot see below `proxy`. `deep` can, by the delegation of DC-1.1.
+
+[[DC-2.5]]
+=== DC-2.5: the 4-point role structure is a finding only
+
+*Choice.* `Wager.Role.Role4` proves that a structure with a separate grade "absent" has all 15 law fields and the GHC rule.
+Stage 2 does not build a kinding or a noninterference theorem on it.
+
+*Reason.* T1 names a 3-point carrier with `𝟘 = phantom`. A 4-point carrier changes T1, the relation `≈` and the phantom part of T2. These changes are decisions of the owner.

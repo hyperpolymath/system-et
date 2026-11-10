@@ -13,7 +13,7 @@ summary from the per-prover MANIFESTs and fails if this file disagrees.
 // Machine-readable ground-truth markers — checked by scripts/check-proof-status.sh.
 // Do not edit by hand without changing the MANIFEST accordingly.
 // gate:lean4 gated=20 quarantined=0
-// gate:agda gated=36 quarantined=0
+// gate:agda gated=41 quarantined=0
 
 == Summary
 
@@ -110,8 +110,26 @@ no file uses coinduction. One warning class is silenced
 | `Wager.Proofs.affine-is-grade-algebra`, `level-is-grade-algebra`
 | *Proven* (law checks computed over the finite carriers)
 
-| 2 to 7
-| T1 to T7 of the experiment
+| 2
+| `Wager.Proofs.t1-lawful`, `t1-ghc-other-laws`, `t1-ghc-mul-zero-fails` : roles as a
+  grade structure. The lawful table has all 15 law fields. The GHC table
+  fails `a · 0 = 0`, at nominal only
+| *Proven*
+
+| 2
+| `Wager.Proofs.noninterference`, `t2-representational`, `t2-phantom` : role
+  soundness as noninterference, for a signature that respects its
+  declared grades
+| *Proven* with that hypothesis. Without it the statement is false
+  (`Wager.Proofs.t2-phantom-fails-without-valid`)
+
+| 2
+| `Wager.Proofs.t4-kinding-rejects`, `t4-not-equivalent` : the classic
+  unsound type-level function is rejected at the grade representational
+| *Proven*
+
+| 3 to 7
+| T3, T5, T6, T7 of the experiment
 | not attempted
 |===
 

@@ -37,3 +37,8 @@ verification/proofs/agda|Wager/Role/Signature.agda|gated|Stage 2: signatures wit
 verification/proofs/agda|Wager/Role/RepEq.agda|gated|Stage 2: representational equivalence (specification only)
 verification/proofs/agda|Wager/Role/Validity.agda|gated|Stage 2: observers and the validity of a signature (definitions)
 verification/proofs/agda|Wager/Role/Classic.agda|gated|Stage 2: the concrete signature (Int, Age, Proxy, isAge, deep)
+verification/proofs/agda|Wager/L1/KindingInversion.agda|gated|Stage 2: inversion of graded kinding (for rejected examples)
+verification/proofs/agda|Wager/Role/Noninterference.agda|gated|Stage 2 (T2): noninterference for a composition table and a valid signature
+verification/proofs/agda|Wager/Role/Lawful.agda|gated|Stage 2 (T2): the two parts of T2 with the lawful table; a sufficient condition for validity
+verification/proofs/agda|Wager/Role/ClassicProofs.agda|gated|Stage 2 (T4): the classic unsound program; the Proxy test
+verification/proofs/agda|Wager/Examples/Stage2.agda|gated|Stage 2: accepted and rejected closed examples

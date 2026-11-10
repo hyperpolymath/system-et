@@ -1,8 +1,6 @@
 {-# OPTIONS --cubical --safe #-}
 -- Forced by cubical-0.9 (InfectiveImport). No coinduction is used.
 {-# OPTIONS --guardedness #-}
--- DESIGN-CHOICES.adoc, DC-0.3: matches on kinded syntax.
-{-# OPTIONS -WnoUnsupportedIndexedMatch #-}
 -- SPDX-License-Identifier: MPL-2.0
 --
 -- What it means that a signature respects its declared grades.

@@ -41,3 +41,8 @@ import Wager.Role.Signature
 import Wager.Role.RepEq
 import Wager.Role.Validity
 import Wager.Role.Classic
+import Wager.L1.KindingInversion
+import Wager.Role.Noninterference
+import Wager.Role.Lawful
+import Wager.Role.ClassicProofs
+import Wager.Examples.Stage2

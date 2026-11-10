@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: relation ledger
-Status: Stage 1. Each later stage adds its entries in the same commit as its rules.
+Status: Stage 2. Each later stage adds its entries in the same commit as its rules.
 :toc: left
 :sectnums:
 
@@ -20,8 +20,8 @@ Each entry has one class:
 | ADDED | The relation is not in 00-notation, and a typing or kinding rule uses it.
 |===
 
-An ADDED entry counts against the wager. *Stage 1 has no ADDED entry.*
-Stage 1 has one "baseline, changed" entry (R1). The owner decides how it counts.
+An ADDED entry counts against the wager. *Stages 1 and 2 have no ADDED entry.*
+The ledger has one "baseline, changed" entry (R1). The owner decides how it counts.
 
 == Judgement forms of the target calculus
 
@@ -97,10 +97,28 @@ Stage 1 has one "baseline, changed" entry (R1). The owner decides how it counts.
 | `SubTyping` in `Wager.L2.Substitution`
 | proof-internal
 | Typing of a parallel substitution with a usage matrix. It is a family of R4 judgements.
+
+| R11
+| `_≈_` in `Wager.Role.RepEq` (Stage 2)
+| specification only
+| Representational equivalence on closed normal types: the least congruence that contains newtype unfolding.
+  The statements of T2 and T4 use it. No typing rule and no kinding rule uses it.
+
+| R12
+| `R★` and `Valid` in `Wager.Role.Validity` (Stage 2)
+| specification only
+| `R★ ρ` is what an observer of the role ρ can tell apart: nothing (phantom), types up to `≈` (representational), types up to identity (nominal).
+  `Valid` says that each constant and each primitive of a signature respects its declared grade.
+  The statements of noninterference and of T2 use them. No rule uses them.
+
+| R13
+| `LR`, `EnvLR` in `Wager.Role.Noninterference` (Stage 2)
+| proof-internal
+| The logical relation on closed values, indexed by the role of the observer.
 |===
 
 == What is absent
 
 * There is no coercion relation and no cast judgement.
-* There is no representational equality. Stage 2 adds one as "specification only".
+* Representational equivalence exists as "specification only" (R11). It is not a judgement of the calculus.
 * There is no subtyping relation between types.
