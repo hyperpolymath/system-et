@@ -56,3 +56,10 @@ import Wager.FC.RoleSoundness
 import Wager.FC.Erasure
 import Wager.FC.ClassicProofs
 import Wager.Examples.Stage3
+import Wager.FC.Tagged
+import Wager.Erased.LogRel
+import Wager.Trans.Scheme
+import Wager.Trans.Target
+import Wager.Trans.Nominal
+import Wager.Trans.Coercion
+import Wager.Trans.TwoState

@@ -15,7 +15,7 @@ module Wager.Statements where
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Data.Sigma using (_×_; Σ-syntax)
-open import Cubical.Data.Sum.Base using (_⊎_)
+open import Cubical.Data.Sum.Base using (_⊎_; inl)
 open import Cubical.Data.Nat.Base using (ℕ; zero; suc)
 open import Cubical.Data.FinData.Base using (Fin) renaming (zero to fzero)
 
@@ -45,6 +45,12 @@ import Wager.FC.Coercion
 import Wager.FC.Term
 import Wager.FC.Classic
 import Wager.Erased.Untyped
+import Wager.Erased.LogRel
+import Wager.FC.Tagged
+import Wager.Trans.Scheme
+import Wager.Trans.Target
+import Wager.Trans.Coercion
+import Wager.Trans.TwoState
 
 ------------------------------------------------------------------------
 -- STAGE 1
@@ -417,3 +423,146 @@ module Classic-Source-Statements where
     Classic-Nominal-No-Coercion : Type
     Classic-Nominal-No-Coercion =
       Co rep sAge sInt × (¬ Co rep (sT sAge) (sT sInt))
+
+------------------------------------------------------------------------
+-- STAGE 4: translation and simulation (theorems T3 and T5)
+------------------------------------------------------------------------
+
+-- The translation of Wager.Trans, for a source signature SS, a state
+-- scheme Sc and a grade algebra A for the term grades.
+--   T       the translation of a type
+--   coerceT the translation of a representational coercion, as a
+--           function of the target
+--   tr      the translation of a term
+--   eraseT  the erasure of a target term (a trope transition vanishes)
+-- `𝒱 a` is observational equality of untyped values at the erased
+-- type a (Wager.Erased.LogRel).
+module Translation-Statements
+  (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+  {R : Type} (A : GradeAlgebra R) where
+  private
+    ops = GradeAlgebra.ops A
+  open GradeOps ops using (𝟘; 𝟙; _+_; _≤_)
+  open Wager.FC.Types SS
+  open Wager.FC.Coercion SS
+  open Wager.FC.Term SS
+  open Wager.Trans.Target SS Sc ops using (tSig; tTSig; tRoleSig; T; bodyFun; arr; [])
+  open Wager.Trans.Coercion SS Sc ops using (coerceT; tr; eraseT; coI; fwd; tvar)
+  open Wager.L2.Typing tSig tTSig ops using (Cx; _▸_⊢_∶_; 0ᵘ)
+  open Wager.Erased.LogRel litTy
+  open Wager.Erased.Untyped using (earr)
+
+  -- English: a representational coercion becomes an ordinary term of
+  -- the target: a function from the translation of τ to the
+  -- translation of σ. The term uses no variable of the context, and
+  -- its parameter has the grade 𝟙. This holds in EACH grade algebra.
+  Coercion-Is-A-Term : Type
+  Coercion-Is-A-Term =
+    WellRoled → ∀ {τ σ} (γ : Co rep τ σ) {n} (Γ : Cx n) →
+    0ᵘ ▸ Γ ⊢ coerceT γ ∶ arr 𝟙 (T τ) (T σ)
+
+  -- English (T3): the erasure of each translated coercion evaluates to
+  -- a function value, and this value is observationally equal to the
+  -- identity function, at the erased type of τ.
+  T3 : Type
+  T3 =
+    WellRoled → ∀ {τ σ} (γ : Co rep τ σ) →
+    Σ[ f ∈ UVal ] (∅ᵉ ⊢ eraseT (coerceT γ) ⇓ f)
+                × 𝒱 (earr (er τ) (er τ)) (vclo ∅ᵉ (uvar fzero)) f
+
+  -- English (T3 at a first-order type): the body of the erased
+  -- coercion, with its argument bound to the value v, evaluates to v.
+  T3-First-Order : Type
+  T3-First-Order =
+    WellRoled → ∀ {τ σ} (γ : Co rep τ σ) → FO (er τ) →
+    ∀ v → 𝒱 (er τ) v v →
+    Σ[ w ∈ UVal ] ((v ∷ᵉ ∅ᵉ) ⊢ eraseT (fwd (coI rep γ) (tvar fzero)) ⇓ w) × (w ≡ v)
+
+  -- English (T5, typing): the translation of a term of the type τ has
+  -- the type `T τ`, with the usage 𝟙 for each variable. This holds in
+  -- each grade algebra in which the grade 𝟙 is unrestricted: 𝟘 ≤ 𝟙 and
+  -- 𝟙 + 𝟙 ≤ 𝟙.
+  T5-Typing : Type
+  T5-Typing =
+    WellRoled → 𝟘 ≤ 𝟙 → (𝟙 + 𝟙) ≤ 𝟙 →
+    ∀ {n} {Γ : SCx n} {τ} (e : STm Γ τ) →
+    (λ _ → 𝟙) ▸ (λ i → T (Γ i)) ⊢ tr e ∶ T τ
+
+  -- English (T5, behaviour): for a closed source term, the erased
+  -- source term and the erased translation evaluate, and the two
+  -- values are observationally equal at the erased type.
+  T5-Behaviour : Type
+  T5-Behaviour =
+    WellRoled → ∀ {τ} (e : STm ∅ˢ τ) →
+    Σ[ v ∈ UVal ] Σ[ w ∈ UVal ]
+      (∅ᵉ ⊢ eraseTm e ⇓ v) × (∅ᵉ ⊢ eraseT (tr e) ⇓ w) × 𝒱 (er τ) v w
+
+  -- English (T5 at a first-order type): the two erased programs
+  -- evaluate to one value.
+  T5-Behaviour-First-Order : Type
+  T5-Behaviour-First-Order =
+    WellRoled → ∀ {τ} (e : STm ∅ˢ τ) → FO (er τ) →
+    Σ[ v ∈ UVal ] (∅ᵉ ⊢ eraseTm e ⇓ v) × (∅ᵉ ⊢ eraseT (tr e) ⇓ v)
+
+  -- English: the target signature of the translation respects its
+  -- declared grades. The hypothesis of T2 thus holds for it.
+  Target-Signature-Valid : Type
+  Target-Signature-Valid = Wager.Role.Validity.Valid tRoleSig mulZ
+
+  module _ where
+    open Wager.L1.Kinding tSig (tableOps tableZ)
+
+    -- English (role correspondence): the body of a newtype N is a
+    -- type-level function of the target. Target kinding accepts the
+    -- grade g for its parameter exactly when the inferred source role
+    -- of the parameter is at most g. The inferred role is thus the
+    -- least grade that kinding accepts.
+    Role-Correspondence : Type
+    Role-Correspondence =
+      (N : N₁) (g : Role) →
+        ((leR (roleOf (body N)) g ≡ true) → Σ[ γ ∈ KUsage [] ] (γ ⊢ᵏ bodyFun N g))
+      × ((γ : KUsage []) → γ ⊢ᵏ bodyFun N g → leR (roleOf (body N)) g ≡ true)
+
+    -- English: the source role check holds exactly when target kinding
+    -- accepts the declared role of each newtype.
+    Role-Check-Is-Kinding : Type
+    Role-Check-Is-Kinding =
+        (WellRoled → (N : N₁) → Σ[ γ ∈ KUsage [] ] (γ ⊢ᵏ bodyFun N (role N)))
+      × (((N : N₁) → Σ[ γ ∈ KUsage [] ] (γ ⊢ᵏ bodyFun N (role N))) → WellRoled)
+
+-- `Translation` and `TwoState` are in Wager.Trans.TwoState.
+-- `Translation` says what a translation of types must keep.
+-- `TwoState` says that each newtype with a parameter is ONE trope state
+-- on its representation, as in Stage 2 (`Int@age`, `Int@raw`).
+module Two-State-Statements where
+
+  module _ (SS : SSig) {R : Type} (ops : GradeOps R) where
+    open Wager.FC.Types SS
+    open Wager.Trans.Scheme SS
+    open Wager.Trans.TwoState SS
+    private
+      tgt : StateScheme → Sig
+      tgt Sc = Wager.Trans.Target.tSig SS Sc ops
+
+    -- English: for each source signature, the translation with the row
+    -- scheme meets the conditions of `Translation`.
+    Row-Translation-Exists : Type
+    Row-Translation-Exists = Translation (tgt rowScheme)
+
+    -- English: when no type-level function looks at the argument of a
+    -- newtype, the translation with two-state tropes exists.
+    Two-State-Translation-Exists : Type
+    Two-State-Translation-Exists =
+      (c : Fam → N₁ → Base) (h : ∀ F N → fNt₁ F N ≡ inl (c F N)) →
+      Σ[ t ∈ Translation (tgt (twoState c h)) ] TwoState (tgt (twoState c h)) t
+
+  -- The source signature `taggedS rep` has the phantom newtype
+  -- `newtype Tag a = MkTag Int` and the type-level function F with
+  -- `F (Tag a) = G a`, `G Int = Bool`, `G Bool = Char`.
+  --
+  -- English: this source program has NO translation with two-state
+  -- tropes. This holds for each target signature.
+  No-Two-State-Translation : Type₁
+  No-Two-State-Translation =
+    (S : Sig) (t : Translation S) → ¬ TwoState S t
+    where open Wager.Trans.TwoState (Wager.FC.Tagged.taggedS rep)

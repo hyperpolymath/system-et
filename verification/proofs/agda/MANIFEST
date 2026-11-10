@@ -52,3 +52,10 @@ verification/proofs/agda|Wager/FC/RoleSoundness.agda|gated|Stage 3: soundness of
 verification/proofs/agda|Wager/FC/Erasure.agda|gated|Stage 3: erasure preserves typing, for a signature that passes the role check
 verification/proofs/agda|Wager/FC/ClassicProofs.agda|gated|Stage 3: the classic unsound program; the role check rejects it; the exploit if it is accepted
 verification/proofs/agda|Wager/Examples/Stage3.agda|gated|Stage 3: accepted and rejected closed examples
+verification/proofs/agda|Wager/FC/Tagged.agda|gated|Stage 3 and 4: a source signature with a phantom newtype and a function that looks at its argument (definitions only)
+verification/proofs/agda|Wager/Erased/LogRel.agda|gated|Stage 4: observational equality of untyped values at an erased type (logical relation)
+verification/proofs/agda|Wager/Trans/Scheme.agda|gated|Stage 4: state schemes for newtypes (row scheme, two-state scheme)
+verification/proofs/agda|Wager/Trans/Target.agda|gated|Stage 4: the target signature of the translation and the translation of types
+verification/proofs/agda|Wager/Trans/Nominal.agda|gated|Stage 4: a nominal coercion of the source becomes conversion in the target
+verification/proofs/agda|Wager/Trans/Coercion.agda|gated|Stage 4: translation of coercions (trope transitions and functorial maps) and of terms; erasure of the target
+verification/proofs/agda|Wager/Trans/TwoState.agda|gated|Stage 4: what a translation of types must keep; two-state tropes (definitions only)

@@ -19,8 +19,8 @@
 --   type family F a where { F Int = Bool ; F Age = Char ; F (Tag a) = G a }
 --   type family G a where { G Int = Bool ; G Bool = Char }
 --
--- `exS d` is this signature with the declared role d for the parameter
--- of Box. Tag is declared phantom and T is declared nominal.
+-- The signature is `taggedS d` of Wager.FC.Tagged: d is the declared role
+-- of the parameter of Box. Tag is declared phantom and T is declared nominal.
 module Wager.Examples.Stage3 where
 
 open import Cubical.Foundations.Prelude
@@ -35,7 +35,7 @@ open import Cubical.Relation.Nullary using (¬_)
 open import Wager.Grade.Finite using (false≢true)
 open import Wager.Role.Role
 open import Wager.FC.Signature
-open import Wager.FC.Classic using (BaseName; bInt; bBool; bChar; bUnit; LitName; ℓint; ℓbool; ℓchar; ℓunit; litTyC)
+open import Wager.FC.Tagged
 open import Wager.Erased.Untyped
 import Wager.FC.Types
 import Wager.FC.Coercion
@@ -44,48 +44,6 @@ import Wager.FC.RoleSoundness
 import Wager.FC.Erasure
 open import Wager.Proofs
 
-data Nt₀E : Type where
-  ageE : Nt₀E
-
-data Nt₁E : Type where
-  boxE tagE teeE : Nt₁E
-
-data FamE : Type where
-  fE gE : FamE
-
-private
-  bodyE : Nt₁E → Body BaseName FamE
-  bodyE boxE = bprod bvar (bbase bInt)
-  bodyE tagE = bbase bInt
-  bodyE teeE = bfam fE bvar
-
-  roleE : Role → Nt₁E → Role
-  roleE d boxE = d
-  roleE d tagE = ph
-  roleE d teeE = nom
-
-  fBaseE : FamE → BaseName → BaseName
-  fBaseE fE bInt  = bBool
-  fBaseE gE bInt  = bBool
-  fBaseE gE bBool = bChar
-  fBaseE _  _     = bUnit
-
-  fNt₀E : FamE → Nt₀E → BaseName
-  fNt₀E fE ageE = bChar
-  fNt₀E gE ageE = bUnit
-
-  -- F (Tag a) = G a: the function F looks at the argument of Tag.
-  fNt₁E : FamE → Nt₁E → BaseName ⊎ FamE
-  fNt₁E fE tagE = inr gE
-  fNt₁E _  _    = inl bUnit
-
-exS : Role → SSig
-exS d = record
-  { Base = BaseName ; Lit = LitName ; litTy = litTyC
-  ; N₀ = Nt₀E ; rep₀ = λ _ → ebase bInt
-  ; N₁ = Nt₁E ; Fam = FamE
-  ; body = bodyE ; role = roleE d
-  ; fBase = fBaseE ; fNt₀ = fNt₀E ; fNt₁ = fNt₁E ; fOther = λ _ → bUnit }
 
 ------------------------------------------------------------------------
 -- The role check.
@@ -93,26 +51,26 @@ exS d = record
 module Role-Check where
 
   -- Accepted: Box declared representational (the inferred role).
-  wr-rep : SSig.WellRoled (exS rep)
+  wr-rep : SSig.WellRoled (taggedS rep)
   wr-rep boxE = refl
   wr-rep tagE = refl
   wr-rep teeE = refl
 
   -- Accepted: Box declared nominal (a declared role above the inferred role).
-  wr-nom : SSig.WellRoled (exS nom)
+  wr-nom : SSig.WellRoled (taggedS nom)
   wr-nom boxE = refl
   wr-nom tagE = refl
   wr-nom teeE = refl
 
   -- Rejected: Box declared phantom.
-  wr-ph-rejected : ¬ SSig.WellRoled (exS ph)
+  wr-ph-rejected : ¬ SSig.WellRoled (taggedS ph)
   wr-ph-rejected wr = false≢true (wr boxE)
 
 ------------------------------------------------------------------------
 -- Coercions, in the signature with Box declared representational.
 
 private
-  SS = exS rep
+  SS = taggedS rep
 
 open Wager.FC.Types SS
 open Wager.FC.Coercion SS
@@ -120,18 +78,8 @@ open Wager.FC.Term SS
 open Wager.FC.RoleSoundness SS
 open Typing litTy
 open Role-Check using (wr-rep)
+open TTypes rep renaming (Tee to T)
 
-sInt sBool sChar sAge : STy
-sInt  = sbase bInt
-sBool = sbase bBool
-sChar = sbase bChar
-sAge  = nt₀ ageE
-
-Box Tag T F : STy → STy
-Box = nt₁ boxE
-Tag = nt₁ tagE
-T   = nt₁ teeE
-F   = fam fE
 
 private
   IsInt : BaseName → Type
