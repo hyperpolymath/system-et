@@ -72,6 +72,7 @@ import Wager.Trans.Typing
 import Wager.Trans.Simulation
 import Wager.Trans.RoleCorrespondence
 import Wager.Trans.TwoStateProofs
+import Wager.Trans.Nominal
 
 module _ where
   open T1-Statements
@@ -245,3 +246,23 @@ module _ where
 
   no-two-state-translation : No-Two-State-Translation
   no-two-state-translation = TS.no-two-state
+
+------------------------------------------------------------------------
+-- STAGE 5
+------------------------------------------------------------------------
+
+module _ (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+         {R : Type} (ops : GradeOps R) where
+  open T6-Statements SS Sc ops
+  private module NM = Wager.Trans.Nominal SS Sc ops
+
+  t6 : T6
+  t6 = NM.nominal-nf
+
+  t6-conversion : T6-Conversion
+  t6-conversion = NM.nominal-defeq
+
+  -- By the definition of the translation: the transformer of a nominal
+  -- coercion is the identity.
+  t6-no-term : T6-No-Term
+  t6-no-term γ e = refl

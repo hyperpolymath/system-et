@@ -69,3 +69,4 @@ import Wager.Trans.Simulation
 import Wager.Trans.RoleCorrespondence
 import Wager.Trans.TwoStateProofs
 import Wager.Examples.Stage4
+import Wager.Examples.Stage5

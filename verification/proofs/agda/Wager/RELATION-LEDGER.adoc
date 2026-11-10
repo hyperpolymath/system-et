@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: relation ledger
-Status: Stage 4. Each later stage adds its entries in the same commit as its rules.
+Status: Stage 5. Each later stage adds its entries in the same commit as its rules.
 :toc: left
 :sectnums:
 
@@ -21,7 +21,7 @@ Each entry has one class:
 | source | The relation belongs to the source calculus (the fragment of System FC). The target calculus does not have it. It does not count against the wager.
 |===
 
-An ADDED entry counts against the wager. *Stages 1, 2, 3 and 4 have no ADDED entry.*
+An ADDED entry counts against the wager. *Stages 1 to 5 have no ADDED entry.*
 The ledger has one "baseline, changed" entry (R1). The owner decides how it counts.
 
 == Judgement forms of the target calculus
@@ -176,6 +176,10 @@ The translated terms use the rules of Stage 1 only: the rule `t-step` types each
 |===
 
 `StateScheme` (`Wager.Trans.Scheme`) is data of the translation: an index type and a table. It is not a relation.
+
+== Stage 5
+
+Stage 5 adds no relation. T6 is stated with conversion (R2) and with the function `nf` (R3), which are baseline entries.
 
 == What is absent
 

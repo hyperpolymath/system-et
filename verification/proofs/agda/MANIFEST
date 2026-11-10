@@ -65,3 +65,4 @@ verification/proofs/agda|Wager/Trans/Simulation.agda|gated|Stage 4 (T3, T5): an 
 verification/proofs/agda|Wager/Trans/RoleCorrespondence.agda|gated|Stage 4: the inferred source role is the least grade that target kinding accepts; the target signature is valid
 verification/proofs/agda|Wager/Trans/TwoStateProofs.agda|gated|Stage 4: the tagged signature has no translation with two-state tropes (checked counterexample)
 verification/proofs/agda|Wager/Examples/Stage4.agda|gated|Stage 4: accepted and rejected closed examples
+verification/proofs/agda|Wager/Examples/Stage5.agda|gated|Stage 5 (T6): accepted and rejected closed examples; the converse of T6 is false for the row scheme

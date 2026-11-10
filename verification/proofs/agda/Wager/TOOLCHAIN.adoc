@@ -292,3 +292,30 @@ A clean build of `Wager/Everything.agda` (64 modules) takes about 35 seconds and
 |===
 
 The third test shows that the proofs of T3 and T5 depend on the terms that the translation gives.
+
+=== Gate watch at the end of Stage 5
+
+A clean build of `Wager/Everything.agda` (65 modules) takes about 35 seconds and prints no warning.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/Examples/Stage5.agda`: a false lemma (the translations of `Age` and `Int` have one normal form), with the proof `refl`
+| `[UnequalTerms]`: the normal form of the first type starts with `ncapp`
+| FAIL
+
+| `Wager/Examples/Stage5.agda`: `postulate t6-by-fiat : …`
+| `[SafeFlagPostulate] Cannot postulate t6-by-fiat with safe flag`. `scan-dangerous.sh` also fails.
+| FAIL
+
+| `Wager/Trans/Target.agda`: a target primitive ignores the index of a state
+| `[UnequalTerms] obs F N (idx N v) != fOther F` in `Wager/Trans/Nominal.agda`
+| FAIL
+
+| All changes removed
+| None
+| PASS, 65 files
+|===
+
+The third test shows that the proof of T6 depends on the table of the target primitives.

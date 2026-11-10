@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: verdict
-Status: DRAFT after Stage 4. This file becomes final after the last stage.
+Status: DRAFT after Stage 5. This file becomes final after the last stage.
 :toc: left
 :sectnums:
 
@@ -57,7 +57,12 @@ Status: DRAFT after Stage 4. This file becomes final after the last stage.
   *A condition on the grade algebra.* `t5-typing` needs a grade algebra in which the grade `𝟙` is unrestricted: `𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙` (DC-4.5). System FC has no usage discipline.
   In `Affine` the translation of the source function `λx. 5`, which drops its argument, has no type (`Wager.Examples.Stage4.Coercions-In-Affine.const-rejected`). Agda checked this one function.
 
-| T6 | NOT ATTEMPTED | Stage 5 is not started. The lemma that T6 needs is proved, because T5 uses it: `Wager.Trans.Nominal.nominal-defeq` (DC-4.4). Stage 5 states T6.
+| T6
+| PROVED
+| `Wager.Proofs.t6`: for each nominal coercion of the source, the two translated types have one normal form.
+  `Wager.Proofs.t6-conversion`: the two translated types are convertible. `Wager.Proofs.t6-no-term`: the translation of a cast along a nominal coercion is the translation of the term under the cast.
+  Each holds for each source signature, each state scheme and each set of grade operations. None needs the role check.
+  T6 is one direction. The converse is false for the row scheme (finding F16, DC-5.2).
 | T7 | NOT ATTEMPTED | Stage 6 is not started.
 |===
 
@@ -170,24 +175,42 @@ The translation with the row scheme gives the two types two states of the carrie
 * No theorem says that a role-rejected `coerce` has no translation. The source calculus has no term for such a `coerce` (DC-3.5), and the role correspondence is about kinding.
 * The row scheme has a finite index type for a finite signature. Agda did not check this sentence (DC-4.1).
 
+== Results of Stage 5: nominal coercions
+
+T6 is in the table of theorems. Its proof is the lemma that Stage 4 needed for the typing of a cast (DC-4.4, DC-5.1).
+
+Checked examples (`Wager.Examples.Stage5`):
+
+* One nominal coercion for each kind of equation of a type-level function (a base type, a newtype with no parameter, a newtype with a parameter, a function type), a congruence below a nominal newtype, and the instance of T6 for each.
+* A cast along a nominal coercion: the translation of `'c' : Char` cast to the type `F Age` is the literal, typed at the translated type `F Age` by conversion (`no-term`, `typed-by-conversion`).
+* Rejected: `Age` and `Int` have no nominal coercion, and their translations have two normal forms (`age-int-rejected`, `age-int-nf-differ`).
+
+=== Not proved in Stage 5
+
+* The converse of T6. It is false for the row scheme (finding F16).
+* The sentence "two source types with one target normal form have one erased type". This development has no proof of it and no counterexample to it.
+
 == Overall result
 
-Not available. W is not decided after Stage 4. T6 and T7 are not attempted.
+Not available. W is not decided after Stage 5. T7 is not attempted, and Stage 6 leaves a decision to the owner.
 
-Results that bear on W after Stage 4:
+Status after Stage 5: T0, T1, T3, T4 and T6 are PROVED. T2 and T5 are PROVED WITH CHANGE (class: signature primitive).
+
+Results that bear on W after Stage 5:
 
 * Parts (a) and (b) of W hold for the fragment, for each source signature that passes the role check: T5. They hold with one change (a newtype with a parameter needs more than one wrapped state) and one condition (an unrestricted grade `𝟙` for whole programs).
 * Part (c) of W holds in the sense of T3: each erased coercion is observationally the identity. It is not the empty term (finding F14).
 * Part (d) of W has the form of the role correspondence (DC-4.7).
 * The target calculus has the judgement forms of Stage 1 only. No relation is added and no rule is added.
-* T2 is "PROVED WITH CHANGE", so the condition "T2 to T6 are PROVED" of the task does not hold as written. The hypothesis of T2 holds for each signature that the translation gives (`target-signature-valid`).
+* T2 and T5 are "PROVED WITH CHANGE", so the condition "T2 to T6 are PROVED" of the task does not hold as written. The hypothesis of T2 holds for each signature that the translation gives (`target-signature-valid`).
+* A nominal coercion becomes conversion, and no term remains: T6.
 
-== Ledgers after Stage 4
+== Ledgers after Stage 5
 
 * `RELATION-LEDGER.adoc`: no ADDED entry. One entry is "baseline, changed": the kinding judgement has a graded context (R1). Stage 2 added two "specification only" entries (`≈`, and the observers with `Valid`).
   Stage 3 added the relations of the source calculus with the class "source" (the coercion relation `Co` is one of them), and the evaluation and the typing of erased terms as "specification only".
-  Stage 4 added observational equality (`𝒱`) and the definition of a translation as "specification only". Stage 3 and Stage 4 added nothing to the target calculus.
-* `RULE-DIFF-LEDGER.adoc`: empty. Stages 2, 3 and 4 added no rule to the target calculus.
+  Stage 4 added observational equality (`𝒱`) and the definition of a translation as "specification only". Stage 5 added no relation. Stages 3, 4 and 5 added nothing to the target calculus.
+* `RULE-DIFF-LEDGER.adoc`: empty. Stages 2, 3, 4 and 5 added no rule to the target calculus.
 
 == Answers of Stage 1
 
@@ -326,6 +349,11 @@ Stage 2 proved the laws of the candidate only. It did not prove that the candida
 | F15
 | In this fragment the result of a type-level function is a base type. For a signature with a finite number of base types and of type-level functions, a finite number of states for each newtype is then enough (DC-4.1). Agda did not check this sentence.
   A function that returns a part of its argument is outside the fragment, in the source and in the target. This development proves nothing about it.
+
+| F16
+| The converse of T6 is false for the row scheme, in the signature `taggedS rep`.
+  `Tag Char` and `Tag Unit` have no nominal coercion (`Wager.Examples.Stage5.tag-char-unit-rejected`), and they have one target type (`tag-char-unit-one-type`). They do have a representational coercion (`tag-char-unit-rep`).
+  The translation thus does not keep each nominal difference of the source. Agda checked this one pair of types.
 |===
 
 == Changes to theorem statements
@@ -338,10 +366,11 @@ Process note: the statement `L1-Equality` was put in `Statements.agda` after its
 The statements of T0, T1, T2 and T4 were put in `Statements.agda`, and committed, before their proofs.
 The statements of Stage 3 were put in `Statements.agda`, and committed, before their proofs.
 The statements of Stage 4 were put in `Statements.agda`, and committed, before their proofs. One proof was complete at that time: the lemma `nominal-defeq`, which is not a statement of Stage 4.
+The statements of Stage 5 (T6) were put in `Statements.agda`, and committed, before their inhabitants in `Proofs.agda`. The proof of the first two statements is the lemma of Stage 4, so it existed before the statements. This is not the order "statement before proof" (DC-5.1).
 
 == Trust base
 
 * Agda 2.8.0 with `--cubical --safe`, and `agda/cubical` v0.9 (`TOOLCHAIN.adoc`).
 * No `postulate`, no hole, no termination pragma, no positivity pragma.
 * `--guardedness` is on in each file (DC-0.2). No file uses coinduction.
-* One warning is silenced, in 35 of the 64 files: `UnsupportedIndexedMatch` (DC-0.3).
+* One warning is silenced, in 36 of the 65 files: `UnsupportedIndexedMatch` (DC-0.3).

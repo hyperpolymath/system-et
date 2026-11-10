@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: design choices
-Status: entries of Stage 0, Stage 1, Stage 2, Stage 3 and Stage 4.
+Status: entries of Stage 0 to Stage 5.
 :toc: left
 :sectnums!:
 
@@ -36,7 +36,7 @@ Agda 2.8.0 then rejects an import from a module without the flag (`InfectiveImpo
 The stock library makes that rule impossible to obey.
 
 *Decision.* The owner accepted alternative 1 on 2026-11-10.
-At the end of each stage a search for `coinductive` in `Wager/` checks the intent of the rule. The search found nothing at the end of Stage 1, of Stage 2, of Stage 3 and of Stage 4.
+At the end of each stage a search for `coinductive` in `Wager/` checks the intent of the rule. The search found nothing at the end of each of the stages 1 to 5.
 
 *Alternatives.*
 
@@ -68,6 +68,8 @@ A match that needs K is an error, not a warning.
 Thus the Lean proofs that use `castNf_diag` (an equality on `Δ = Δ` closed by `rfl`) cannot be copied directly.
 
 *Alternative.* Leave the warning on. This is honest but makes the output hard to read.
+
+*Audit at the end of Stage 5.* 36 of the 65 files have the line. The one new file has the line. A test without the line found the warning in it and found no other warning.
 
 *Audit at the end of Stage 4.* 35 of the 64 files have the line. A test of the 13 new files without the line found the warning in 6 of them. It found no other warning, and it found 2 new files that had the line and did not need it. The line was removed from them. The other 5 new files compile without a warning.
 
@@ -442,3 +444,35 @@ Kinding has a subusage rule, so it accepts each grade above the least one. "The 
 
 *Reason.* "This program has no translation" needs a definition of "translation". The three conditions are properties that claim W asks for. The fourth condition is the form of Stage 2.
 The translation with the row scheme meets the three conditions (`Wager.Proofs.row-translation-exists`), so the conditions are not empty.
+
+== Stage 5
+
+[[DC-5.1]]
+=== DC-5.1: the form of T6
+
+*Choice.* T6 has three statements (`Wager.Statements.T6-Statements`):
+
+* `T6`: for each nominal coercion of the source, the two translated types have one normal form;
+* `T6-Conversion`: the two translated types are convertible (`DefEq`);
+* `T6-No-Term`: the translation of a cast along a nominal coercion is the translation of the term under the cast.
+
+Each holds for each source signature, each state scheme and each set of grade operations. None needs the role check.
+
+*Reading of the task text.* The task says: "every source coercion at nominal role built from the axioms of total type-level functions".
+In this fragment each nominal coercion (`Co nom`) is built from reflexivity, symmetry, transitivity, congruence and the equations of the type-level functions. T6 is thus stated for each nominal coercion.
+
+*Reason for the proof.* The normal form of a translated type is a function of the nominal value of the source type (`Wager.Trans.Nominal.nf-T`). A nominal coercion keeps the nominal value (`Wager.Proofs.source-nominal-soundness`).
+
+*Process.* The proof of the first two statements is the lemma of Stage 4 (DC-4.4). It existed before the statements of T6 were put in `Statements.agda`.
+
+[[DC-5.2]]
+=== DC-5.2: T6 is one direction
+
+*Choice.* T6 says: a nominal coercion gives one normal form. This development does not state the converse, because the converse is false for the row scheme.
+
+*Checked example.* `Tag Char` and `Tag Unit` have no nominal coercion in the source (`Wager.Examples.Stage5.tag-char-unit-rejected`). They have one target type (`tag-char-unit-one-type`), and they have a representational coercion (`tag-char-unit-rep`).
+The reason: no type-level function of the signature tells the two types apart, so they have one row and one state.
+
+*Consequence.* The translation can give one target type to two source types that the source keeps apart nominally.
+
+*Not proved here.* This development does not prove the general sentence "two source types with one target normal form have one erased type".

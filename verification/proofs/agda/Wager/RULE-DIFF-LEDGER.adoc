@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: rule-diff ledger
-Status: Stage 4. *The ledger is empty.*
+Status: Stage 5. *The ledger is empty.*
 :toc: left
 :sectnums:
 
@@ -81,3 +81,7 @@ The translation names the grade `𝟙` only: a function type becomes `arr 𝟙`,
 
 Theorem T5 (typing of a translated program) has two hypotheses on the grade algebra: `𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙`.
 They name the grades `𝟘` and `𝟙` only. They are hypotheses of a theorem and not side conditions of a rule, so they are not entries of this ledger. `VERDICT.adoc` records them at T5.
+
+== Stage 5
+
+Stage 5 adds no typing rule and no kinding rule to the target calculus. T6 is a statement about the translation of types and about conversion.
