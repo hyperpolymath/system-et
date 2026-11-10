@@ -75,3 +75,6 @@ import Wager.Local.Source
 import Wager.Local.Gadt
 import Wager.Local.Separation
 import Wager.Examples.Stage6
+import Wager.Identity.Family
+import Wager.Identity.Term
+import Wager.Identity.Typing

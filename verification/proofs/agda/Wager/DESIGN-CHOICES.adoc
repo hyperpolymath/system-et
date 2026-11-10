@@ -487,7 +487,7 @@ The reason: no type-level function of the signature tells the two types apart, s
 The task gives two options for Stage 6: (1) an identity type at the grade `0`, with a proof that erasure of its proofs is sound; (2) a separation.
 `PLAN.adoc` says that the owner makes the choice. On 2026-11-10 the owner chose: the two options, option 2 first, with a stop and a report between the two parts.
 
-T7 thus has two parts. Part 1 is the separation (`Wager.Statements.T7-Statements.T7-Separation`). Part 2 is the identity type. Part 2 has no statement yet.
+T7 thus has two parts. Part 1 is the separation (`Wager.Statements.T7-Statements.T7-Separation`). Part 2 is the identity type (`Wager.Statements.T7-Identity-Statements`). The statements of part 2 were frozen on 2026-11-10, after the report on part 1 and after the owner said to continue.
 
 [[DC-6.2]]
 === DC-6.2: a type is closed, and the type variable of the task is an Agda variable
@@ -538,3 +538,70 @@ The statement is for each target signature and each set of grade operations.
 * A translation that changes the text of the branch with the false assumption.
 
 The statement is thus weaker than "the program has no translation". The verdict file says this again at T7.
+
+[[DC-6.5]]
+=== DC-6.5: the identity type is a family of base constants of a signature
+
+*The task text.* "Add an identity type as an ordinary indexed family used at grade `0`."
+
+*The documents.* They have no identity type and no rule for an indexed family. `03-l2-grades.adoc` says that `0` is "the grade of an unused assumption".
+
+*Choice.* DC-1.1 says that a later stage adds entries to a signature and does not add constructors to the language. The identity type is thus a family of entries (`Wager.Identity.Family.IdFamily`):
+
+* `Id A B` is a base constant, for each pair of closed types A and B of the kind ★. The family respects conversion in each index (`Id-conv`).
+* `rfl A` is a literal of the base type `Id A A`. It is the one constructor. The existing rule `t-lit` types it, so there is no introduction rule.
+* `diagonal`: a literal of the base type `Id A B` shows that A and B are convertible. The family thus has no constructor off the diagonal.
+
+*EQUALITY EVIDENCE IS NOW A TERM.* A term of the type `base (Id A B)` is evidence that A and B are equal. It is an ordinary value: a function can take it, a pair can hold it, and a variable can stand for it. A variable of such a type is a local equality assumption.
+
+*What does not change.* The type language (`Wager.L1.Syntax.Ty`), the conversion relation `DefEq`, normal forms, and the 12 rules of the target judgement.
+
+*Consequence.* Evidence is a value at run time: a literal. The erased type of `Id A B` is the base type `Id A B`.
+
+*The record is a hypothesis on a signature.* It does not say that a signature has a family. DC-6.8 gives one signature that has one.
+
+*Not chosen.* A new type former in `Ty`: it changes each definition of Stage 1. An encoding of `Id A B` as a trope state of `A ⊗ B`: a trope state is a different notion in the documents.
+
+[[DC-6.6]]
+=== DC-6.6: one new term former and one new rule
+
+*Choice.* `cast e t` is the eliminator: e is evidence, t is the payload. The rule is `Wager.Identity.Typing.t-cast`:
+
+----
+γ ▸ Γ ⊢ⁱ e ∶ base (Id A B)      δ ▸ Γ ⊢ⁱ t ∶ A
+-----------------------------------------------
+((𝟘 ·ᵘ γ) +ᵘ δ) ▸ Γ ⊢ⁱ cast e t ∶ B
+----
+
+The rule uses the evidence at the grade `𝟘`. It names no other grade, and it has no side condition for one algebra.
+
+*The Agda judgement is a new data type.* An Agda data type cannot get a constructor later. `_▸_⊢ⁱ_∶_` has the 12 rules of `Wager.L2.Typing` and the rule `t-cast`. The term syntax `ITm` has the 10 formers of `Wager.L2.Term.Tm` and `cast`.
+`T7-Conservative` says that each typed target term is a typed term of the extension. Agda does not check that the 12 rules have the same text; this is by inspection of the two files.
+
+*Not done.*
+
+* The other direction: that a derivation with no cast is a derivation of the target.
+* A reduction relation for the extension. The relation `_⟶_` of the target is not extended, and progress and preservation are not proved for the extension. The two erasures and the evaluation of the untyped calculus give the meaning of a term of the extension.
+
+[[DC-6.7]]
+=== DC-6.7: what "erasure of its proofs is sound" means
+
+*The task text.* "Prove that erasure of its proofs is sound, by totality and the grade."
+
+*Choice.* A term of the extension has two erasures into the untyped calculus (`Wager.Identity.Term`):
+
+* `keepⁱ` is the reference. For `cast e t` it evaluates the evidence, then the payload, and it gives the value of the payload. It does not inspect the value of the evidence, because the untyped calculus has no test on a literal.
+* `eraseⁱ` is the erasure of proofs: `eraseⁱ (cast e t)` is `eraseⁱ t`. The evidence is absent from the program.
+
+"Sound" is `T7-Erasure`: for a closed typed term, the two programs evaluate, and the two values are observationally equal at the erased type.
+
+*By totality.* The statement includes that the reference program has a value. If the evidence of a cast has no value, then the reference program has no value. The erased program can have a value. The statement is then false.
+The proof also uses the value of the evidence: it is a literal of the type `Id A B`, so A and B are convertible (`diagonal`), so the payload type and the result type have one erased type. `T7-Canonicity` is this fact for a closed term.
+
+*By the grade.* `T7-Grade`: in a grade algebra, the usage vector of `cast e t` is the usage vector of the payload `t`, which is the term that remains after the erasure. The grade thus makes the resource count of the typed term equal to the resource count of the erased term at each cast.
+
+The proof of `T7-Erasure` does not use the grade. The behaviour comes from totality, and the resource count comes from the grade. This development has no semantics that counts resources, so it has no theorem that joins the two.
+
+*What the erasure does not remove.* Evidence that is data: an argument of a function, a component of a pair. Such evidence stays in the erased program as a literal. To remove it, the erasure must read the grade of a binder. Its soundness then needs a property of the grade algebra: in the one-point algebra each binder has the grade `𝟘`, and not each binder is unused. This is not done.
+
+*The separation of part 1.* `T7-Separation` is a statement about the target with no identity family. This part does not prove and does not refute the same statement for the extension.

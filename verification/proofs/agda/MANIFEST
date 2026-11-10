@@ -71,3 +71,6 @@ verification/proofs/agda|Wager/Local/Source.agda|gated|Stage 6: the source calcu
 verification/proofs/agda|Wager/Local/Gadt.agda|gated|Stage 6: the GADT program of the separation (definitions only)
 verification/proofs/agda|Wager/Local/Separation.agda|gated|Stage 6 (T7, the separation): no typed target term has the erasure and the erased type of the GADT program
 verification/proofs/agda|Wager/Examples/Stage6.agda|gated|Stage 6 (T7, the separation): accepted and rejected closed examples
+verification/proofs/agda|Wager/Identity/Family.agda|gated|Stage 6, part 2: the identity type as a family of base constants of a signature (definitions only)
+verification/proofs/agda|Wager/Identity/Term.agda|gated|Stage 6, part 2: the terms of the target with the cast, and the two erasures (definitions only)
+verification/proofs/agda|Wager/Identity/Typing.agda|gated|Stage 6, part 2: the target judgement with the rule t-cast, which uses the evidence at the grade 0 (definitions only)

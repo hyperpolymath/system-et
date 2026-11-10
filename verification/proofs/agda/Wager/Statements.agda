@@ -55,6 +55,8 @@ open import Cubical.Data.Empty using (⊥)
 import Wager.L2.Erasure
 import Wager.Local.Source
 import Wager.Local.Gadt
+import Wager.Identity.Family
+import Wager.Identity.Typing
 
 ------------------------------------------------------------------------
 -- STAGE 1
@@ -661,3 +663,113 @@ module T7-Statements
     erT A ≡ erˡ (G b α ⇒ˡ lbase b) →
     eraseᵗ t ≡ eraseˡ (gadt-eval b α) →
     ⊥
+
+------------------------------------------------------------------------
+-- STAGE 6, PART 2: the identity type at the grade 𝟘 (theorem T7)
+------------------------------------------------------------------------
+
+-- This part is the other option of the stage (DESIGN-CHOICES.adoc,
+-- DC-6.1 and DC-6.5): the target gets an identity type.
+--
+-- EQUALITY EVIDENCE IS NOW A TERM. A term of the type `base (Id A B)`
+-- is evidence that the closed types A and B are equal.
+--
+--   Id A B        a base constant of the signature (`IdFamily`)
+--   rfl A         a literal of the base type `Id A A`
+--   cast e t      the one new term former: the evidence e, the payload t
+--   _▸_⊢ⁱ_∶_      the target judgement with one new rule, `t-cast`, which
+--                 uses the evidence at the grade 𝟘
+--   keepⁱ         the reference erasure: each cast evaluates its
+--                 evidence, then its payload
+--   eraseⁱ        the erasure of proofs: the evidence of each cast is
+--                 absent
+--   𝒱 a           observational equality of untyped values at the
+--                 erased type a (Wager.Erased.LogRel)
+--
+-- The statements hold for each signature that has an identity family,
+-- and for each set of grade operations. Two statements need the laws
+-- of a grade algebra, and they say so.
+module T7-Identity-Statements
+  (S : Sig) (TS : Wager.L2.Signature.TSig S) (ops : GradeOps (Sig.TG S))
+  (F : Wager.Identity.Family.IdFamily S TS) where
+  open Wager.L1.Syntax S using (Ty; []; ★; base; arr)
+  open Wager.L1.Conversion S using (DefEq)
+  open Wager.L2.Typing S TS ops using (_▸_⊢_∶_; Tm)
+  open Wager.L2.Erasure S TS ops using (erT; eraseᵗ)
+  open Wager.Identity.Typing S TS ops F
+  open GradeOps ops using (𝟘; 𝟙)
+  open Wager.Erased.Untyped.Terms Lit using (UVal; ∅ᵉ; _⊢_⇓_)
+  open Wager.Erased.LogRel litTy using (𝒱; FO)
+
+  -- English (the target is a part): each typed term of the target is a
+  -- typed term of the extension, with the same usage and the same type.
+  T7-Conservative : Type
+  T7-Conservative =
+    ∀ {n} {γ : Usage n} {Γ : Cx n} {t : Tm n} {A : Ty [] ★} →
+    γ ▸ Γ ⊢ t ∶ A → γ ▸ Γ ⊢ⁱ emb t ∶ A
+
+  -- English: on a term of the target, the two erasures of the
+  -- extension are the erasure of the target.
+  T7-Conservative-Erasure : Type
+  T7-Conservative-Erasure =
+    ∀ {n} (t : Tm n) → (keepⁱ (emb t) ≡ eraseᵗ t) × (eraseⁱ (emb t) ≡ eraseᵗ t)
+
+  -- English (introduction): a conversion gives evidence. If A and B
+  -- are convertible, the literal `rfl A` has the type `Id A B`, in each
+  -- context, and it uses no variable.
+  T7-Intro : Type
+  T7-Intro =
+    ∀ {n} {Γ : Cx n} {A B : Ty [] ★} → DefEq A B →
+    0ᵘ ▸ Γ ⊢ⁱ ilit (rfl A) ∶ base (Id A B)
+
+  -- English (canonicity): closed evidence gives a conversion. If a
+  -- closed term has the type `Id A B`, then A and B are convertible.
+  -- The identity family thus adds no equality between closed types.
+  T7-Canonicity : Type
+  T7-Canonicity =
+    ∀ {γ : Usage 0} {Γ : Cx 0} {e : ITm 0} {A B : Ty [] ★} →
+    γ ▸ Γ ⊢ⁱ e ∶ base (Id A B) → DefEq A B
+
+  -- English (T7, the erasure of proofs is sound): for a closed typed
+  -- term, the reference program and the program with no evidence in its
+  -- casts evaluate, and the two values are observationally equal at the
+  -- erased type.
+  --
+  -- Totality is a part of the statement: the reference program, which
+  -- evaluates the evidence of each cast, has a value.
+  T7-Erasure : Type
+  T7-Erasure =
+    ∀ {γ : Usage 0} {Γ : Cx 0} {t : ITm 0} {A : Ty [] ★} →
+    γ ▸ Γ ⊢ⁱ t ∶ A →
+    Σ[ v ∈ UVal ] Σ[ w ∈ UVal ]
+      (∅ᵉ ⊢ keepⁱ t ⇓ v) × (∅ᵉ ⊢ eraseⁱ t ⇓ w) × 𝒱 (erT A) v w
+
+  -- English (T7 at a first-order type): the two programs evaluate to
+  -- one value.
+  T7-Erasure-First-Order : Type
+  T7-Erasure-First-Order =
+    ∀ {γ : Usage 0} {Γ : Cx 0} {t : ITm 0} {A : Ty [] ★} →
+    γ ▸ Γ ⊢ⁱ t ∶ A → FO (erT A) →
+    Σ[ v ∈ UVal ] (∅ᵉ ⊢ keepⁱ t ⇓ v) × (∅ᵉ ⊢ eraseⁱ t ⇓ v)
+
+  -- English (the grade): in a grade algebra, evidence costs nothing.
+  -- The usage vector of `cast e t` is the usage vector of the payload t,
+  -- which is the term that remains after the erasure of proofs.
+  T7-Grade : Type
+  T7-Grade =
+    GradeLaws ops →
+    ∀ {n} {γ δ : Usage n} {Γ : Cx n} {e t : ITm n} {A B : Ty [] ★} →
+    γ ▸ Γ ⊢ⁱ e ∶ base (Id A B) → δ ▸ Γ ⊢ⁱ t ∶ A →
+    δ ▸ Γ ⊢ⁱ cast e t ∶ B
+
+  -- English (a local equality assumption): in a grade algebra, for each
+  -- pair of closed types A and B, this closed function is typed:
+  --
+  --   λ (e : Id A B) at the grade 𝟘. λ (x : A) at the grade 𝟙. cast e x
+  --
+  -- It has the type `Id A B → A → B`. The types A and B are any types.
+  -- The first parameter is the local assumption that A and B are equal.
+  T7-Assumption : Type
+  T7-Assumption =
+    GradeLaws ops → ∀ (A B : Ty [] ★) {Γ : Cx 0} →
+    0ᵘ ▸ Γ ⊢ⁱ use-assumption A B ∶ arr 𝟘 (base (Id A B)) (arr 𝟙 A B)
