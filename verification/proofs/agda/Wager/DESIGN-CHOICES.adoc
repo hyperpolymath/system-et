@@ -600,8 +600,29 @@ The proof also uses the value of the evidence: it is a literal of the type `Id A
 
 *By the grade.* `T7-Grade`: in a grade algebra, the usage vector of `cast e t` is the usage vector of the payload `t`, which is the term that remains after the erasure. The grade thus makes the resource count of the typed term equal to the resource count of the erased term at each cast.
 
-The proof of `T7-Erasure` does not use the grade. The behaviour comes from totality, and the resource count comes from the grade. This development has no semantics that counts resources, so it has no theorem that joins the two.
+The proof of `T7-Erasure` does not use the grade. A test shows this: with the grade `𝟙` in the rule `t-cast`, the proofs of `T7-Erasure` and `T7-Canonicity` check, and the proof of `T7-Grade` does not (`TOOLCHAIN.adoc`, gate watch of part 2).
+The behaviour comes from totality, and the resource count comes from the grade. This development has no semantics that counts resources, so it has no theorem that joins the two.
 
 *What the erasure does not remove.* Evidence that is data: an argument of a function, a component of a pair. Such evidence stays in the erased program as a literal. To remove it, the erasure must read the grade of a binder. Its soundness then needs a property of the grade algebra: in the one-point algebra each binder has the grade `𝟘`, and not each binder is unused. This is not done.
 
 *The separation of part 1.* `T7-Separation` is a statement about the target with no identity family. This part does not prove and does not refute the same statement for the extension.
+
+[[DC-6.8]]
+=== DC-6.8: one signature that has an identity family
+
+*Choice.* `Wager.Identity.Instance` builds a signature from a set of base constants and a set of literals. Its base constants are codes:
+
+* `cb b` is a base constant of the start.
+* `cid x y` is the family, at the codes of two closed normal forms.
+* The other codes are the code of a closed normal form (`enc`). The function `enc` is injective (`enc-inj`).
+
+`Id A B` is `cid (enc (nf A)) (enc (nf B))`. The family is thus about the types of the same signature, also about a type that has an identity type in it.
+The literals are the literals of the start and one literal for each code `c`, of the base type `cid c c`.
+
+*Reason.* A base constant cannot hold a type of its own signature directly: the type language is made after the signature. A code is a first-order copy of a closed normal form, so the set of base constants is an ordinary data type.
+
+*Limits.*
+
+* The signature has no generative constant, no primitive and no trope operation. It is one signature for the purpose. This development does not show that each signature has an extension with a family.
+* Each code is a base constant, also a code that `enc` does not give.
+* A literal exists for each code `c`, also when `c` is not the code of a type. Its base type `cid c c` is on the diagonal, so `diagonal` holds.

@@ -13,7 +13,7 @@ summary from the per-prover MANIFESTs and fails if this file disagrees.
 // Machine-readable ground-truth markers — checked by scripts/check-proof-status.sh.
 // Do not edit by hand without changing the MANIFEST accordingly.
 // gate:lean4 gated=20 quarantined=0
-// gate:agda gated=73 quarantined=0
+// gate:agda gated=76 quarantined=0
 
 == Summary
 
@@ -165,14 +165,22 @@ no file uses coinduction. One warning class is silenced
 | *Proven*. The converse is false for one checked pair of types
 
 | 6
-| T7 of the experiment (local equality assumptions), part 1, a separation.
-  `Wager.Proofs.t7-separation` : for each closed instance of one GADT
-  program of a source calculus with local equality assumptions, no typed
-  closed target term has the erasure of the program together with a type
-  that has the erased type of the source type. Part 2 (an identity type at the
-  grade `0`) has no statement yet
+| T7 of the experiment (local equality assumptions), in 2 parts.
+  Part 1, a separation. `Wager.Proofs.t7-separation` : for each closed
+  instance of one GADT program of a source calculus with local equality
+  assumptions, no typed closed target term has the erasure of the program
+  together with a type that has the erased type of the source type.
+  Part 2, an identity type at the grade `0`, as a family of base constants
+  of a signature. Equality evidence is a term. `Wager.Proofs.t7-erasure`,
+  `t7-canonicity`, `t7-intro`, `t7-grade`, `t7-assumption`,
+  `t7-conservative` : the erasure of the proofs in casts is sound; closed
+  evidence exists exactly for convertible types; a local equality
+  assumption is a variable at the grade `0`
 | Part 1 *Proven*. It excludes a translation that keeps the erased type
-  and the erased term, and no other translation. Part 2 not attempted
+  and the erased term, and no other translation.
+  Part 2 *Proven* for a signature that has an identity family (one such
+  signature is built). The extension has 1 new rule and 1 new term former.
+  The owner decides if it is inside the wager
 
 | 7
 | the optional cross-check

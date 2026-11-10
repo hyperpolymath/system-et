@@ -346,3 +346,45 @@ A clean build of `Wager/Everything.agda` (70 modules) takes about 39 seconds and
 |===
 
 The third test shows that the proof of the separation depends on the text of the program.
+
+=== Gate watch at the end of Stage 6, part 2 (the identity type)
+
+A clean build of `Wager/Everything.agda` (76 modules) takes about 43 seconds and prints no warning.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/Examples/Stage6Identity.agda`: a false lemma (no closed term is evidence that `Int` is `Int`)
+| `[UnequalTerms]` in `no-evidence`
+| FAIL
+
+| `Wager/Identity/Term.agda`: `eraseⁱ (cast e t)` is the erasure of the evidence
+| `[UnequalTerms]` in the case of the cast of `Wager.Identity.Soundness.fund`
+| FAIL
+
+| `Wager/Identity/Typing.agda`: the rule `t-cast` takes evidence of the type `Id A A`
+| `[UnequalTerms]` in the case of the cast of `fund`
+| FAIL
+
+| `Wager/Identity/Typing.agda`: the rule `t-cast` uses the evidence at the grade `𝟙`
+| `[MismatchedProjectionsError]` in `cast-free`
+| FAIL
+
+| `Wager/Identity/Instance.agda`: the literal of the code `c` has the base type `cid c (cq c)`, off the diagonal
+| `[UnequalTerms]` in `diag`
+| FAIL
+
+| `Wager/Identity/Soundness.agda`: `postulate evidence-bad : erT A ≡ erT B`
+| `[SafeFlagPostulate]`. `scan-dangerous.sh` also fails.
+| FAIL
+
+| All changes removed
+| None
+| PASS, 76 files
+|===
+
+The second and the third test show that the proof of `T7-Erasure` depends on the erasure and on the rule.
+
+The fourth test has a second part. With the grade `𝟙` in the rule, sections 1 to 4 of `Wager.Identity.Soundness` were checked alone: they pass. These are the embedding of the target, `intro`, `fund`, `erasure-sound`, `erasure-sound-fo` and `canonicity`. Section 5 (`cast-free`, `assumption`) does not pass.
+The behaviour statements of part 2 thus do not depend on the grade of the rule, and the grade statements do (DC-6.7).

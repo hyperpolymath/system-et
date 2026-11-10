@@ -78,3 +78,6 @@ import Wager.Examples.Stage6
 import Wager.Identity.Family
 import Wager.Identity.Term
 import Wager.Identity.Typing
+import Wager.Identity.Soundness
+import Wager.Identity.Instance
+import Wager.Examples.Stage6Identity
