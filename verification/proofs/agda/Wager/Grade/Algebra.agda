@@ -70,3 +70,35 @@ record GradeAlgebra (R : Type) : Type₁ where
     laws : GradeLaws ops
   open GradeOps ops public
   open GradeLaws laws public
+
+-- The laws without `mul-zero` (a · 𝟘 ≡ 𝟘). Stage 2 examines a
+-- structure that has these 14 laws and fails `mul-zero`.
+record GradeLawsExceptMulZero {R : Type} (ops : GradeOps R) : Type where
+  open GradeOps ops
+  field
+    add-assoc     : ∀ a b c → (a + b) + c ≡ a + (b + c)
+    add-comm      : ∀ a b → a + b ≡ b + a
+    add-zero      : ∀ a → a + 𝟘 ≡ a
+    mul-assoc     : ∀ a b c → (a · b) · c ≡ a · (b · c)
+    one-mul       : ∀ a → 𝟙 · a ≡ a
+    mul-one       : ∀ a → a · 𝟙 ≡ a
+    zero-mul      : ∀ a → 𝟘 · a ≡ 𝟘
+    left-distrib  : ∀ a b c → a · (b + c) ≡ (a · b) + (a · c)
+    right-distrib : ∀ a b c → (a + b) · c ≡ (a · c) + (b · c)
+    le-refl       : ∀ a → a ≤ a
+    le-trans      : ∀ a b c → a ≤ b → b ≤ c → a ≤ c
+    le-antisym    : ∀ a b → a ≤ b → b ≤ a → a ≡ b
+    add-mono      : ∀ a b c d → a ≤ b → c ≤ d → (a + c) ≤ (b + d)
+    mul-mono      : ∀ a b c d → a ≤ b → c ≤ d → (a · c) ≤ (b · d)
+
+-- The 14 laws and `mul-zero` together are exactly the 15 laws.
+withMulZero : {R : Type} {ops : GradeOps R} → GradeLawsExceptMulZero ops →
+              (∀ a → GradeOps._·_ ops a (GradeOps.𝟘 ops) ≡ GradeOps.𝟘 ops) → GradeLaws ops
+withMulZero L mz = record
+  { add-assoc = add-assoc ; add-comm = add-comm ; add-zero = add-zero
+  ; mul-assoc = mul-assoc ; one-mul = one-mul ; mul-one = mul-one
+  ; zero-mul = zero-mul ; mul-zero = mz
+  ; left-distrib = left-distrib ; right-distrib = right-distrib
+  ; le-refl = le-refl ; le-trans = le-trans ; le-antisym = le-antisym
+  ; add-mono = add-mono ; mul-mono = mul-mono }
+  where open GradeLawsExceptMulZero L

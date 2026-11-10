@@ -30,3 +30,10 @@ verification/proofs/agda|Wager/L2/Preservation.agda|gated|Stage 1 (T0): preserva
 verification/proofs/agda|Wager/L2/Progress.agda|gated|Stage 1 (T0): canonical forms and progress
 verification/proofs/agda|Wager/Proofs.agda|gated|one inhabitant for each statement of Statements.agda
 verification/proofs/agda|Wager/Examples/Stage1.agda|gated|Stage 1: accepted and rejected closed examples
+verification/proofs/agda|Wager/Role/Role.agda|gated|Stage 2 (T1): roles, the lawful table and the GHC table, law by law
+verification/proofs/agda|Wager/Role/Role4.agda|gated|Stage 2 finding: a 4-point role structure with all laws and the GHC rule
+verification/proofs/agda|Wager/Role/Table.agda|gated|Stage 2: composition tables with the properties that noninterference uses
+verification/proofs/agda|Wager/Role/Signature.agda|gated|Stage 2: signatures with roles as kind grades
+verification/proofs/agda|Wager/Role/RepEq.agda|gated|Stage 2: representational equivalence (specification only)
+verification/proofs/agda|Wager/Role/Validity.agda|gated|Stage 2: observers and the validity of a signature (definitions)
+verification/proofs/agda|Wager/Role/Classic.agda|gated|Stage 2: the concrete signature (Int, Age, Proxy, isAge, deep)

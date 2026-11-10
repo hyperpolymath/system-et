@@ -34,3 +34,10 @@ import Wager.L2.Preservation
 import Wager.L2.Progress
 import Wager.Proofs
 import Wager.Examples.Stage1
+import Wager.Role.Role
+import Wager.Role.Role4
+import Wager.Role.Table
+import Wager.Role.Signature
+import Wager.Role.RepEq
+import Wager.Role.Validity
+import Wager.Role.Classic

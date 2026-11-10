@@ -191,3 +191,20 @@ module Check {A : Type} (F : Finite A) (B : BoolOps A) where
     ; left-distrib = left-distrib! h₉ ; right-distrib = right-distrib! h₁₀
     ; le-refl = le-refl! h₁₁ ; le-trans = le-trans! h₁₂ ; le-antisym = le-antisym! h₁₃
     ; add-mono = add-mono! h₁₄ ; mul-mono = mul-mono! h₁₅ }
+
+  -- The 14 checks without `mul-zero?`.
+  mkLaws14 :
+    add-assoc? ≡ true → add-comm? ≡ true → add-zero? ≡ true →
+    mul-assoc? ≡ true → one-mul? ≡ true → mul-one? ≡ true →
+    zero-mul? ≡ true →
+    left-distrib? ≡ true → right-distrib? ≡ true →
+    le-refl? ≡ true → le-trans? ≡ true → le-antisym? ≡ true →
+    add-mono? ≡ true → mul-mono? ≡ true →
+    GradeLawsExceptMulZero (toOps B)
+  mkLaws14 h₁ h₂ h₃ h₄ h₅ h₆ h₇ h₉ h₁₀ h₁₁ h₁₂ h₁₃ h₁₄ h₁₅ = record
+    { add-assoc = add-assoc! h₁ ; add-comm = add-comm! h₂ ; add-zero = add-zero! h₃
+    ; mul-assoc = mul-assoc! h₄ ; one-mul = one-mul! h₅ ; mul-one = mul-one! h₆
+    ; zero-mul = zero-mul! h₇
+    ; left-distrib = left-distrib! h₉ ; right-distrib = right-distrib! h₁₀
+    ; le-refl = le-refl! h₁₁ ; le-trans = le-trans! h₁₂ ; le-antisym = le-antisym! h₁₃
+    ; add-mono = add-mono! h₁₄ ; mul-mono = mul-mono! h₁₅ }
