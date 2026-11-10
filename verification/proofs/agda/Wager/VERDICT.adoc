@@ -50,11 +50,12 @@ Status: DRAFT after Stage 4. This file becomes final after the last stage.
   Each holds for each source signature that passes the role check, and for each state scheme.
 
   *The change.* A newtype with a parameter is not a two-state trope. It needs one wrapped state for each index of a state scheme (DC-4.1).
-  With two-state tropes T5 is false for a program of the fragment: `Wager.Proofs.no-two-state-translation` is a checked counterexample.
+  With two-state tropes, one program of the fragment has no translation of types that keeps the three properties of `Translation` (DC-4.8): `Wager.Proofs.no-two-state-translation` is the checked counterexample.
+  One of the three properties is "a nominal coercion becomes conversion", the content of T6. Agda did not prove that the typing part of T5 alone fails for each two-state translation.
   The row scheme exists for each signature (`Wager.Proofs.row-translation-exists`). The two-state scheme exists when no type-level function looks at the argument of a newtype (`Wager.Proofs.two-state-translation-exists`).
 
   *A condition on the grade algebra.* `t5-typing` needs a grade algebra in which the grade `𝟙` is unrestricted: `𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙` (DC-4.5). System FC has no usage discipline.
-  In `Affine` the translation of a source function that drops its argument has no type.
+  In `Affine` the translation of the source function `λx. 5`, which drops its argument, has no type (`Wager.Examples.Stage4.Coercions-In-Affine.const-rejected`). Agda checked this one function.
 
 | T6 | NOT ATTEMPTED | Stage 5 is not started. The lemma that T6 needs is proved, because T5 uses it: `Wager.Trans.Nominal.nominal-defeq` (DC-4.4). Stage 5 states T6.
 | T7 | NOT ATTEMPTED | Stage 6 is not started.
@@ -66,7 +67,8 @@ Stage 1 also proved the L1 equivalence that the task asks for:
 == Results of Stage 3: the source calculus
 
 Stage 3 has no T number. It defines the source calculus of claim W, a small fragment of System FC with roles (`Wager.FC`, DC-3.1 to DC-3.6).
-Its results are about the source calculus only. They show that the fragment behaves as the calculus of Breitner et al.
+Its results are about the source calculus only. They are properties that Breitner et al. state for their calculus, checked here for this fragment.
+This development has no formal comparison of the fragment with the calculus of the paper.
 
 [cols="3,1,5",options="header"]
 |===
@@ -109,7 +111,7 @@ The limits of the fragment are in DC-3.1 and DC-3.2. Two limits matter most for 
 * The body of a newtype cannot mention a declared newtype.
 
 Not proved in Stage 3: evaluation of a typed erased term gives a value of its erased type (DC-3.6).
-Stage 4 proves a part of it: the erasure of each closed source term evaluates to a value (`Wager.Proofs.t5-behaviour`).
+Stage 4 proves a part of it: in a signature that passes the role check, the erasure of each closed source term evaluates to a value (`Wager.Proofs.t5-behaviour`).
 
 == Results of Stage 4: the translation
 
@@ -143,6 +145,7 @@ Stage 4 defines the translation of the source calculus into the target calculus 
 | `No-Two-State-Translation`
 | PROVED
 | `Wager.Proofs.no-two-state-translation`. The checked counterexample: the signature `taggedS rep` has no translation with two-state tropes, into any target signature.
+  "Translation" has the sense of DC-4.8: a translation of types that keeps the three properties of `Translation`.
 |===
 
 === The source program with no two-state translation
@@ -194,8 +197,8 @@ Yes, for the declarative judgement.
 Rule `t-case` gives the two branches one usage vector, and rule `t-sub` raises each branch to that vector.
 The rule has no join. T0 is proved with this rule.
 
-The proofs of substitution and preservation use 14 of the 15 law fields. They do not use `le-antisym`.
-The proof of progress uses no law.
+The proofs of substitution and preservation do not use `le-antisym`: the name does not occur in the proof files of `Wager/L2`. This is a text search. Agda does not check it.
+The module of progress takes the operations only (`GradeOps`), so Agda checks that progress uses no law.
 
 A checker that computes a usage vector is a different matter.
 For `case` it must find one vector that is above the two branch vectors.
@@ -222,15 +225,15 @@ The two tables then differ in three points.
 
 | A parameter that does not occur, under a nominal function
 | The grade phantom is accepted.
-| The grade phantom is rejected (`Wager.Proofs.ghc-rejects-unused-parameter`). GHC itself gives phantom to such a parameter.
+| The grade phantom is rejected (`Wager.Proofs.ghc-rejects-unused-parameter`). The role inference of GHC gives phantom to a parameter that does not occur. This development did not run GHC.
 
 | What the grade phantom gives
 | Equal normal forms for all arguments (`t2-phantom`).
-| Equivalent normal forms only (`Wager.Examples.Stage2.GHC-Examples.ghc-phantom`).
+| Equivalent normal forms (`Wager.Examples.Stage2.GHC-Examples.ghc-phantom`). This development has no proof of equal normal forms for the GHC table.
 |===
 
 *Part 2: a generative constant with a parameter that is declared phantom (`Proxy`).*
-Such a signature does not respect its grades, with either table.
+With the lawful table such a signature does not respect its grades (`Wager.Proofs.phantom-constant-not-valid`). Agda did not check this sentence for the GHC table.
 With the lawful table the result is unsound: kinding accepts the grade phantom for `λa. deep (Proxy a)`, and this function maps `Age` and `Int` to types that are not equivalent (`Wager.Proofs.lawful-unsound-with-phantom-constant`).
 With the GHC table the same function is rejected at each grade below nominal (`Wager.Proofs.ghc-rejects-deep`).
 
@@ -257,7 +260,8 @@ Stage 2 proved the laws of the candidate only. It did not prove that the candida
 | F2
 | The systemet order of `Affine` has `0 ≤ ω` and `1 ≤ ω`, and `0` and `1` are not comparable.
   With this order a binder of grade `1` that is not used is rejected (`Wager.Examples.Stage1.T0-Affine.drop-rejected`).
-  The grade `1` is thus linear, not affine. The anytype kernel uses the order `0 ≤ 1 ≤ ω`, which accepts the same term.
+  The grade `1` is thus linear, not affine. The anytype kernel has the total order `0 ≤ 1 ≤ ω` (`src/kernel/Anytype/Grade/Affine.idr` in the anytype repository).
+  This development did not run the anytype checker on the term.
 
 | F3
 | T0 uses the law `a · 0 = 0` (`mul-zero`), in the product of a usage vector with a matrix.
@@ -272,7 +276,7 @@ Stage 2 proved the laws of the candidate only. It did not prove that the candida
 
 | F6
 | Noninterference needs `a ≤ a + b`. This holds for roles, because `+` is the maximum. It is not one of the 15 law fields.
-  It is false in `Affine` with the systemet order (`0 ≤ 0 + 1` is false).
+  It is false in `Affine` with the systemet order: `0 + 1` is `1`, and `0 ≤ 1` is false (`Wager.Examples.Stage4.Coercions-In-Affine.affine-not-unrestricted`).
 
 | F7
 | The signature of Stage 2 with `Proxy` declared phantom does not respect its grades (`Wager.Proofs.phantom-constant-not-valid`).
@@ -281,7 +285,7 @@ Stage 2 proved the laws of the candidate only. It did not prove that the candida
 
 | F8
 | With `Proxy` declared representational the signature is valid, and `Proxy Age ≈ Proxy Int` holds.
-  But `Proxy Int` and `Proxy Bool` are not related by `≈` (`Wager.Proofs.no-phantom-coercion`). GHC accepts a coercion between them.
+  But `Proxy Int` and `Proxy Bool` are not related by `≈` (`Wager.Proofs.no-phantom-coercion`). In Haskell a phantom parameter allows a coercion between them. This development did not run GHC.
   This result is about the relation `≈` only. It does not show that no term of the target calculus can do this coercion.
   Stage 4 shows a related result (finding F12): with the row scheme, a phantom coercion between two instances of a source newtype is a typed term of the target.
   Stage 4 does not translate the constant `Proxy` of the Stage 2 signature. The question stays open for that signature.
@@ -289,7 +293,7 @@ Stage 2 proved the laws of the candidate only. It did not prove that the candida
 | F9
 | Two notions of use. A 4-point structure with a separate grade "absent" for `0` has all 15 law fields and the GHC rule `nominal · phantom = nominal` (`Wager.Proofs.role4-lawful`, `Wager.Proofs.role4-has-ghc-rule`).
   This is a candidate for the phantom coercions without a change of the law set. Stage 2 did not prove that it gives them back.
-  It needs a larger `≈` (a constant with a phantom parameter ignores its argument) and a weaker phantom part of T2 (`≈` in place of `≡`).
+  It would need a larger `≈` (a constant with a phantom parameter ignores its argument) and a weaker phantom part of T2 (`≈` in place of `≡`). This development did not check these two points.
   Stage 2 proved the laws only. It did not build kinding or noninterference for this structure. The owner decides.
 
 | F10
@@ -304,19 +308,20 @@ Stage 2 proved the laws of the candidate only. It did not prove that the candida
   For that body the lawful entry gives phantom, and example `f-sees-phantom` shows that phantom is wrong there. Stage 3 has no Agda proof about such a body.
 
 | F12
-| Two-state tropes are not enough for a newtype with a phantom parameter and a type-level function that looks at that parameter (`Wager.Proofs.no-two-state-translation`).
+| Two-state tropes are not enough for the signature `taggedS rep`: a newtype with a phantom parameter and a type-level function that looks at that parameter (`Wager.Proofs.no-two-state-translation`, in the sense of DC-4.8). Agda checked this one signature.
   One wrapped state for each row of function results is enough (`rowScheme`, T5).
   The phantom parameter is then in the name of the state. It is not a type argument of a constant, so findings F7 and F8 do not apply to it.
   The phantom coercion is two trope transitions: unwrap from one state, wrap to the other state.
 
 | F13
-| A source program has no usage discipline. Its translation needs a grade algebra in which the grade `𝟙` is unrestricted (DC-4.5).
-  The rules of Stage 1 bind the components of a pair and the variable of a `case` branch at the grade `𝟙`. In `Affine` a source function that drops its argument has no translated type.
+| A source program has no usage discipline. Its translation is typed in each grade algebra in which the grade `𝟙` is unrestricted (DC-4.5). This development does not prove that the condition is necessary.
+  The rules of Stage 1 bind the components of a pair and the variable of a `case` branch at the grade `𝟙`. In `Affine` the translation of the source function `λx. 5` has no type (`const-rejected`). Agda checked this one function.
   A translated coercion is different: it uses each variable one time, and it is typed in each grade algebra.
 
 | F14
 | After erasure a translated coercion is not the empty term. The trope transitions vanish, and the maps of functions, pairs and sums stay (`Wager.Examples.Stage4.Programs.prog-erased`).
-  The coercion is observationally the identity (T3). It is zero-cost only when the coercion has no map, or after a later optimisation that this development does not have.
+  The coercion is observationally the identity (T3). By the definition of `eraseT`, a trope transition leaves no term, and a map of a function, of a pair or of a sum leaves a term.
+  This development has no optimisation that removes such a map.
 
 | F15
 | In this fragment the result of a type-level function is a base type. For a signature with a finite number of base types and of type-level functions, a finite number of states for each newtype is then enough (DC-4.1). Agda did not check this sentence.

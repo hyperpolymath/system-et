@@ -148,9 +148,10 @@ no file uses coinduction. One warning class is silenced
   fragment preserves typing, and the erased source program and the erased
   translation evaluate to observationally equal values
 | *Proven* with a change: a newtype with a parameter needs more than one
-  wrapped trope state. With two-state tropes the statement is false
-  (`Wager.Proofs.no-two-state-translation`). Typing of a whole program
-  needs a grade algebra with an unrestricted grade `1`
+  wrapped trope state. With two-state tropes one program of the fragment
+  has no translation of types that keeps the properties that the
+  experiment asks for (`Wager.Proofs.no-two-state-translation`). Typing of a
+  whole program is proved for a grade algebra with an unrestricted grade `1`
 
 | 4
 | `Wager.Proofs.role-correspondence` : the inferred source role of a

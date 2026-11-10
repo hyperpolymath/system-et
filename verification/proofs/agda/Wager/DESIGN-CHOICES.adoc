@@ -286,7 +286,7 @@ A body cannot mention a declared newtype. The representation of a newtype with n
 The rule for a type-level function is `nominal · r` with the lawful table: a parameter that does not occur below the function stays phantom.
 `Source-Role-Soundness` is proved with this rule.
 
-*Consequence 2.* The fragment cannot declare the body that separates the lawful table from the rule of GHC: a phantom newtype below a type-level function, such as `F (Tag a)`.
+*Consequence 2.* The fragment cannot declare the body that separates the lawful table from the role inference of GHC, as Breitner et al. describe it: a phantom newtype below a type-level function, such as `F (Tag a)`. This development did not run GHC.
 For that body the lawful table gives the role phantom to `a`. Phantom is wrong there: `F (Tag Int)` and `F (Tag Bool)` are different types (`Wager.Examples.Stage3.Nominal-Soundness-Examples.f-sees-phantom`).
 A larger fragment with such bodies must use another inference rule. Stage 3 proves nothing about such a body.
 The coercion rules of this fragment do have the rule of GHC for a newtype (DC-3.3).
@@ -299,7 +299,7 @@ The coercion rules of this fragment do have the rule of GHC for a newtype (DC-3.
 *Choice.* `Co r τ σ` (`Wager.FC.Coercion`) has the role `r` as an index.
 The congruence rule for a newtype `N` has a premise at the role `mulG r (role N)`. `mulG` is the GHC composition table of T1.
 
-*Reason.* This is the rule of Breitner et al.: at the role nominal the arguments are nominally equal, at the role representational the arguments are equal at the declared role, at the role phantom there is no condition.
+*Reason.* This development reads the rule of Breitner et al. in this way: at the role nominal the arguments are nominally equal, at the role representational the arguments are equal at the declared role, at the role phantom there is no condition.
 The entry `nominal · phantom = nominal` says that a newtype is generative: `Tag Int` and `Tag Bool` are different types, also when the parameter of `Tag` is phantom.
 
 *Note.* `Co` is a relation of the source calculus. The target calculus does not have it (`RELATION-LEDGER.adoc`, entry R14).
@@ -310,7 +310,7 @@ The entry `nominal · phantom = nominal` says that a newtype is generative: `Tag
 *Choice.* A source type-level function has the same form as a target primitive (DC-1.1): one equation for each head.
 For a newtype with one parameter, the right side is a base type, or another function on the PARAMETER of the newtype (`F (N τ) = G τ`).
 
-*Reason.* A closed type family of GHC can match on the argument of a type constructor. The form also keeps each function total.
+*Reason.* A closed type family of Haskell can match on the argument of a type constructor (this development did not run GHC). The form also keeps each function total.
 
 *Difference from the target.* A target primitive on `capp c A` can look at `A`. In the planned translation of Stage 4, `A` is the representation of the newtype, not its parameter.
 Stage 4 must show what this difference costs.
@@ -347,7 +347,7 @@ Two schemes exist:
 * `rowScheme`: the index is the row of the results of all the type-level functions on `N τ`. It exists for each source signature.
 * `twoState`: there is one index. The newtype is a two-state trope (raw, wrapped), as in Stage 2. It exists when no type-level function looks at the argument of a newtype.
 
-*Reason.* Stage 2 made a newtype a two-state trope. This is not enough for a newtype with a phantom parameter and a function that looks at that parameter (`Wager.Proofs.no-two-state-translation`).
+*Reason.* Stage 2 made a newtype a two-state trope. This is not enough for the signature `taggedS rep`, which has a newtype with a phantom parameter and a function that looks at that parameter (`Wager.Proofs.no-two-state-translation`, in the sense of DC-4.8). Agda checked this one signature.
 `Tag Int` and `Tag Bool` have one representation, and the function tells them apart. They need two states of one carrier.
 
 *Finite state sets.* Document 07 says that a trope has a finite set of states. The index type of the row scheme is `Fam → Base`.
@@ -408,7 +408,7 @@ A nominal coercion is the identity transformer. Its typing uses rule `t-conv`, b
 *Reason.* System FC has no usage discipline: a source term can drop a variable and can use it two times.
 The rules of Stage 1 bind the two components of a pair and the variable of a `case` branch at the grade 𝟙, as the anytype checker does. A source term can drop a component. Thus 𝟙 itself must allow this.
 
-*Consequence.* In the algebra `Affine` (systemet order) the grade 1 is linear. The translation of a source function that drops its argument has no type there (`Wager.Examples.Stage4.Coercions-In-Affine.const-rejected`).
+*Consequence.* In the algebra `Affine` (systemet order) the grade 1 is linear. The translation of the source function `λx. 5`, which drops its argument, has no type there (`Wager.Examples.Stage4.Coercions-In-Affine.const-rejected`). Agda checked this one function. This development does not prove that the two conditions are necessary.
 The two conditions name the grades 𝟘 and 𝟙 only. They are hypotheses of a theorem. They are not side conditions of a rule.
 
 [[DC-4.6]]
