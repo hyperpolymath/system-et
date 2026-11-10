@@ -13,7 +13,7 @@ summary from the per-prover MANIFESTs and fails if this file disagrees.
 // Machine-readable ground-truth markers — checked by scripts/check-proof-status.sh.
 // Do not edit by hand without changing the MANIFEST accordingly.
 // gate:lean4 gated=20 quarantined=0
-// gate:agda gated=76 quarantined=0
+// gate:agda gated=77 quarantined=0
 
 == Summary
 

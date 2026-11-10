@@ -57,6 +57,7 @@ import Wager.Local.Source
 import Wager.Local.Gadt
 import Wager.Identity.Family
 import Wager.Identity.Typing
+import Wager.Univalent.Model
 
 ------------------------------------------------------------------------
 -- STAGE 1
@@ -773,3 +774,68 @@ module T7-Identity-Statements
   T7-Assumption =
     GradeLaws ops → ∀ (A B : Ty [] ★) {Γ : Cx 0} →
     0ᵘ ▸ Γ ⊢ⁱ use-assumption A B ∶ arr 𝟘 (base (Id A B)) (arr 𝟙 A B)
+
+------------------------------------------------------------------------
+-- STAGE 7: the optional univalent cross-check
+------------------------------------------------------------------------
+
+-- The task: "Interpret target types in the cubical universe and newtype
+-- transitions as equivalences. Show that the denotation of a translated
+-- coercion equals transport along the path from `ua`."
+--
+-- The model is `Wager.Univalent.Model` (DESIGN-CHOICES.adoc, DC-7.1 to
+-- DC-7.3). It is for the target of Stage 4, for each source signature,
+-- each state scheme and each grade algebra, and for each interpretation
+-- `El` of the base constants with an element `elLit ℓ` for each literal.
+--
+--   ⟦ X ⟧          the interpretation of a closed target type: a type of
+--                  the cubical universe. A newtype instance is a wrapper
+--                  `Box`, and `unboxEquiv : Box Z ≃ Z` is its transition.
+--   Real X ρ u x   the untyped term u, in the environment ρ, evaluates
+--                  to a value that realises the element x of ⟦ X ⟧
+--   Denotes X Y f g
+--                  the term transformer f denotes the function g: on a
+--                  term that evaluates to a realiser of x, the term
+--                  `f t` evaluates to a realiser of `g x`
+--   pathOf wr γ    the path ⟦ T τ ⟧ ≡ ⟦ T σ ⟧ of a representational
+--                  coercion γ. It is made from `ua unboxEquiv` (a newtype
+--                  axiom), `sym`, composition, and congruence of the
+--                  type formers. It needs the source role check `wr`.
+module Stage7-Statements
+  (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+  {R : Type} (A : GradeAlgebra R)
+  (El : SSig.Base SS → Type)
+  (elLit : (ℓ : SSig.Lit SS) → El (SSig.litTy SS ℓ)) where
+  private
+    ops = GradeAlgebra.ops A
+  open GradeOps ops using (𝟙)
+  open Wager.FC.Types SS
+  open Wager.FC.Coercion SS
+  open Wager.Trans.Target SS Sc ops using (T; arr)
+  open Wager.Trans.Coercion SS Sc ops using (coI; fwd; bwd; coerceT; eraseT)
+  open Wager.Univalent.Model SS Sc A El elLit
+  open Wager.Erased.Untyped.Terms Lit using (UEnv)
+
+  -- English (the cross-check): the translation of a representational
+  -- coercion denotes transport along its path. On a term that evaluates
+  -- to a realiser of x, the transformed term evaluates to a realiser of
+  -- `transport (pathOf wr γ) x`.
+  Coercion-Denotes-Transport : Type
+  Coercion-Denotes-Transport =
+    (wr : WellRoled) → ∀ {τ σ} (γ : Co rep τ σ) →
+    Denotes (T τ) (T σ) (fwd (coI rep γ)) (transport (pathOf wr γ))
+
+  -- English: the transformer in the other direction denotes transport
+  -- along the inverse path.
+  Coercion-Denotes-Transport-Back : Type
+  Coercion-Denotes-Transport-Back =
+    (wr : WellRoled) → ∀ {τ σ} (γ : Co rep τ σ) →
+    Denotes (T σ) (T τ) (bwd (coI rep γ)) (transport (sym (pathOf wr γ)))
+
+  -- English: the erased coercion function evaluates, in each
+  -- environment, to a closure that realises the function
+  -- `transport (pathOf wr γ)`.
+  Coerce-Function-Is-Transport : Type
+  Coerce-Function-Is-Transport =
+    (wr : WellRoled) → ∀ {τ σ} (γ : Co rep τ σ) {n} {ρ : UEnv n} →
+    Real (arr 𝟙 (T τ) (T σ)) ρ (eraseT (coerceT γ)) (transport (pathOf wr γ))

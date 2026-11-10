@@ -81,3 +81,4 @@ import Wager.Identity.Typing
 import Wager.Identity.Soundness
 import Wager.Identity.Instance
 import Wager.Examples.Stage6Identity
+import Wager.Univalent.Model

@@ -626,3 +626,47 @@ The literals are the literals of the start and one literal for each code `c`, of
 * The signature has no generative constant, no primitive and no trope operation. It is one signature for the purpose. This development does not show that each signature has an extension with a family.
 * Each code is a base constant, also a code that `enc` does not give.
 * A literal exists for each code `c`, also when `c` is not the code of a type. Its base type `cid c c` is on the diagonal, so `diagonal` holds.
+
+== Stage 7
+
+[[DC-7.1]]
+=== DC-7.1: the model of types in the cubical universe
+
+*The task text.* "Interpret target types in the cubical universe and newtype transitions as equivalences. Show that the denotation of a translated coercion equals transport along the path from `ua`." The stage is optional. The owner asked for it on 2026-11-10.
+
+*Choice.* `Wager.Univalent.Model` interprets a closed type of the target of Stage 4 as a type of the cubical universe, by its normal form:
+
+* A base constant `b` is `El b`. `El` is a parameter of the model, with an element `elLit ℓ` for each literal.
+* A function, a pair and a sum are the function type, the product and the sum.
+* A newtype instance `capp s A` is `Box X`, where X is the interpretation of A. `Box` is a record with one field. It is a different type from X, and `unboxEquiv : Box X ≃ X` is an equivalence.
+
+A trope transition (wrap, unwrap) is thus an equivalence, and `ua unboxEquiv` is a path between the two types.
+
+*Not chosen.* The interpretation of `capp s A` as the interpretation of A. Each transition is then the identity equivalence, and the statement of the stage says no more than T3.
+
+*Limit.* The model has one wrapper for each state. It does not have a different type for each newtype name: two newtypes with one content have one interpretation.
+
+[[DC-7.2]]
+=== DC-7.2: the denotation of a term is by realisers
+
+*The gap.* The development has no function from a typed term to an element of the model. The typing judgement of the target is declarative: it has a conversion rule and a subusage rule. A denotation by recursion on a derivation needs a proof that two derivations of one term give one element. This is not done.
+
+*Choice.* The model is a realisability model. `𝓡 u v x` says that the untyped value v realises the element x of the interpretation of the normal form u. A wrapper is not seen at run time: v realises `box x` when v realises x.
+`Denotes X Y f g` says that the term transformer f denotes the function g: on a term that evaluates to a realiser of x, the term `f t` evaluates to a realiser of `g x`.
+
+"The denotation of a translated coercion equals transport along the path" is thus: the transformer of the coercion denotes the function `transport (pathOf wr γ)`.
+
+*Limits.* The statement is about an element that has a realiser. The development does not show that each element of the model has a realiser, and it does not show that a realiser has one element only. It has no fundamental lemma for each typed term of the target.
+
+[[DC-7.3]]
+=== DC-7.3: the path of a coercion
+
+*Choice.* `pathOf wr γ` is a path between the interpretations of the two translated types, by recursion on the coercion:
+
+* a newtype axiom gives `ua unboxEquiv`, moved along the equation of the type translation (`T-embE`, `T-inst`);
+* symmetry gives `sym`, transitivity gives the composition of paths;
+* a function, a pair and a sum give the congruence of the type former;
+* a nominal coercion gives the path of two types with one normal form;
+* congruence for a newtype gives the path of the body below the wrapper, by the role of the parameter.
+
+The path needs the source role check, as the typing of a translated coercion does (T3).

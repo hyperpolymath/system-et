@@ -77,3 +77,4 @@ verification/proofs/agda|Wager/Identity/Typing.agda|gated|Stage 6, part 2: the t
 verification/proofs/agda|Wager/Identity/Soundness.agda|gated|Stage 6, part 2 (T7, the identity type): the erasure of proofs is sound for each signature with an identity family and each set of grade operations; canonicity; the grade lemma needs the laws
 verification/proofs/agda|Wager/Identity/Instance.agda|gated|Stage 6, part 2: one signature that has an identity family (the record is not empty)
 verification/proofs/agda|Wager/Examples/Stage6Identity.agda|gated|Stage 6, part 2 (T7, the identity type): accepted and rejected closed examples
+verification/proofs/agda|Wager/Univalent/Model.agda|gated|Stage 7 (optional): the model of target types in the cubical universe, realisers, and the path of a coercion (definitions only)
