@@ -566,3 +566,37 @@ module Two-State-Statements where
   No-Two-State-Translation =
     (S : Sig) (t : Translation S) → ¬ TwoState S t
     where open Wager.Trans.TwoState (Wager.FC.Tagged.taggedS rep)
+
+------------------------------------------------------------------------
+-- STAGE 5: nominal coercions from type-level functions (theorem T6)
+------------------------------------------------------------------------
+
+-- A nominal coercion of the source is built from reflexivity, symmetry,
+-- transitivity, congruence and the equations of the type-level
+-- functions. `T` is the translation of types of Stage 4.
+module T6-Statements
+  (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+  {R : Type} (ops : GradeOps R) where
+  open Wager.FC.Types SS
+  open Wager.FC.Coercion SS
+  open Wager.FC.Term SS
+  open Wager.Trans.Target SS Sc ops using (tSig; T)
+  open Wager.Trans.Coercion SS Sc ops using (tr)
+  open Wager.L1.Conversion tSig using (DefEq)
+  open Wager.L1.Eval tSig using (nf)
+
+  -- English (T6): for each nominal coercion of the source, the two
+  -- translated types have one normal form.
+  T6 : Type
+  T6 = ∀ {τ σ} → Co nom τ σ → nf (T τ) ≡ nf (T σ)
+
+  -- English: the coercion becomes conversion of the target.
+  T6-Conversion : Type
+  T6-Conversion = ∀ {τ σ} → Co nom τ σ → DefEq (T τ) (T σ)
+
+  -- English: no term remains. The translation of a cast along a nominal
+  -- coercion is the translation of the term under the cast.
+  T6-No-Term : Type
+  T6-No-Term =
+    ∀ {n} {Γ : SCx n} {τ σ} (γ : Co nom τ σ) (e : STm Γ τ) →
+    tr (cast (c-sub γ) e) ≡ tr e
