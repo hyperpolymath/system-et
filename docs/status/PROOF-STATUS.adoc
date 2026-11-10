@@ -13,7 +13,7 @@ summary from the per-prover MANIFESTs and fails if this file disagrees.
 // Machine-readable ground-truth markers — checked by scripts/check-proof-status.sh.
 // Do not edit by hand without changing the MANIFEST accordingly.
 // gate:lean4 gated=20 quarantined=0
-// gate:agda gated=29 quarantined=0
+// gate:agda gated=64 quarantined=0
 
 == Summary
 
@@ -110,8 +110,56 @@ no file uses coinduction. One warning class is silenced
 | `Wager.Proofs.affine-is-grade-algebra`, `level-is-grade-algebra`
 | *Proven* (law checks computed over the finite carriers)
 
-| 2 to 7
-| T1 to T7 of the experiment
+| 2
+| `Wager.Proofs.t1-lawful`, `t1-ghc-other-laws`, `t1-ghc-mul-zero-fails` : roles as a
+  grade structure. The lawful table has all 15 law fields. The GHC table
+  fails `a · 0 = 0`, at nominal only
+| *Proven*
+
+| 2
+| `Wager.Proofs.noninterference`, `t2-representational`, `t2-phantom` : role
+  soundness as noninterference, for a signature that respects its
+  declared grades
+| *Proven* with that hypothesis. Without it the statement is false
+  (`Wager.Proofs.t2-phantom-fails-without-valid`)
+
+| 2
+| `Wager.Proofs.t4-kinding-rejects`, `t4-not-equivalent` : the classic
+  unsound type-level function is rejected at the grade representational
+| *Proven*
+
+| 3
+| `Wager.Proofs.source-role-soundness`, `erasure-preserves-typing`,
+  `classic-rejected`, `classic-unsound-if-accepted`,
+  `classic-nominal-no-coercion` : the source calculus (a fragment of System
+  FC with roles). The role check makes a representational coercion keep
+  the erased type. The check rejects the classic unsound program
+| *Proven* for the source fragment of the experiment
+
+| 4
+| `Wager.Proofs.t3`, `coercion-is-a-term` : the translation of a
+  representational coercion is an ordinary typed term of the target (trope
+  transitions and functorial maps, no cast). Its erasure is observationally
+  the identity function
+| *Proven*
+
+| 4
+| `Wager.Proofs.t5-typing`, `t5-behaviour` : the translation of the source
+  fragment preserves typing, and the erased source program and the erased
+  translation evaluate to observationally equal values
+| *Proven* with a change: a newtype with a parameter needs more than one
+  wrapped trope state. With two-state tropes one program of the fragment
+  has no translation of types that keeps the properties that the
+  experiment asks for (`Wager.Proofs.no-two-state-translation`). Typing of a
+  whole program is proved for a grade algebra with an unrestricted grade `1`
+
+| 4
+| `Wager.Proofs.role-correspondence` : the inferred source role of a
+  newtype parameter is the least grade that target kinding accepts
+| *Proven*
+
+| 5 to 7
+| T6, T7 of the experiment
 | not attempted
 |===
 

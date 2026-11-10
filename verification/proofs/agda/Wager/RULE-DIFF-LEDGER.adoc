@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: rule-diff ledger
-Status: Stage 1. *The ledger is empty.*
+Status: Stage 4. *The ledger is empty.*
 :toc: left
 :sectnums:
 
@@ -54,3 +54,30 @@ The evidence is structural, and Agda checks it.
 They are data of the signature, not of a rule.
 A later stage chooses these entries for a specific algebra.
 If a theorem then needs a condition on the entries, `VERDICT.adoc` records the condition with the class "signature primitive".
+
+== Stage 2
+
+Stage 2 adds no typing rule and no kinding rule. The kinding judgement of Stage 1 is used with the role tables as it is.
+
+The signature of Stage 2 (`Wager.Role.Classic`) has entries that name grades: each primitive has the grade `nom`, the newtype state `age` has the grade `rep`.
+These are signature entries, not rules.
+
+T2 needs a condition on the entries: the predicate `Valid` of `Wager.Role.Validity`.
+`VERDICT.adoc` records this condition with the class "signature primitive".
+It is not an entry of this ledger, because no rule has a side condition.
+
+== Stage 3
+
+Stage 3 adds no typing rule and no kinding rule to the target calculus.
+
+The source rule `c-nt₁` (`Wager.FC.Coercion`) names the GHC composition table `mulG`.
+It is a rule of the source calculus, the fragment of System FC. It is not a rule of the target calculus, so it is not an entry of this ledger.
+
+== Stage 4
+
+Stage 4 adds no typing rule and no kinding rule to the target calculus. The translation gives terms that the rules of Stage 1 type.
+
+The translation names the grade `𝟙` only: a function type becomes `arr 𝟙`, and each binder of a translated term has the grade `𝟙`.
+
+Theorem T5 (typing of a translated program) has two hypotheses on the grade algebra: `𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙`.
+They name the grades `𝟘` and `𝟙` only. They are hypotheses of a theorem and not side conditions of a rule, so they are not entries of this ledger. `VERDICT.adoc` records them at T5.

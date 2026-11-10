@@ -54,3 +54,11 @@ inv-app (t-conv d e) =
 inv-app (t-sub d le) =
   let (q , A , B , γ₁ , γ₂ , c , le' , d₁ , d₂) = inv-app d
   in q , A , B , γ₁ , γ₂ , c , ≤ᵘ-trans le' le , d₁ , d₂
+
+inv-step : {γ : Usage n} {Γ : Cx n} {o : Op} {t : Tm n} {C : Ty [] ★} →
+           γ ▸ Γ ⊢ step o t ∶ C →
+           Σ[ γ' ∈ Usage n ]
+             DefEq (carrier o at to o) C × (γ' ≤ᵘ γ) × (γ' ▸ Γ ⊢ t ∶ carrier o at from o)
+inv-step (t-step o d) = _ , d-refl , ≤ᵘ-refl _ , d
+inv-step (t-conv d e) = let (γ' , c , le , d') = inv-step d in γ' , d-trans c e , le , d'
+inv-step (t-sub d le) = let (γ' , c , le' , d') = inv-step d in γ' , c , ≤ᵘ-trans le' le , d'

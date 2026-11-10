@@ -30,3 +30,38 @@ verification/proofs/agda|Wager/L2/Preservation.agda|gated|Stage 1 (T0): preserva
 verification/proofs/agda|Wager/L2/Progress.agda|gated|Stage 1 (T0): canonical forms and progress
 verification/proofs/agda|Wager/Proofs.agda|gated|one inhabitant for each statement of Statements.agda
 verification/proofs/agda|Wager/Examples/Stage1.agda|gated|Stage 1: accepted and rejected closed examples
+verification/proofs/agda|Wager/Role/Role.agda|gated|Stage 2 (T1): roles, the lawful table and the GHC table, law by law
+verification/proofs/agda|Wager/Role/Role4.agda|gated|Stage 2 finding: a 4-point role structure with all laws and the GHC rule
+verification/proofs/agda|Wager/Role/Table.agda|gated|Stage 2: composition tables with the properties that noninterference uses
+verification/proofs/agda|Wager/Role/Signature.agda|gated|Stage 2: signatures with roles as kind grades
+verification/proofs/agda|Wager/Role/RepEq.agda|gated|Stage 2: representational equivalence (specification only)
+verification/proofs/agda|Wager/Role/Validity.agda|gated|Stage 2: observers and the validity of a signature (definitions)
+verification/proofs/agda|Wager/Role/Classic.agda|gated|Stage 2: the concrete signature (Int, Age, Proxy, isAge, deep)
+verification/proofs/agda|Wager/L1/KindingInversion.agda|gated|Stage 2: inversion of graded kinding (for rejected examples)
+verification/proofs/agda|Wager/Role/Noninterference.agda|gated|Stage 2 (T2): noninterference for a composition table and a valid signature
+verification/proofs/agda|Wager/Role/Lawful.agda|gated|Stage 2 (T2): the two parts of T2 with the lawful table; a sufficient condition for validity
+verification/proofs/agda|Wager/Role/ClassicProofs.agda|gated|Stage 2 (T4): the classic unsound program; the Proxy test
+verification/proofs/agda|Wager/Examples/Stage2.agda|gated|Stage 2: accepted and rejected closed examples
+verification/proofs/agda|Wager/Erased/Untyped.agda|gated|Stage 3: the untyped calculus after erasure (terms, big-step evaluation, erased typing)
+verification/proofs/agda|Wager/FC/Signature.agda|gated|Stage 3: source signature (newtypes, declared roles, type-level functions), role inference, the role check
+verification/proofs/agda|Wager/FC/Types.agda|gated|Stage 3: source types, nominal values (ev), erased types (er)
+verification/proofs/agda|Wager/FC/Coercion.agda|gated|Stage 3: source coercions with roles (the relation Co)
+verification/proofs/agda|Wager/FC/Term.agda|gated|Stage 3: source terms with cast and coerce; erasure, in which a cast vanishes
+verification/proofs/agda|Wager/FC/Classic.agda|gated|Stage 3: the classic unsound program as a source signature (definitions only)
+verification/proofs/agda|Wager/FC/RoleSoundness.agda|gated|Stage 3: soundness of the source roles (a representational coercion keeps the erased type)
+verification/proofs/agda|Wager/FC/Erasure.agda|gated|Stage 3: erasure preserves typing, for a signature that passes the role check
+verification/proofs/agda|Wager/FC/ClassicProofs.agda|gated|Stage 3: the classic unsound program; the role check rejects it; the exploit if it is accepted
+verification/proofs/agda|Wager/Examples/Stage3.agda|gated|Stage 3: accepted and rejected closed examples
+verification/proofs/agda|Wager/FC/Tagged.agda|gated|Stage 3 and 4: a source signature with a phantom newtype and a function that looks at its argument (definitions only)
+verification/proofs/agda|Wager/Erased/LogRel.agda|gated|Stage 4: observational equality of untyped values at an erased type (logical relation)
+verification/proofs/agda|Wager/Trans/Scheme.agda|gated|Stage 4: state schemes for newtypes (row scheme, two-state scheme)
+verification/proofs/agda|Wager/Trans/Target.agda|gated|Stage 4: the target signature of the translation and the translation of types
+verification/proofs/agda|Wager/Trans/Nominal.agda|gated|Stage 4: a nominal coercion of the source becomes conversion in the target
+verification/proofs/agda|Wager/Trans/Coercion.agda|gated|Stage 4: translation of coercions (trope transitions and functorial maps) and of terms; erasure of the target
+verification/proofs/agda|Wager/Trans/TwoState.agda|gated|Stage 4: what a translation of types must keep; two-state tropes (definitions only)
+verification/proofs/agda|Wager/Grade/Trivial.agda|gated|Stage 4: the one-point grade algebra (no usage discipline)
+verification/proofs/agda|Wager/Trans/Typing.agda|gated|Stage 4 (T5): the translation preserves typing; a coercion is a typed term in each grade algebra
+verification/proofs/agda|Wager/Trans/Simulation.agda|gated|Stage 4 (T3, T5): an erased coercion is observationally the identity; erased source and erased target agree
+verification/proofs/agda|Wager/Trans/RoleCorrespondence.agda|gated|Stage 4: the inferred source role is the least grade that target kinding accepts; the target signature is valid
+verification/proofs/agda|Wager/Trans/TwoStateProofs.agda|gated|Stage 4: the tagged signature has no translation with two-state tropes (checked counterexample)
+verification/proofs/agda|Wager/Examples/Stage4.agda|gated|Stage 4: accepted and rejected closed examples

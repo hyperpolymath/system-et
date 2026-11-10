@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: plan
-Status: Stage 0 deliverable. It is a proposal. It waits for the owner.
+Status: Stage 0 deliverable. The owner accepted it on 2026-11-10. Stages 0 to 2 are complete.
 :sectnums:
 
 == Goal
@@ -13,7 +13,7 @@ A proof is a success. A checked counterexample is a success. A vague result is a
 
 . Agda 2.8.0 and cubical v0.9 are installed and recorded in `TOOLCHAIN.adoc`. The gate failed on a false lemma, a `postulate` and a hole, and passes on the restored file.
 . The stock cubical v0.9 library forces `--guardedness` on each importer (DC-0.2). This conflicts with a task rule.
-. `scripts/check-proof-status.sh` is red on this branch, because the task forbids the marker line in `PROOF-STATUS.adoc`.
+. `scripts/check-proof-status.sh` was red at Stage 0, because the task did not allow the marker line in `PROOF-STATUS.adoc`. This is resolved since 2026-11-10 (`VERDICT.adoc`, F5).
 . The systemet `Affine` order (`0 ≤ ω`, `1 ≤ ω`, and `0`, `1` not comparable) differs from the anytype order (`0 ≤ 1 ≤ ω`). Stage 1 uses the systemet order.
 . The documents leave the L2 rule table open (doc 03) and say that a trope has a finite state set (doc 07). Both facts matter in stages 1 and 4.
 
