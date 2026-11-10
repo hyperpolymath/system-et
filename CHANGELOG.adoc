@@ -21,7 +21,7 @@ open proof obligation.
 and the AFFIRMATION honesty snapshot with the systemet identity and an
 honest status (theory specified; proofs OPEN; no compiler here).
 * Added the wager experiment for coercions and roles in Cubical Agda
-(`+verification/proofs/agda/Wager/+`, stages 0 to 2), with an `+agda+` job
+(`+verification/proofs/agda/Wager/+`, stages 0 to 3), with an `+agda+` job
 in the proofs workflow. The experiment claims no ET obligation.
 
 ==== Changed

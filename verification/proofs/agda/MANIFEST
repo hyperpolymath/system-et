@@ -48,3 +48,7 @@ verification/proofs/agda|Wager/FC/Types.agda|gated|Stage 3: source types, nomina
 verification/proofs/agda|Wager/FC/Coercion.agda|gated|Stage 3: source coercions with roles (the relation Co)
 verification/proofs/agda|Wager/FC/Term.agda|gated|Stage 3: source terms with cast and coerce; erasure, in which a cast vanishes
 verification/proofs/agda|Wager/FC/Classic.agda|gated|Stage 3: the classic unsound program as a source signature (definitions only)
+verification/proofs/agda|Wager/FC/RoleSoundness.agda|gated|Stage 3: soundness of the source roles (a representational coercion keeps the erased type)
+verification/proofs/agda|Wager/FC/Erasure.agda|gated|Stage 3: erasure preserves typing, for a signature that passes the role check
+verification/proofs/agda|Wager/FC/ClassicProofs.agda|gated|Stage 3: the classic unsound program; the role check rejects it; the exploit if it is accepted
+verification/proofs/agda|Wager/Examples/Stage3.agda|gated|Stage 3: accepted and rejected closed examples

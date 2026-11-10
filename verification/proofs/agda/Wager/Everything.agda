@@ -52,3 +52,7 @@ import Wager.FC.Types
 import Wager.FC.Coercion
 import Wager.FC.Term
 import Wager.FC.Classic
+import Wager.FC.RoleSoundness
+import Wager.FC.Erasure
+import Wager.FC.ClassicProofs
+import Wager.Examples.Stage3

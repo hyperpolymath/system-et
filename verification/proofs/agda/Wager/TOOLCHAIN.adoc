@@ -238,3 +238,30 @@ A clean build of `Wager/Everything.agda` (41 modules) takes about 25 seconds and
 | None
 | PASS, 41 files
 |===
+
+=== Gate watch at the end of Stage 3
+
+A clean build of `Wager/Everything.agda` (51 modules) takes about 28 seconds and prints no warning.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/FC/ClassicProofs.agda`: a false lemma (the wrong declaration passes the role check), with the proof `refl`
+| `[UnequalTerms] false != true of type Bool`
+| FAIL
+
+| `Wager/FC/ClassicProofs.agda`: `postulate s3-by-fiat : SSig.WellRoled (classicS rep)`
+| `[SafeFlagPostulate] Cannot postulate s3-by-fiat with safe flag`. `scan-dangerous.sh` also fails.
+| FAIL
+
+| `Wager/FC/Classic.agda`: the equation `F Age = Char` changed to `F Age = Bool`
+| `[UnequalTerms] bBool != bChar of type BaseName` in the proof of the classic program
+| FAIL
+
+| All changes removed
+| None
+| PASS, 51 files
+|===
+
+The third test shows that the proofs for the classic program depend on the function `F`, which maps `Age` and `Int` to different types.

@@ -18,7 +18,7 @@ module Wager.FC.Types (SS : SSig) where
 open import Cubical.Foundations.Prelude
 open import Cubical.Data.Sum.Base using (_⊎_; inl; inr)
 
-open import Wager.Erased.Untyped using (ETy; ebase; earr; eprod; esum) public
+open import Wager.Erased.Untyped using (ETy; ebase; earr; eprod; esum)
 open SSig SS public
 
 infixr 20 _⇒ˢ_

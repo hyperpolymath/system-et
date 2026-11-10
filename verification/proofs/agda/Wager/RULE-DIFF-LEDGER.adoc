@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: rule-diff ledger
-Status: Stage 2. *The ledger is empty.*
+Status: Stage 3. *The ledger is empty.*
 :toc: left
 :sectnums:
 
@@ -65,3 +65,10 @@ These are signature entries, not rules.
 T2 needs a condition on the entries: the predicate `Valid` of `Wager.Role.Validity`.
 `VERDICT.adoc` records this condition with the class "signature primitive".
 It is not an entry of this ledger, because no rule has a side condition.
+
+== Stage 3
+
+Stage 3 adds no typing rule and no kinding rule to the target calculus.
+
+The source rule `c-nt₁` (`Wager.FC.Coercion`) names the GHC composition table `mulG`.
+It is a rule of the source calculus, the fragment of System FC. It is not a rule of the target calculus, so it is not an entry of this ledger.

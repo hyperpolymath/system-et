@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: relation ledger
-Status: Stage 2. Each later stage adds its entries in the same commit as its rules.
+Status: Stage 3. Each later stage adds its entries in the same commit as its rules.
 :toc: left
 :sectnums:
 
@@ -18,9 +18,10 @@ Each entry has one class:
 | specification only | The relation is used in theorem statements. No typing or kinding rule uses it.
 | proof-internal | The relation is used in proofs only. No rule and no statement uses it.
 | ADDED | The relation is not in 00-notation, and a typing or kinding rule uses it.
+| source | The relation belongs to the source calculus (the fragment of System FC). The target calculus does not have it. It does not count against the wager.
 |===
 
-An ADDED entry counts against the wager. *Stages 1 and 2 have no ADDED entry.*
+An ADDED entry counts against the wager. *Stages 1, 2 and 3 have no ADDED entry.*
 The ledger has one "baseline, changed" entry (R1). The owner decides how it counts.
 
 == Judgement forms of the target calculus
@@ -117,8 +118,39 @@ The ledger has one "baseline, changed" entry (R1). The owner decides how it coun
 | The logical relation on closed values, indexed by the role of the observer.
 |===
 
+== Relations of the source calculus and of the erased calculus (Stage 3)
+
+Stage 3 defines the source calculus. It adds no rule and no relation to the target calculus.
+
+[cols="1,3,2,5",options="header"]
+|===
+| Id | Agda identifier | Class | Notes
+
+| R14
+| `Co` in `Wager.FC.Coercion`
+| source
+| The coercion relation of System FC, at the three roles. `cast` and `coerce` use it at the role representational.
+  The wager says that the target calculus does not need this relation. The target calculus does not have it.
+
+| R15
+| `STm` in `Wager.FC.Term`, `WellRoled` in `Wager.FC.Signature`
+| source
+| Typing of source terms (by construction), and the role check of a source signature.
+
+| R16
+| `_⊢_⇓_` and `_⊢ᵉ_∶_` in `Wager.Erased.Untyped`
+| specification only
+| Big-step evaluation of untyped terms, and typing of untyped terms with erased types.
+  The statements of Stage 3 use them. No typing rule and no kinding rule of the target calculus uses them.
+
+| R17
+| `RelV` in `Wager.FC.RoleSoundness`
+| proof-internal
+| What a coercion at each role must keep: the nominal value (nominal), the erased type (representational), nothing (phantom).
+|===
+
 == What is absent
 
-* There is no coercion relation and no cast judgement.
+* The target calculus has no coercion relation and no cast judgement. The coercion relation `Co` (R14) is in the source calculus only.
 * Representational equivalence exists as "specification only" (R11). It is not a judgement of the calculus.
 * There is no subtyping relation between types.

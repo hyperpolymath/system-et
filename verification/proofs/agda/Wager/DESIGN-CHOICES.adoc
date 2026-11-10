@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: design choices
-Status: entries of Stage 0, Stage 1 and Stage 2.
+Status: entries of Stage 0, Stage 1, Stage 2 and Stage 3.
 :toc: left
 :sectnums!:
 
@@ -36,7 +36,7 @@ Agda 2.8.0 then rejects an import from a module without the flag (`InfectiveImpo
 The stock library makes that rule impossible to obey.
 
 *Decision.* The owner accepted alternative 1 on 2026-11-10.
-At the end of each stage a search for `coinductive` in `Wager/` checks the intent of the rule. The search found nothing at the end of Stage 1.
+At the end of each stage a search for `coinductive` in `Wager/` checks the intent of the rule. The search found nothing at the end of Stage 1, of Stage 2 and of Stage 3.
 
 *Alternatives.*
 
@@ -68,6 +68,8 @@ A match that needs K is an error, not a warning.
 Thus the Lean proofs that use `castNf_diag` (an equality on `Δ = Δ` closed by `rfl`) cannot be copied directly.
 
 *Alternative.* Leave the warning on. This is honest but makes the output hard to read.
+
+*Audit at the end of Stage 3.* 29 of the 51 files have the line. A test of the 10 new files without the line found the warning in each of the 6 new files that have the line. It found no other warning. The other 4 new files compile without a warning.
 
 *Audit at the end of Stage 2.* 23 of the 41 files have the line. A test without the line found the warning in each of the 23 files, found no other warning, and found 2 new files that did not need the line.
 
@@ -246,3 +248,86 @@ A primitive that inspects the head only cannot see below `proxy`. `deep` can, by
 Stage 2 does not build a kinding or a noninterference theorem on it.
 
 *Reason.* T1 names a 3-point carrier with `𝟘 = phantom`. A 4-point carrier changes T1, the relation `≈` and the phantom part of T2. These changes are decisions of the owner.
+
+== Stage 3
+
+[[DC-3.1]]
+=== DC-3.1: the source calculus is a small fragment of System FC
+
+*Choice.* The source calculus (`Wager.FC`) follows Breitner, Eisenberg, Peyton Jones and Weirich, "Safe Zero-cost Coercions for Haskell". It has:
+
+* base types, functions, pairs and sums;
+* newtypes with no parameter and newtypes with one parameter, each with a declared role;
+* total closed type-level functions with one argument;
+* coercions at the three roles, with reflexivity, symmetry, transitivity, the rule from nominal to representational, the phantom rule, role-gated congruence, the newtype rules and the rules of the type-level functions;
+* terms with `cast`, and `coerce` as the function `λx. cast γ x`;
+* erasure into an untyped calculus.
+
+*Limits.* Each limit makes the fragment smaller, so each limit makes claim W weaker.
+
+* A type is closed. A term has no type variable, and there is no `∀`.
+* A newtype has 0 parameters or 1 parameter. A type-level function has 1 argument.
+* The data types are the function, the pair and the sum. Their parameters are representational. A signature cannot declare a data type.
+* The constructor of each newtype is visible. There is no abstract type.
+* There is no decomposition rule (`nth`), no coercion between polymorphic types and no coercion variable.
+* A source term has no grade. System FC has no grades.
+
+[[DC-3.2]]
+=== DC-3.2: recursion is kept out by construction
+
+*Choice.* The body of a newtype with one parameter is a `Body`: the parameter, a base type, a function, a pair, a sum, or a type-level function on a body.
+A body cannot mention a declared newtype. The representation of a newtype with no parameter is an erased type.
+
+*Reason.* The task says: keep recursion out. With this choice the functions `ev` (nominal value) and `er` (erased type) are structurally recursive. No termination argument is needed.
+
+*Consequence 1.* Role inference (`roleOf`) is a structural function. In a body, the role phantom means "the parameter does not occur".
+The rule for a type-level function is `nominal · r` with the lawful table: a parameter that does not occur below the function stays phantom.
+`Source-Role-Soundness` is proved with this rule.
+
+*Consequence 2.* The fragment cannot declare the body that separates the lawful table from the rule of GHC: a phantom newtype below a type-level function, such as `F (Tag a)`.
+For that body the lawful table gives the role phantom to `a`. Phantom is wrong there: `F (Tag Int)` and `F (Tag Bool)` are different types (`Wager.Examples.Stage3.Nominal-Soundness-Examples.f-sees-phantom`).
+A larger fragment with such bodies must use another inference rule. Stage 3 proves nothing about such a body.
+The coercion rules of this fragment do have the rule of GHC for a newtype (DC-3.3).
+
+*Alternative.* A list of declarations in which each body can mention the earlier newtypes. This is more faithful and much larger. It was not built.
+
+[[DC-3.3]]
+=== DC-3.3: one coercion relation with a role index
+
+*Choice.* `Co r τ σ` (`Wager.FC.Coercion`) has the role `r` as an index.
+The congruence rule for a newtype `N` has a premise at the role `mulG r (role N)`. `mulG` is the GHC composition table of T1.
+
+*Reason.* This is the rule of Breitner et al.: at the role nominal the arguments are nominally equal, at the role representational the arguments are equal at the declared role, at the role phantom there is no condition.
+The entry `nominal · phantom = nominal` says that a newtype is generative: `Tag Int` and `Tag Bool` are different types, also when the parameter of `Tag` is phantom.
+
+*Note.* `Co` is a relation of the source calculus. The target calculus does not have it (`RELATION-LEDGER.adoc`, entry R14).
+
+[[DC-3.4]]
+=== DC-3.4: type-level functions look at the head of the argument
+
+*Choice.* A source type-level function has the same form as a target primitive (DC-1.1): one equation for each head.
+For a newtype with one parameter, the right side is a base type, or another function on the PARAMETER of the newtype (`F (N τ) = G τ`).
+
+*Reason.* A closed type family of GHC can match on the argument of a type constructor. The form also keeps each function total.
+
+*Difference from the target.* A target primitive on `capp c A` can look at `A`. In the planned translation of Stage 4, `A` is the representation of the newtype, not its parameter.
+Stage 4 must show what this difference costs.
+
+[[DC-3.5]]
+=== DC-3.5: source terms are typed by construction
+
+*Choice.* `STm Γ τ` (`Wager.FC.Term`) is the set of the terms of the type τ. There is no separate typing relation for source terms.
+`cast γ e` needs a coercion `γ : Co rep τ σ`. The constructor and the destructor of a newtype are casts along the newtype rule.
+
+*Reason.* A program with a wrong `coerce` is then not a term. "The source calculus rejects the program" means: the type of its terms has no inhabitant of that form, or the coercion type is empty (`¬ Co rep τ σ`).
+
+[[DC-3.6]]
+=== DC-3.6: the erasure semantics
+
+*Choice.* `Wager.Erased.Untyped` has untyped terms, big-step call-by-value evaluation with closures, erased types (a base type, a function, a pair, a sum) and a typing of untyped terms with erased types.
+The erasure of a source term (`eraseTm`) removes each cast. No other change is made.
+
+*Reason.* The task asks for an erasure semantics in which coercions vanish. A cast vanishes by the definition of `eraseTm`, and `coerce` erases to `λx. x`.
+The module does not depend on the source calculus. Stage 4 can erase the target calculus into the same untyped calculus and compare the two results there.
+
+*Not proved here.* Stage 3 does not prove that a typed untyped term evaluates to a value of its erased type. It proves that erasure preserves typing (`Wager.Proofs.erasure-preserves-typing`).

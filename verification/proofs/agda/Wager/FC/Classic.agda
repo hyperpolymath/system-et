@@ -39,13 +39,13 @@ data Nt₁ : Type where
 data FamName : Type where
   famF : FamName
 
-private
-  litTyC : LitName → BaseName
-  litTyC ℓint  = bInt
-  litTyC ℓbool = bBool
-  litTyC ℓchar = bChar
-  litTyC ℓunit = bUnit
+litTyC : LitName → BaseName
+litTyC ℓint  = bInt
+litTyC ℓbool = bBool
+litTyC ℓchar = bChar
+litTyC ℓunit = bUnit
 
+private
   -- F Int = Bool, and Unit on each other base type.
   fBaseC : FamName → BaseName → BaseName
   fBaseC famF bInt = bBool

@@ -63,6 +63,10 @@ open import Wager.Role.Signature
 import Wager.Role.Noninterference
 import Wager.Role.Lawful
 import Wager.Role.ClassicProofs as CP
+open import Wager.FC.Signature
+import Wager.FC.RoleSoundness
+import Wager.FC.Erasure
+import Wager.FC.ClassicProofs
 
 module _ where
   open T1-Statements
@@ -139,3 +143,48 @@ module _ where
 
   role4-has-ghc-rule : Role4-Has-GHC-Rule
   role4-has-ghc-rule = role4-ghc-rule
+
+------------------------------------------------------------------------
+-- STAGE 3
+------------------------------------------------------------------------
+
+module _ (SS : SSig) where
+  open Source-Statements SS
+  private
+    module RS = Wager.FC.RoleSoundness SS
+    module ER = Wager.FC.Erasure SS
+
+  source-nominal-soundness : Source-Nominal-Soundness
+  source-nominal-soundness τ σ = RS.nom-sound
+
+  source-role-soundness : Source-Role-Soundness
+  source-role-soundness wr τ σ = RS.rep-sound wr
+
+  cast-vanishes : Cast-Vanishes
+  cast-vanishes γ e = refl
+
+  coerce-erases-to-identity : Coerce-Erases-To-Identity
+  coerce-erases-to-identity γ = refl
+
+  erasure-preserves-typing : Erasure-Preserves-Typing
+  erasure-preserves-typing wr = ER.erase-typing wr
+
+module _ where
+  open Classic-Source-Statements
+  private module SP = Wager.FC.ClassicProofs
+
+  classic-rejected : Classic-Rejected
+  classic-rejected = SP.classic-rejected
+
+  classic-bad-coercion : Bad.Classic-Bad-Coercion
+  classic-bad-coercion = SP.Bad.tAge~tInt
+
+  classic-unsound-if-accepted : Bad.Classic-Unsound-If-Accepted
+  classic-unsound-if-accepted =
+    SP.Bad.exploit , SP.Bad.exploit-erased , SP.Bad.exploit-value , SP.Bad.exploit-untyped
+
+  classic-nominal-accepted : Good.Classic-Nominal-Accepted
+  classic-nominal-accepted = SP.Good.accepted
+
+  classic-nominal-no-coercion : Good.Classic-Nominal-No-Coercion
+  classic-nominal-no-coercion = SP.Good.age~int , SP.Good.no-coercion

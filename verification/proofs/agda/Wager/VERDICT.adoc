@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: verdict
-Status: DRAFT after Stage 2. This file becomes final after the last stage.
+Status: DRAFT after Stage 3. This file becomes final after the last stage.
 :toc: left
 :sectnums:
 
@@ -46,19 +46,71 @@ Status: DRAFT after Stage 2. This file becomes final after the last stage.
 Stage 1 also proved the L1 equivalence that the task asks for:
 `Wager.Proofs.l1-equality` : `DefEq t u ↔ nf t ≡ nf u`, for each signature.
 
+== Results of Stage 3: the source calculus
+
+Stage 3 has no T number. It defines the source calculus of claim W, a small fragment of System FC with roles (`Wager.FC`, DC-3.1 to DC-3.6).
+Its results are about the source calculus only. They show that the fragment behaves as the calculus of Breitner et al.
+
+[cols="3,1,5",options="header"]
+|===
+| Statement (`Wager.Statements`) | Status | Evidence and reading
+
+| `Source-Nominal-Soundness`
+| PROVED
+| `Wager.Proofs.source-nominal-soundness`. A nominal coercion relates two types with the same nominal value. This needs no role check.
+
+| `Source-Role-Soundness`
+| PROVED
+| `Wager.Proofs.source-role-soundness`. In a signature that passes the role check, a representational coercion relates two types with the same erased type.
+
+| `Cast-Vanishes`, `Coerce-Erases-To-Identity`
+| PROVED
+| `Wager.Proofs.cast-vanishes`, `Wager.Proofs.coerce-erases-to-identity`. Each proof is `refl`: erasure removes each cast, and `coerce` erases to `λx. x`.
+
+| `Erasure-Preserves-Typing`
+| PROVED
+| `Wager.Proofs.erasure-preserves-typing`. In a signature that passes the role check, the erasure of a term of the type τ has the erased type of τ.
+
+| `Classic-Rejected`
+| PROVED
+| `Wager.Proofs.classic-rejected`. The source role check rejects the declarations "representational" and "phantom" for the parameter of `T` in `newtype T a = MkT (F a)`.
+
+| `Classic-Bad-Coercion`, `Classic-Unsound-If-Accepted`
+| PROVED
+| `Wager.Proofs.classic-bad-coercion`, `Wager.Proofs.classic-unsound-if-accepted`. With the wrong declaration, `T Age` and `T Int` are representationally equal.
+  A closed term of the type Bool then exists whose erasure is a Char literal. The erased term evaluates to that literal and has no erased type Bool.
+
+| `Classic-Nominal-Accepted`, `Classic-Nominal-No-Coercion`
+| PROVED
+| `Wager.Proofs.classic-nominal-accepted`, `Wager.Proofs.classic-nominal-no-coercion`. The check accepts the declaration "nominal".
+  Then `Age` and `Int` are representationally equal, and `T Age` and `T Int` are not: the source calculus rejects `coerce : T Age → T Int`.
+|===
+
+The limits of the fragment are in DC-3.1 and DC-3.2. Two limits matter most for the strength of W:
+
+* A type is closed, and a term has no type variable.
+* The body of a newtype cannot mention a declared newtype.
+
+Not proved in Stage 3: evaluation of a typed erased term gives a value of its erased type (DC-3.6).
+
 == Overall result
 
-Not available. W is not decided after Stage 2.
+Not available. W is not decided after Stage 3.
 
 One result of Stage 2 already limits W (finding F8).
 In the target, `Proxy Int` and `Proxy Bool` are not representationally equivalent when `Proxy` is a generative constant.
 GHC accepts a coercion between them, because the parameter of `Proxy` is phantom.
 Stage 4 must show whether this gives a source program with no translation.
 
-== Ledgers after Stage 2
+Stage 3 gives the source side of this question (finding F10).
+The source calculus accepts a newtype `Tag` with a phantom parameter, accepts the coercion `Tag Int ~R Tag Bool`, and has a type-level function `F` with `F (Tag Int) = Bool` and `F (Tag Bool) = Char`.
+The signature passes the role check (`Wager.Examples.Stage3`).
+
+== Ledgers after Stage 3
 
 * `RELATION-LEDGER.adoc`: no ADDED entry. One entry is "baseline, changed": the kinding judgement has a graded context (R1). Stage 2 added two "specification only" entries (`≈`, and the observers with `Valid`).
-* `RULE-DIFF-LEDGER.adoc`: empty. Stage 2 added no rule.
+  Stage 3 added the relations of the source calculus with the class "source" (the coercion relation `Co` is one of them), and the evaluation and the typing of erased terms as "specification only". Stage 3 added nothing to the target calculus.
+* `RULE-DIFF-LEDGER.adoc`: empty. Stage 2 and Stage 3 added no rule to the target calculus.
 
 == Answers of Stage 1
 
@@ -159,6 +211,17 @@ The third finding that the task names, two notions of use, is the smallest chang
   This is the candidate that gives the phantom coercions back without a change of the law set.
   It needs a larger `≈` (a constant with a phantom parameter ignores its argument) and a weaker phantom part of T2 (`≈` in place of `≡`).
   Stage 2 proved the laws only. It did not build kinding or noninterference for this structure. The owner decides.
+
+| F10
+| The source calculus uses the GHC entry `nominal · phantom = nominal` in its congruence rule for a newtype (DC-3.3): a newtype is generative.
+  `Tag Int` and `Tag Bool` are not nominally equal, though the parameter of `Tag` is phantom (`Wager.Examples.Stage3.Nominal-Soundness-Examples.tag-nominal-rejected`).
+  A type-level function tells them apart (`f-sees-phantom` in the same module), and they are representationally equal (`Wager.Examples.Stage3.Role-Soundness-Examples.tag-co`).
+  This is the source side of findings F7 and F8.
+
+| F11
+| Role inference of the source (`roleOf`) uses the lawful entry `nominal · phantom = phantom`: a parameter that does not occur below a type-level function is phantom. `Source-Role-Soundness` is proved with it.
+  This is sound only because a body of this fragment cannot mention a declared newtype (DC-3.2). The fragment cannot declare `newtype N a = MkN (F (Tag a))`.
+  For that body the lawful entry gives phantom, and example `f-sees-phantom` shows that phantom is wrong there. Stage 3 has no Agda proof about such a body.
 |===
 
 == Changes to theorem statements
@@ -169,10 +232,11 @@ T2 was written with the hypothesis `Valid` from the start of Stage 2. The task t
 
 Process note: the statement `L1-Equality` was put in `Statements.agda` after its proof was complete. It is the statement that the task gives.
 The statements of T0, T1, T2 and T4 were put in `Statements.agda`, and committed, before their proofs.
+The statements of Stage 3 were put in `Statements.agda`, and committed, before their proofs.
 
 == Trust base
 
 * Agda 2.8.0 with `--cubical --safe`, and `agda/cubical` v0.9 (`TOOLCHAIN.adoc`).
 * No `postulate`, no hole, no termination pragma, no positivity pragma.
 * `--guardedness` is on in each file (DC-0.2). No file uses coinduction.
-* One warning is silenced, in 23 of the 41 files: `UnsupportedIndexedMatch` (DC-0.3).
+* One warning is silenced, in 29 of the 51 files: `UnsupportedIndexedMatch` (DC-0.3).
