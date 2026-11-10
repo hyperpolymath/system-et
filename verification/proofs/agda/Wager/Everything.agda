@@ -46,3 +46,9 @@ import Wager.Role.Noninterference
 import Wager.Role.Lawful
 import Wager.Role.ClassicProofs
 import Wager.Examples.Stage2
+import Wager.Erased.Untyped
+import Wager.FC.Signature
+import Wager.FC.Types
+import Wager.FC.Coercion
+import Wager.FC.Term
+import Wager.FC.Classic

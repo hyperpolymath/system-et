@@ -42,3 +42,9 @@ verification/proofs/agda|Wager/Role/Noninterference.agda|gated|Stage 2 (T2): non
 verification/proofs/agda|Wager/Role/Lawful.agda|gated|Stage 2 (T2): the two parts of T2 with the lawful table; a sufficient condition for validity
 verification/proofs/agda|Wager/Role/ClassicProofs.agda|gated|Stage 2 (T4): the classic unsound program; the Proxy test
 verification/proofs/agda|Wager/Examples/Stage2.agda|gated|Stage 2: accepted and rejected closed examples
+verification/proofs/agda|Wager/Erased/Untyped.agda|gated|Stage 3: the untyped calculus after erasure (terms, big-step evaluation, erased typing)
+verification/proofs/agda|Wager/FC/Signature.agda|gated|Stage 3: source signature (newtypes, declared roles, type-level functions), role inference, the role check
+verification/proofs/agda|Wager/FC/Types.agda|gated|Stage 3: source types, nominal values (ev), erased types (er)
+verification/proofs/agda|Wager/FC/Coercion.agda|gated|Stage 3: source coercions with roles (the relation Co)
+verification/proofs/agda|Wager/FC/Term.agda|gated|Stage 3: source terms with cast and coerce; erasure, in which a cast vanishes
+verification/proofs/agda|Wager/FC/Classic.agda|gated|Stage 3: the classic unsound program as a source signature (definitions only)

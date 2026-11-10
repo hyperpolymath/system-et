@@ -17,7 +17,7 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Data.Sigma using (_×_; Σ-syntax)
 open import Cubical.Data.Sum.Base using (_⊎_)
 open import Cubical.Data.Nat.Base using (ℕ; zero; suc)
-open import Cubical.Data.FinData.Base using (Fin)
+open import Cubical.Data.FinData.Base using (Fin) renaming (zero to fzero)
 
 open import Wager.Grade.Algebra
 open import Wager.Grade.Affine using (Affine)
@@ -39,6 +39,12 @@ open import Wager.Role.Signature
 import Wager.Role.RepEq
 import Wager.Role.Validity
 import Wager.Role.Classic
+open import Wager.FC.Signature
+import Wager.FC.Types
+import Wager.FC.Coercion
+import Wager.FC.Term
+import Wager.FC.Classic
+import Wager.Erased.Untyped
 
 ------------------------------------------------------------------------
 -- STAGE 1
@@ -308,3 +314,106 @@ module Role4-Statements where
   -- nominal · phantom = nominal.
   Role4-Has-GHC-Rule : Type
   Role4-Has-GHC-Rule = mul4 nom4 ph4 ≡ nom4
+
+------------------------------------------------------------------------
+-- STAGE 3: the source calculus (a fragment of System FC with roles)
+------------------------------------------------------------------------
+
+-- The statements of this stage are about the SOURCE calculus only.
+-- They have no T number. They show that the source calculus is the
+-- calculus of Breitner et al. for this fragment: the role check makes
+-- zero-cost coercions safe, and without the check the classic program
+-- is unsound.
+module Source-Statements (SS : SSig) where
+  open Wager.FC.Types SS
+  open Wager.FC.Coercion SS
+  open Wager.FC.Term SS
+  open Wager.Erased.Untyped.Typing litTy
+
+  -- English: a nominal coercion relates two types with the same
+  -- nominal value. (This part needs no role check.)
+  Source-Nominal-Soundness : Type
+  Source-Nominal-Soundness = (τ σ : STy) → Co nom τ σ → ev τ ≡ ev σ
+
+  -- English: in a signature that passes the role check, a
+  -- representational coercion relates two types with the same erased
+  -- type.
+  Source-Role-Soundness : Type
+  Source-Role-Soundness =
+    WellRoled → (τ σ : STy) → Co rep τ σ → er τ ≡ er σ
+
+  -- English: erasure removes each cast.
+  Cast-Vanishes : Type
+  Cast-Vanishes =
+    ∀ {n} {Γ : SCx n} {τ σ} (γ : Co rep τ σ) (e : STm Γ τ) →
+    eraseTm (cast γ e) ≡ eraseTm e
+
+  -- English: `coerce` erases to the identity function.
+  Coerce-Erases-To-Identity : Type
+  Coerce-Erases-To-Identity =
+    ∀ {n} {Γ : SCx n} {τ σ} (γ : Co rep τ σ) →
+    eraseTm (coerce {Γ = Γ} γ) ≡ ulam (uvar fzero)
+
+  -- English: in a signature that passes the role check, the erasure of
+  -- a term of the type τ has the erased type `er τ`.
+  Erasure-Preserves-Typing : Type
+  Erasure-Preserves-Typing =
+    WellRoled → ∀ {n} {Γ : SCx n} {τ} (e : STm Γ τ) →
+    (λ i → er (Γ i)) ⊢ᵉ eraseTm e ∶ er τ
+
+-- The classic unsound program:
+--   newtype Age = MkAge Int
+--   type family F a where { F Int = Bool ; F Age = Char }
+--   newtype T a = MkT (F a)
+-- `classicS d` is this signature with the declared role d for the
+-- parameter of T.
+module Classic-Source-Statements where
+  open Wager.FC.Classic
+
+  -- English: the source role check rejects the declaration
+  -- "representational" and the declaration "phantom" for the parameter
+  -- of T.
+  Classic-Rejected : Type
+  Classic-Rejected =
+    (d : Role) → leR d rep ≡ true → ¬ SSig.WellRoled (classicS d)
+
+  -- The signature with the wrong declaration (representational).
+  module Bad where
+    open STypes rep
+    open Wager.FC.Types (classicS rep)
+    open Wager.FC.Coercion (classicS rep)
+    open Wager.FC.Term (classicS rep)
+    open Wager.Erased.Untyped.Typing litTy
+
+    -- English: with the wrong declaration, `T Age` and `T Int` are
+    -- representationally equal.
+    Classic-Bad-Coercion : Type
+    Classic-Bad-Coercion = Co rep (sT sAge) (sT sInt)
+
+    -- English: with the wrong declaration, there is a closed term of
+    -- the type Bool whose erasure is a Char literal. The erased term
+    -- evaluates to the Char literal, and it does not have the erased
+    -- type Bool.
+    Classic-Unsound-If-Accepted : Type
+    Classic-Unsound-If-Accepted =
+      Σ[ e ∈ STm ∅ˢ sBool ]
+        (eraseTm e ≡ ulit ℓchar)
+        × (∅ᵉ ⊢ eraseTm e ⇓ vlit ℓchar)
+        × (¬ (∅ᶜ ⊢ᵉ eraseTm e ∶ er sBool))
+
+  -- The signature with the correct declaration (nominal).
+  module Good where
+    open STypes nom
+    open Wager.FC.Types (classicS nom)
+    open Wager.FC.Coercion (classicS nom)
+
+    -- English: the source role check accepts the declaration "nominal".
+    Classic-Nominal-Accepted : Type
+    Classic-Nominal-Accepted = WellRoled
+
+    -- English: with the correct declaration, Age and Int are
+    -- representationally equal, and `T Age` and `T Int` are not.
+    -- The source calculus thus rejects `coerce : T Age → T Int`.
+    Classic-Nominal-No-Coercion : Type
+    Classic-Nominal-No-Coercion =
+      Co rep sAge sInt × (¬ Co rep (sT sAge) (sT sInt))
