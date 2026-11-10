@@ -1,0 +1,153 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Wager: plan of Stage 9, the quantifier
+Status: PROPOSAL of 2026-11-10. The owner did not accept it yet. No proof of Stage 9 exists, and none starts before the owner accepts a plan.
+:sectnums:
+
+== Goal
+
+Stage 9 adds the quantifier to the target with open types of Stage 8: a `∀` type former, type abstraction and type application, and a logical relation with relation variables.
+A proof is a success. A checked counterexample is a success. A vague result is a failure.
+
+The overall result of `VERDICT.adoc` is about the fragment of claim W. Stage 9 is outside that fragment, as Stage 8 is. It can change no result of stages 1 to 8.
+
+== What Stage 8 gives to Stage 9
+
+. Terms with open types, and their typing judgement with the 12 rules of the target (`Wager/Poly`, DC-8.2).
+. Instantiation of the types of a term (`inst`), and the lemma that it keeps typing, for a substitution into each context (`T8-Inst`). This is the type-substitution lemma that the rule of type application needs.
+. Conversion is stable under a substitution of types (`T8-Conv`).
+. Noninterference for a type with free variables (`T8-Role`).
+. Two checked limits with one shape (F25): an entry of a signature is indexed by closed types. A trope operation has a closed carrier (DC-8.5), and a constant of the identity family has 2 closed types (DC-8.6). A quantifier alone does not remove them.
+
+== Four decisions for the owner
+
+Each decision has a recommended option, written first. The text says which option is the most complete long-term form.
+
+=== D1: where the quantifier lives
+
+[cols="1,4,3",options="header"]
+|===
+| Option | Text | Cost and risk
+
+| D1-a (recommended)
+| A layer of type schemes over the type language of Stage 1, which does not change. A scheme is a type of Stage 1, a quantifier `∀ k. S`, or a function, a pair or a sum of schemes. A type variable stands for a type of Stage 1, so instantiation is predicative.
+  New modules only. No module of stages 1 to 8 changes.
+| Moderate. Conversion of schemes is the congruence of `DefEq`, and its normal form is `nf` in each leaf. No second normalisation proof.
+  The limit: a type variable cannot stand for a quantified type. GHC has this limit by default.
+
+| D1-b (the most complete long-term form)
+| A second type language with `∀` as a type former of the kind ★, beside the language of Stage 1. Instantiation is impredicative, as in System F and System FC.
+  New modules only, and the modules of Stage 1 for syntax, conversion and normalisation are written again for the new language.
+| High. About 1500 lines of Stage 1 have a second version with one more former, with `DefEq t u ↔ nf t ≡ nf u` proved again. Stages 2 to 8 do not apply to the new language until each is ported.
+
+| D1-c
+| The former `∀` is added to `Wager.L1.Syntax`. Each module of stages 1 to 8 that matches on a type changes.
+| High, and it breaks the rule "the checked modules do not change". `VERDICT.adoc` is final for 79 modules.
+|===
+
+=== D2: the scope, after finding F25
+
+[cols="1,4,3",options="header"]
+|===
+| Option | Text | Cost and risk
+
+| D2-a (recommended)
+| The quantifier, and an identity type with 2 type arguments at the level of schemes (possible with D1-a without a change of Stage 1). The GADT program of Stage 6 is then 1 term with 1 type `∀ a. G a → a`, with the equality `a ~ Int` as a type in a context with the variable a.
+| Moderate. It answers the example of the task of Stage 6 (F17, F24). The class of the identity type stays the decision of the owner (R23, R24).
+
+| D2-b
+| The quantifier only. The 2 limits of Stage 8 stay.
+| Low. The quantifier then has few programs to show: the GADT program and the polymorphic unwrap stay out of reach.
+
+| D2-c (the most complete long-term form)
+| D2-a, and trope operations with type parameters, so that the unwrap of a newtype at a type variable is 1 term.
+| High, with an open question. For the row scheme the state of `N τ` depends on τ (DC-8.5), so a parameter of the operation is not enough. The work can end with a checked limit for the row scheme and a positive result for the two-state scheme.
+|===
+
+=== D3: evaluation and erasure
+
+[cols="1,4,3",options="header"]
+|===
+| Option | Text | Cost and risk
+
+| D3-a (recommended)
+| Type abstraction and type application are erased: the erased term has no trace of them. The results about behaviour are statements about the erased term, by the logical relation. The calculus with the quantifier has no reduction relation, as the extensions of stages 6 and 8 have none.
+| Moderate. The erasure of a type abstraction evaluates its body earlier. This is sound because each typed term has a value. The fundamental lemma proves this fact, so the plan depends on that lemma.
+
+| D3-b (the most complete long-term form)
+| D3-a, and a reduction relation with type abstraction as a value, with progress and preservation (T0 for the quantifier).
+| Higher. It needs substitution of terms and of types in the terms of Stage 8, which Stage 8 did not need (DC-8.2).
+|===
+
+=== D4: a grade on the quantifier
+
+[cols="1,4,3",options="header"]
+|===
+| Option | Text | Cost and risk
+
+| D4-a (recommended)
+| The quantifier has no grade. The role of a type variable stays a property of a type (`T8-Role`, F26).
+| None.
+
+| D4-b (the most complete long-term form)
+| The quantifier has the grade of its variable, `∀[g] a. S`, and the rule of type abstraction has a kinding premise at that grade. The typing of a term then checks roles.
+| Moderate to high. It makes the kinding judgement (R1) a premise of a typing rule. That is a new use of a judgement, and it needs an entry in the relation ledger.
+|===
+
+== Stages of the work, for the recommended options
+
+Each part freezes its statements in a statement module, and the freeze is committed before the proofs. The names of the statements are working names.
+
+[cols="1,5,4",options="header"]
+|===
+| Part | Method | Main risk or decision point
+
+| 9a: the calculus
+| `Wager/Forall`: schemes `Sch Δ`; terms with type abstraction and type application; the typing judgement with the 12 rules of Stage 8 and 2 new rules.
+  Statements: each typed term of Stage 8 is a typed term at a scheme with no quantifier (`T9-Conservative`); the closure of a typed open term of Stage 8 by type abstractions has the closed scheme `∀ Δ. A` (`T9-Generalise`); the application of that closure to the types of a substitution σ and the instance `inst σ t` of Stage 8 have one erasure (`T9-Instantiate`); instantiation keeps typing (`T9-Inst`).
+| The 2 new rules are the first new typing rules since `t-cast`. They are entries of the rule-diff table for the extension, with a count of 2.
+  The rule of type abstraction weakens each type of the context. This needs renaming of the types of a context.
+
+| 9b: the logical relation
+| The erasure of a term. A relation on untyped values, by recursion on a scheme, with an environment that gives each type variable 2 closed types and a relation between values. The aim: at a type of Stage 1 with no variable it agrees with the relation `𝒱` of Stage 4 (DC-4.6). This is a statement to prove (`T9-Agrees`).
+  Statements: the fundamental lemma (`T9-Fund`): the erasure of a typed term, in related environments, evaluates to related values. Corollary: the erasure of each closed typed term has a value.
+| The universe: the relation at a quantifier ranges over all relations, so it is in `Type₁`. It is defined by recursion on the scheme, so Agda accepts it.
+  The substitution lemma of the relation (the relation at `S[A]` and the relation at S in an extended environment). The plan states it as a logical equivalence, to avoid a path between relations.
+  A type of Stage 1 under a relation environment needs the normal form of an open type. If this lemma fails for types with inspection primitives at a type variable, the part reports the lemma that fails. A primitive inspects the head of its argument, and a relation variable has no head: a first fix is to demand the grade nominal for that variable, which is finding F26 again.
+
+| 9c: free theorems
+| Checked examples and 2 statements. Each closed term of the type `∀ a. a → a` erases to a function that is observationally the identity (`T9-Identity`). The closure of the polymorphic coercion of Stage 8 erases to a function that is observationally the identity at each instance (`T9-Coercion`, T3 for a polymorphic coercion).
+  Rejected examples: a term that is not parametric has no type.
+| Low, when 9b holds.
+
+| 9d: the identity type with type arguments (only with D2-a)
+| A scheme former `Id A B` for 2 types in Δ, the literal `rfl`, and the rule of the cast with evidence at the grade `𝟘`, as in Stage 6, part 2.
+  Statements: the GADT program is 1 typed term at the scheme `∀ a. G a → a` (`T9-Gadt`); the erasure of the proofs in casts is sound (`T9-Erasure`); closed evidence exists exactly for convertible types (`T9-Canonicity`); each closed instance is the program of Stage 6, part 2 (`T9-Gadt-Instance`).
+| An open term can have a false assumption. The relation at `Id A B` under a relation environment is the place where this shows. If the fundamental lemma needs a condition on the relation of a variable that occurs in an identity type, the condition is recorded as a change.
+  The class of the identity type is the decision of the owner. The entries have no class.
+
+| 9e: records
+| Gate watch, examples, DC-9.x, the 2 ledgers, `TOOLCHAIN.adoc`, new sections in `VERDICT.adoc`, the index modules, `PROOF-STATUS.adoc` and the MANIFEST. One draft pull request.
+| None.
+|===
+
+== What Stage 9 does not do, in each option
+
+* A source calculus with a quantifier, and a theorem as T5 for a polymorphic source program. The source calculus stays the calculus of Stage 3.
+* Type-level functions over schemes, and kinds other than the kinds of Stage 1.
+* Recursion in terms or in types.
+* A change of a result of stages 1 to 8.
+
+== Rules of work
+
+The rules of `PLAN.adoc` hold: statements before proofs; the ledgers change with the rules; each theorem has an accepted and a rejected example; the gate is watched to fail; `--cubical --safe`, no `postulate`, no hole, no termination or positivity pragma.
+The 91 checked modules of stages 1 to 8 do not change, apart from a new section at the end of each index module.
+
+A part that cannot be proved as stated stops, and the owner gets the statement, the lemma that fails and the options. A statement does not change in silence.
+
+== Questions for the owner
+
+. D1: the scheme layer (D1-a), a second type language (D1-b), or a change of Stage 1 (D1-c)?
+. D2: the quantifier with the identity type (D2-a), the quantifier only (D2-b), or also trope operations with type parameters (D2-c)?
+. D3: erasure only (D3-a), or also a reduction relation with progress and preservation (D3-b)?
+. D4: no grade on the quantifier (D4-a), or a graded quantifier with a kinding premise (D4-b)?
