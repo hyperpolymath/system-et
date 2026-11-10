@@ -38,6 +38,8 @@ a step-level action with a record in `actions.lock`.
 
 * `codeql.yml` — CodeQL (matrix defaults to `actions`; every repo has workflows).
 * `sonarqube.yml` — SonarCloud (shell / JS surface; see `sonar-project.properties`).
+  With no `SONAR_TOKEN` secret, the job says that the scan is not configured
+  and passes. The SonarCloud app still analyses each pull request.
 * `static-analysis-gate.yml` — panic-attack + Hypatia gate (see above).
 
 Each targets a different language/surface; together they cover what no single
