@@ -34,7 +34,7 @@
       { fact = "state.phase", op = 'present },
       { fact = "ecosystem.type", op = 'present },
     ],
-    note = "STATE.a2ml + ECOSYSTEM.a2ml were read from .machine_readable/descriptiles/",
+    note = "the thin journal (docs/status/JOURNAL.adoc) + ECOSYSTEM.a2ml were read",
   },
   "must.anchors-directory" = {
     kind = "descriptile",
@@ -73,12 +73,12 @@
   "bust.template-substitution-failure" = {
     kind = "descriptile",
     witnesses = [ { fact = "state.open-failures", op = 'nonzero } ],
-    note = "alarm iff STATE records open failures; else latent (declared, not active)",
+    note = "alarm iff a maintenance record shows open failures; none is recorded since STATE v1 was archived, so latent",
   },
   "bust.sync-drift-between-repos" = {
     kind = "descriptile",
     witnesses = [ { fact = "state.open-failures", op = 'nonzero } ],
-    note = "alarm iff STATE records open failures; else latent",
+    note = "alarm iff a maintenance record shows open failures; none is recorded since STATE v1 was archived, so latent",
   },
   "bust.contractile-parse-error" = {
     kind = "descriptile",

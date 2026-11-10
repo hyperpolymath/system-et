@@ -37,7 +37,7 @@ K9!
       ".machine_readable/descriptiles/CLADE.a2ml",
       ".machine_readable/descriptiles/ECOSYSTEM.a2ml",
       ".machine_readable/descriptiles/AGENTIC.a2ml",
-      ".machine_readable/descriptiles/STATE.a2ml",
+      "systemet_chora.deed",   # lifecycle + maturity (state-v1-decision option B)
       ".machine_readable/descriptiles/anchors/ANCHOR.a2ml",
     ],
     estate_common = "hyperpolymath/manifesto@<pinned-sha>",  # DRAFT-unratified today

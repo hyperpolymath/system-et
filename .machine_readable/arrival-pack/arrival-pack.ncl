@@ -22,7 +22,7 @@ let data = import "claude-md-data.json" in
 let manifesto_pin = "DRAFT-unratified" in
 
 let provenance =
-  "CLADE@%{data.h_clade} ECOSYSTEM@%{data.h_eco} AGENTIC@%{data.h_agentic} STATE@%{data.h_state} ANCHOR@%{data.h_anchor}"
+  "CLADE@%{data.h_clade} ECOSYSTEM@%{data.h_eco} AGENTIC@%{data.h_agentic} DEED@%{data.h_deed} ANCHOR@%{data.h_anchor}"
 in
 
 m%"
@@ -48,7 +48,7 @@ If you are unsure what something is, **read the canon; do not guess** (guessing 
 13. **Equivalence as identity** — the estate's intellectual through-line.
 
 ## The machine-readable substrate (read in this order on arrival)
-**CLADE** → **ANCHOR** → **AGENTIC** → **ECOSYSTEM** → **STATE**
+**CLADE** → **ANCHOR** → **AGENTIC** → **ECOSYSTEM** → **JOURNAL**
 
 The descriptive family (working name *descriptiles*) describes what-is; the **contractiles** are the normative set-point.
 
@@ -61,7 +61,7 @@ The descriptive family (working name *descriptiles*) describes what-is; the **co
 | `ECOSYSTEM.a2ml` | *Where it sits* — estate + external relations, and `what-this-is-not`. |
 | `NEUROSYM.a2ml` | *Meaning* of operations — proof obligations. |
 | `PLAYBOOK.a2ml` | *How* permitted actions run. |
-| `STATE.a2ml` | *Where things are now* — progress, blockers, next-actions. |
+| `docs/status/JOURNAL.adoc` | *Where things are now* — phase, blockers, next action (the STATE v2 thin journal). |
 | contractiles | Normative doctrine: **Intend** (north-star) · **Must** (invariants) · **Trust** (security) · **Adjust** (accessibility / inclusive design) — the integral core that holds strong; plus **Dust** (exnovation drift) · **Bust** (failure / breakage, not drift). |
 | k9 | *Validation*. Kennel (data) / Yard (pure eval) / Hunt (guarded exec). |
 
@@ -82,7 +82,7 @@ Deny: **Nix, TypeScript, Python, Go, AGPL**. JS runtimes in preference order **B
 - **Where it sits** — pipeline position **%{data.pipeline_pos}**; chain `%{data.chain}`; coordination = `%{data.coordination}`.
 - **Constraints here** (AGENTIC) — fail-closed; evidence-per-step; no-silent-skip; rerun-after-fix; release-claim-requires-hard-pass. Never: banned langs (above), secrets, state files in repo root, AGPL. Details: `.machine_readable/bot_directives/{methodology,coverage,debt}.a2ml`.
 - **Golden path** (ANCHOR) — `%{data.golden_smoke}` → %{data.golden_crit}.
-- **State** — phase %{data.phase}; maturity %{data.maturity}; %{data.completion}% complete; status %{data.status}.
+- **State** — lifecycle %{data.lifecycle}; maturity %{data.maturity}. Phase, blockers and next action: `docs/status/JOURNAL.adoc`.
 
 <!-- ARRIVAL-PACK:END · provenance: %{provenance} · Manifesto@%{manifesto_pin} · regenerate: `just claude-md` (k9 drift-detects; do not hand-edit above) -->
 "%

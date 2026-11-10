@@ -54,9 +54,9 @@ let methodology_guard = {
     },
 
     state_not_template = {
-      description = "STATE.a2ml must not contain template placeholders",
+      description = "The thin journal must not contain template placeholders",
       severity = "warning",
-      file = ".machine_readable/descriptiles/STATE.a2ml",
+      file = "docs/status/JOURNAL.adoc",
       # NOTE: the PROJECT token below is written as a Nickel concat
       # ("{{" ++ "PROJECT}}") ON PURPOSE. `just init` runs a sed substitution for
       # the brace-PROJECT-brace token over EVERY text file, which would otherwise

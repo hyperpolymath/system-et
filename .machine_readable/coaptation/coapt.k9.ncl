@@ -44,7 +44,8 @@ K9!
     ],
     descriptiles = [
       ".machine_readable/descriptiles/CLADE.a2ml",
-      ".machine_readable/descriptiles/STATE.a2ml",
+      "systemet_chora.deed",   # lifecycle + maturity
+      "docs/status/JOURNAL.adoc",   # phase
       ".machine_readable/descriptiles/ECOSYSTEM.a2ml",
       ".machine_readable/descriptiles/AGENTIC.a2ml",
       ".machine_readable/descriptiles/anchors/ANCHOR.a2ml",
