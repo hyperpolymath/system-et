@@ -6,4 +6,23 @@
 -- Imports every module of the Wager development.
 module Wager.Everything where
 
-import Wager.Toolchain
+import Wager.Grade.Algebra
+import Wager.Grade.Finite
+import Wager.Grade.Affine
+import Wager.Grade.Level
+import Wager.L1.Signature
+import Wager.L1.Syntax
+import Wager.L1.SyntaxLemmas
+import Wager.L1.Conversion
+import Wager.L1.Normal
+import Wager.L1.Eval
+import Wager.L1.Completeness
+import Wager.L1.Soundness
+import Wager.L1.Equality
+import Wager.L1.Heads
+import Wager.L1.Kinding
+import Wager.L2.Signature
+import Wager.L2.Usage
+import Wager.L2.Term
+import Wager.L2.Typing
+import Wager.Statements

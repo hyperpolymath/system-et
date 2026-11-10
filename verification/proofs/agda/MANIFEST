@@ -2,4 +2,23 @@
 # <source-root>|<module-path-relative-to-source-root>|gated|<note>
 # gated = must compile; quarantine = known-broken, must keep failing.
 verification/proofs/agda|Wager/Everything.agda|gated|import graph root (imports every Wager module)
-verification/proofs/agda|Wager/Toolchain.agda|gated|Stage 0 anchor: pinned toolchain resolves under --cubical --safe
+verification/proofs/agda|Wager/Statements.agda|gated|headline theorems as types only (the file a human reviews)
+verification/proofs/agda|Wager/Grade/Algebra.agda|gated|Stage 1: grade operations and the 15 law fields of the Lean class
+verification/proofs/agda|Wager/Grade/Finite.agda|gated|Stage 1: Boolean law checks for a finite carrier, with soundness
+verification/proofs/agda|Wager/Grade/Affine.agda|gated|Stage 1: Affine {0,1,omega} instance (systemet order)
+verification/proofs/agda|Wager/Grade/Level.agda|gated|Stage 1: two-point lattice instance Low <= High
+verification/proofs/agda|Wager/L1/Signature.agda|gated|Stage 1: signature of the L1 language
+verification/proofs/agda|Wager/L1/Syntax.agda|gated|Stage 1: kinds with graded arrows, types, renaming, substitution
+verification/proofs/agda|Wager/L1/SyntaxLemmas.agda|gated|Stage 1: laws of renaming and substitution
+verification/proofs/agda|Wager/L1/Conversion.agda|gated|Stage 1: DefEq (beta, delta, equivalence, congruence)
+verification/proofs/agda|Wager/L1/Normal.agda|gated|Stage 1: beta-normal forms, embedding, inspect
+verification/proofs/agda|Wager/L1/Eval.agda|gated|Stage 1: total normalizer nf by evaluation
+verification/proofs/agda|Wager/L1/Completeness.agda|gated|Stage 1: DefEq t u -> nf t = nf u
+verification/proofs/agda|Wager/L1/Soundness.agda|gated|Stage 1: DefEq t (emb (nf t))
+verification/proofs/agda|Wager/L1/Equality.agda|gated|Stage 1: DefEq t u <-> nf t = nf u
+verification/proofs/agda|Wager/L1/Heads.agda|gated|Stage 1: heads and injectivity of type formers up to DefEq
+verification/proofs/agda|Wager/L1/Kinding.agda|gated|Stage 1: graded kinding judgement
+verification/proofs/agda|Wager/L2/Signature.agda|gated|Stage 1: literals and trope transitions
+verification/proofs/agda|Wager/L2/Usage.agda|gated|Stage 1: usage vectors and usage matrices
+verification/proofs/agda|Wager/L2/Term.agda|gated|Stage 1: terms, values, reduction
+verification/proofs/agda|Wager/L2/Typing.agda|gated|Stage 1: declarative graded typing judgement with subusage
