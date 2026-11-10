@@ -31,7 +31,7 @@ CITATION.cff               # citation metadata (surfaced at root by #96)
 
 # ─── Build entry points (must live at root for their tooling) ────────────────
 Justfile                   # task runner entry point (self-contained since build/ scaffolding removal)
-coordination.k9            # repo-local session binding (template-mandated)
+coordination.k9.ncl        # repo-local session binding (template-mandated)
 
 # ─── Conventional dotfiles (tool-required at root) ───────────────────────────
 .editorconfig
@@ -56,7 +56,7 @@ docs/                      # onboarding/, status/, governance/, ...
 docs-template/             # template-only: scaffolding docs copied into new repos
 machine-readable-design/   # template-only: design rationale for .machine_readable/ layout
 .githooks/                 # vendored A2ML/K9 validation scripts run by the dogfood gate (PR #31); kept at root because git's core.hooksPath convention and the workflow both reference it there
-session/                   # dispatch.sh, custom-checks.k9, local-hooks.sh
+session/                   # dispatch.sh, custom-checks.k9.ncl, local-hooks.sh
 
 # Source / test / artifact trees (project-specific but conventional)
 # NB: src/ is deliberately NOT allowed — systemet is a theory repo (IS-NOT:

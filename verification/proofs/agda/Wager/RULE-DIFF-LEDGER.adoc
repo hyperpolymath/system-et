@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: rule-diff ledger
-Status: Stage 4. *The ledger is empty.*
+Status: Stage 5. *The ledger is empty.*
 :toc: left
 :sectnums:
 
@@ -81,3 +81,58 @@ The translation names the grade `𝟙` only: a function type becomes `arr 𝟙`,
 
 Theorem T5 (typing of a translated program) has two hypotheses on the grade algebra: `𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙`.
 They name the grades `𝟘` and `𝟙` only. They are hypotheses of a theorem and not side conditions of a rule, so they are not entries of this ledger. `VERDICT.adoc` records them at T5.
+
+== Stage 5
+
+Stage 5 adds no typing rule and no kinding rule to the target calculus. T6 is a statement about the translation of types and about conversion.
+
+== Stage 6
+
+Stage 6, part 1 (the separation) adds no typing rule and no kinding rule to the target calculus. The separation is a statement about the rules of Stage 1.
+
+The rule of the match (`lopen`) in the source calculus of Stage 6 has a local equality assumption. It is a rule of a source calculus, so it is not an entry of this ledger.
+
+Stage 6, part 2 (the identity type) is an extension of the target calculus, in separate modules (`Wager/Identity`). No rule of the target calculus changes. The owner decides if the extension is a part of the target (`VERDICT.adoc`, the trade).
+
+The difference between the target and the extension:
+
+[cols="3,1,5",options="header"]
+|===
+| Item | Count | Text
+
+| New judgement forms
+| 0
+| The judgement `_▸_⊢ⁱ_∶_` has the form of the target judgement.
+
+| New typing rules
+| 1
+| `t-cast` (`Wager.Identity.Typing`): from `γ ▸ Γ ⊢ⁱ e ∶ base (Id A B)` and `δ ▸ Γ ⊢ⁱ t ∶ A` to `((𝟘 ·ᵘ γ) +ᵘ δ) ▸ Γ ⊢ⁱ cast e t ∶ B`.
+  The rule names the grade `𝟘` and no other grade. It has no side condition for one algebra.
+
+| New kinding rules
+| 0
+|
+
+| New conversion rules
+| 0
+| `DefEq` does not change.
+
+| New type formers
+| 0
+| `Id A B` is a base constant of the signature.
+
+| New term formers
+| 1
+| `cast e t`.
+
+| New entries of a signature
+| 2 families
+| The base constants `Id A B` and the literals `rfl A`, with 3 laws (`Id-conv`, `rfl-ty`, `diagonal`). The existing rule `t-lit` is the introduction rule.
+|===
+
+`T7-Grade` and `T7-Assumption` have the hypothesis `GradeLaws`. Their proofs use the laws `zero-mul`, `add-comm` and `add-zero`. It is a hypothesis of a theorem and not a side condition of a rule, so it is not an entry of this ledger.
+The other statements of part 2 hold for each set of grade operations.
+
+== Stage 7
+
+Stage 7 adds no typing rule and no kinding rule to the target calculus. The cross-check is a statement about a model of the target of Stage 4.

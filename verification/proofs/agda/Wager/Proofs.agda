@@ -72,6 +72,11 @@ import Wager.Trans.Typing
 import Wager.Trans.Simulation
 import Wager.Trans.RoleCorrespondence
 import Wager.Trans.TwoStateProofs
+import Wager.Trans.Nominal
+import Wager.Local.Separation
+import Wager.Identity.Family
+import Wager.Identity.Soundness
+import Wager.Univalent.CrossCheck
 
 module _ where
   open T1-Statements
@@ -245,3 +250,87 @@ module _ where
 
   no-two-state-translation : No-Two-State-Translation
   no-two-state-translation = TS.no-two-state
+
+------------------------------------------------------------------------
+-- STAGE 5
+------------------------------------------------------------------------
+
+module _ (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+         {R : Type} (ops : GradeOps R) where
+  open T6-Statements SS Sc ops
+  private module NM = Wager.Trans.Nominal SS Sc ops
+
+  t6 : T6
+  t6 = NM.nominal-nf
+
+  t6-conversion : T6-Conversion
+  t6-conversion = NM.nominal-defeq
+
+  -- By the definition of the translation: the transformer of a nominal
+  -- coercion is the identity.
+  t6-no-term : T6-No-Term
+  t6-no-term γ e = refl
+
+------------------------------------------------------------------------
+-- STAGE 6
+------------------------------------------------------------------------
+
+module _ (S : Sig) (TS : Wager.L2.Signature.TSig S) (ops : GradeOps (Sig.TG S)) where
+  open T7-Statements S TS ops
+  private module Sep = Wager.Local.Separation S TS ops
+
+  t7-separation : T7-Separation
+  t7-separation = Sep.separation
+
+------------------------------------------------------------------------
+-- STAGE 6, PART 2
+------------------------------------------------------------------------
+
+module _ (S : Sig) (TS : Wager.L2.Signature.TSig S) (ops : GradeOps (Sig.TG S))
+         (F : Wager.Identity.Family.IdFamily S TS) where
+  open T7-Identity-Statements S TS ops F
+  private module Snd = Wager.Identity.Soundness S TS ops F
+
+  t7-conservative : T7-Conservative
+  t7-conservative = Snd.emb-typed
+
+  t7-conservative-erasure : T7-Conservative-Erasure
+  t7-conservative-erasure t = Snd.emb-keep t , Snd.emb-erase t
+
+  t7-intro : T7-Intro
+  t7-intro = Snd.intro
+
+  t7-canonicity : T7-Canonicity
+  t7-canonicity = Snd.canonicity
+
+  t7-erasure : T7-Erasure
+  t7-erasure = Snd.erasure-sound
+
+  t7-erasure-first-order : T7-Erasure-First-Order
+  t7-erasure-first-order = Snd.erasure-sound-fo
+
+  t7-grade : T7-Grade
+  t7-grade laws = Snd.cast-free laws
+
+  t7-assumption : T7-Assumption
+  t7-assumption = Snd.assumption
+
+------------------------------------------------------------------------
+-- STAGE 7
+------------------------------------------------------------------------
+
+module _ (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+         {R : Type} (A : GradeAlgebra R)
+         (El : SSig.Base SS → Type)
+         (elLit : (ℓ : SSig.Lit SS) → El (SSig.litTy SS ℓ)) where
+  open Stage7-Statements SS Sc A El elLit
+  private module CC = Wager.Univalent.CrossCheck SS Sc A El elLit
+
+  coercion-denotes-transport : Coercion-Denotes-Transport
+  coercion-denotes-transport = CC.coercion-denotes-transport
+
+  coercion-denotes-transport-back : Coercion-Denotes-Transport-Back
+  coercion-denotes-transport-back = CC.coercion-denotes-transport-back
+
+  coerce-function-is-transport : Coerce-Function-Is-Transport
+  coerce-function-is-transport = CC.coerce-function-is-transport

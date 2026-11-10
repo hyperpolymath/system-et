@@ -50,6 +50,7 @@ let base    = import "../_base.ncl" in
       allow_network = false,
       allow_filesystem_write = false,
       allow_subprocess = true,
+      signature_required = true,        # K9-S008: required at 'Hunt
       probe_scope = 'read_only,
     },
   },
@@ -82,7 +83,7 @@ let base    = import "../_base.ncl" in
       { kind = 'verisimdb, table = "contractile_executions",
         schema = "contractile_execution_v1",
         aux_tables = [ "bust_triggers_history" ] },
-      { kind = 'drift_log, path = ".machine_readable/6a2/DRIFT.a2ml",
+      { kind = 'drift_log, path = ".machine_readable/descriptiles/DRIFT.a2ml",
         append_only = true },
     ],
 
@@ -135,7 +136,7 @@ let base    = import "../_base.ncl" in
             signature_required = true,
           },
         ],
-        signed_record_destination = ".machine_readable/6a2/ratification-<session-id>.a2ml",
+        signed_record_destination = ".machine_readable/descriptiles/ratification-<session-id>.a2ml",
         must_precede_work = true,
       },
 

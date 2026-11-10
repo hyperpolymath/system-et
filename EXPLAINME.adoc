@@ -149,7 +149,7 @@ profile.
 How this is kept honest:
 
 * systemet owns the semantics and is the *semantic authority* (see
-  `.machine_readable/6a2/anchors/ANCHOR.a2ml`). Downstream may *extend* but not
+  `.machine_readable/descriptiles/anchors/ANCHOR.a2ml`). Downstream may *extend* but not
   *redefine* the theory.
 * anytype must *pin* systemet upstream and implement it; it may not silently change
   the theory to match the implementation. If implementation pressure forces a
