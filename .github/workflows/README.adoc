@@ -18,10 +18,21 @@ either loses real function — keep both.
 
 == Secret scanning is single-sourced
 
-`secret-scanner.yml` calls the standards reusable (gitleaks + a Rust-secrets
-check). An inline TruffleHog job was removed: the reusable deliberately retired
-TruffleHog as redundant with gitleaks, so re-adding it was duplicated work, not
-extra coverage.
+`secret-scanner.yml` runs three inline jobs: gitleaks (with the estate
+baseline from the standards repository at a pinned commit), a Rust-secrets
+check and a shell-secrets check. An inline TruffleHog job was removed earlier:
+the estate retired TruffleHog as redundant with gitleaks, so re-adding it was
+duplicated work, not extra coverage.
+
+== Six workflows are self-contained, not reusable callers
+
+`secret-scanner.yml`, `governance.yml`, `hypatia-scan.yml`, `rust-ci.yml`,
+`mirror.yml` and `scorecard.yml` follow the workflows of the estate template
+(`hyperpolymath/rsr-template-repo`). Earlier each one called a reusable
+workflow of the standards repository. Those calls did not start: each run
+failed with no job. A job-level call to a remote reusable workflow is also
+outside what `gh actions-lock` records. Each `uses:` in these six files is now
+a step-level action with a record in `actions.lock`.
 
 == SAST tools are complementary, not redundant
 

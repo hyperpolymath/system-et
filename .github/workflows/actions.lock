@@ -18,15 +18,22 @@ workflows:
         - 'actions/checkout@v7.0.1'
     '.github/workflows/estate-rules.yml':
         - 'actions/checkout@v7.0.1'
-    '.github/workflows/governance.yml': []
+    '.github/workflows/governance.yml':
+        - 'actions/checkout@v7.0.1'
     '.github/workflows/guix-policy.yml':
         - 'actions/checkout@v7.0.1'
-    '.github/workflows/hypatia-scan.yml': []
+    '.github/workflows/hypatia-scan.yml':
+        - 'actions/cache@v6.1.0'
+        - 'actions/checkout@v7.0.1'
+        - 'actions/upload-artifact@v7.0.2'
+        - 'erlef/setup-beam@v1.24.1'
+        - 'github/codeql-action@v4.39.2'
     '.github/workflows/instant-sync.yml':
         - 'peter-evans/repository-dispatch@v4.0.1'
     '.github/workflows/label-triage.yml': []
     '.github/workflows/labels.yml': []
-    '.github/workflows/mirror.yml': []
+    '.github/workflows/mirror.yml':
+        - 'actions/checkout@v7.0.1'
     '.github/workflows/openssf-compliance.yml':
         - 'actions/checkout@v7.0.1'
     '.github/workflows/pages.yml':
@@ -53,9 +60,14 @@ workflows:
         - 'actions/checkout@v7.0.1'
     '.github/workflows/runtime-policy.yml':
         - 'actions/checkout@v7.0.1'
-    '.github/workflows/rust-ci.yml': []
-    '.github/workflows/scorecard.yml': []
-    '.github/workflows/secret-scanner.yml': []
+    '.github/workflows/rust-ci.yml':
+        - 'actions/checkout@v7.0.1'
+    '.github/workflows/scorecard.yml':
+        - 'actions/checkout@v7.0.1'
+        - 'github/codeql-action@v4.39.2'
+        - 'ossf/scorecard-action@v2.5.0'
+    '.github/workflows/secret-scanner.yml':
+        - 'actions/checkout@v7.0.1'
     '.github/workflows/security-policy.yml':
         - 'actions/checkout@v7.0.1'
     '.github/workflows/sonarqube.yml':
@@ -155,6 +167,11 @@ dependencies:
         commit: 'sha1-e384daf6167a7a7567642d6a62060106244d2413'
         owner_id: 6759885
         repo_id: 1352485172
+    'ossf/scorecard-action@v2.5.0':
+        ref: 'v2.5.0'
+        commit: 'sha1-fa7117db83c52d787ae5a89f350999701505d78e'
+        owner_id: 67707773
+        repo_id: 421101922
     'peter-evans/repository-dispatch@v4.0.1':
         ref: 'v4.0.1'
         commit: 'sha1-28959ce8df70de7be546dd1250a005dd32156697'
