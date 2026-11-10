@@ -1,0 +1,179 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Wager: toolchain record
+Status: Stage 0 record. Checked on 2026-11-10.
+:toc: left
+:sectnums:
+
+This file records the exact toolchain that checks the `Wager` development.
+A green result from a different toolchain is not evidence for this development.
+
+== Pinned versions
+
+[cols="1,2,4",options="header"]
+|===
+| Tool | Version | Source and identity
+
+| Agda
+| 2.8.0
+| Release asset `Agda-v2.8.0-linux.tar.xz` from
+  `https://github.com/agda/agda/releases/download/v2.8.0/`.
+  SHA-256 of the archive:
+  `824081b8dcbe431289a50ac6bd83e451f390c51c3884ac7a8c4a5c0df2632faf`.
+  The archive contains one statically linked `agda` binary.
+
+| `agda/cubical`
+| v0.9
+| `https://github.com/agda/cubical`, tag `v0.9`,
+  commit `b150186d2544e7efeddd31e5d14a8b9ecbb100f7`.
+  Library name in its `cubical.agda-lib`: `cubical-0.9`.
+|===
+
+No other library is used. `agda-stdlib` is not installed.
+
+== Exact output of `agda --version`
+
+[source,text]
+----
+Agda version 2.8.0
+Built with flags (cabal -f)
+ - optimise-heavily: extra optimisations
+ - use-xdg-data-home: install and locate data files under $XDG_DATA_HOME/agda/$AGDA_VERSION by default instead of the location defined by Cabal
+----
+
+== Compatibility check
+
+The compatibility table is in the `README.md` of `agda/cubical` (branch `master`).
+On 2026-11-10 the table had these rows for Agda 2.8:
+
+[source,text]
+----
+| cubical library version | Agda versions |
+| current master          | `v2.8.0`      |
+| `v0.9`                  | `v2.8.0`      |
+----
+
+Other facts from the same day:
+
+* The Agda repository has the tags `v2.8.0.1` and `v2.8.0.2`.
+  Hackage lists both as normal versions.
+  The table does not list them, so this development uses `v2.8.0`.
+* The Agda repository has the tags `v2.9.0-rc1` and `v2.9.0-rc2`.
+  They are release candidates. This development does not use them.
+
+== Installation steps (bash)
+
+[source,bash]
+----
+mkdir -p /opt/agda/2.8.0/bin
+curl -sSfL -O https://github.com/agda/agda/releases/download/v2.8.0/Agda-v2.8.0-linux.tar.xz
+echo "824081b8dcbe431289a50ac6bd83e451f390c51c3884ac7a8c4a5c0df2632faf  Agda-v2.8.0-linux.tar.xz" | sha256sum -c -
+tar -xJf Agda-v2.8.0-linux.tar.xz -C /opt/agda/2.8.0/bin
+ln -sf /opt/agda/2.8.0/bin/agda /usr/local/bin/agda
+
+git clone --depth 1 --branch v0.9 https://github.com/agda/cubical /opt/agda/cubical-0.9
+git -C /opt/agda/cubical-0.9 rev-parse HEAD   # b150186d2544e7efeddd31e5d14a8b9ecbb100f7
+
+mkdir -p "$(agda --print-agda-app-dir)"
+echo "/opt/agda/cubical-0.9/cubical.agda-lib" > "$(agda --print-agda-app-dir)/libraries"
+----
+
+The project library file is `verification/proofs/agda/wager.agda-lib`.
+It names the dependency `cubical-0.9` and has no `flags:` line.
+
+== Flags
+
+=== First line of each file
+
+Each `.agda` file starts with this line:
+
+[source,agda]
+----
+{-# OPTIONS --cubical --safe #-}
+----
+
+`scripts/check-proofs.sh agda` also passes `--safe` on the command line.
+
+=== Finding: the stock library forces `--guardedness`
+
+The `cubical.agda-lib` file of v0.9 has this line:
+
+[source,text]
+----
+flags: --safe --cubical --no-import-sorts -WnoUnsupportedIndexedMatch --guardedness
+----
+
+Agda 2.8.0 rejects an import of a `--guardedness` module from a module that does not use the flag.
+This is the error for a file that has only `--cubical --safe`:
+
+[source,text]
+----
+error: [InfectiveImport]
+Importing module Cubical.Foundations.Prelude using the
+--guardedness flag from a module which does not.
+----
+
+Thus the rule "add `--guardedness` only in a file that needs coinduction" cannot hold with the stock library.
+Stage 0 uses a second pragma line, `{-# OPTIONS --guardedness #-}`, in each file.
+This is provisional. The owner decides (see `DESIGN-CHOICES.adoc`, DC-0.2).
+
+One alternative was tested.
+A copy of the library tree with `--guardedness` removed from its `flags:` line lets a `--cubical --safe` file import `Cubical.Foundations.Prelude` and `Cubical.Data.List`.
+That alternative changes the configuration of the pinned library.
+
+=== Finding: `UnsupportedIndexedMatch`
+
+The warning is on by default in Agda 2.8.0 (`agda --help=warning` marks it `d`).
+It is not an error warning, and `--safe` accepts a file that has it.
+The Agda 2.8.0 documentation says that a flagged definition "will not compute when applied to transports".
+
+A test with intrinsically kinded syntax (`Var : Ctx → Kind → Type`) gave this result:
+
+* A match that needs a constructor in an index (`Var (j ∷ Γ) k`, `Ty Γ ★`) gets the warning.
+  The reason text is "It relies on injectivity of the data constructor".
+* A match on a fully general index (`Ty Γ k`) gets no warning.
+* The exit code is 0 in both cases.
+
+The decision for this warning is in `DESIGN-CHOICES.adoc`, DC-0.3.
+
+== The gate
+
+The command is:
+
+[source,bash]
+----
+./scripts/check-proofs.sh agda
+----
+
+The gate was watched to fail before its green result was trusted.
+Each test added text to `Wager/Toolchain.agda`, ran the gate, and removed the text.
+
+[cols="2,3,1",options="header"]
+|===
+| Added text | Error from Agda | Gate
+
+| `false-lemma : 1 ≡ 0` with the proof `refl`
+| `[UnequalTerms] 1 != 0 of type ℕ`
+| FAIL, exit 1
+
+| `postulate false-by-fiat : 1 ≡ 0`
+| `[SafeFlagPostulate] Cannot postulate false-by-fiat with safe flag`
+| FAIL, exit 1
+
+| `open-goal : 1 ≡ 0` with the proof `?`
+| `[UnsolvedInteractionMetas]`
+| FAIL, exit 1
+
+| No added text (restored file)
+| None
+| PASS, exit 0
+|===
+
+`./scripts/scan-dangerous.sh` also failed on the `postulate` test and passes on the restored file.
+
+=== Known red gate: status drift
+
+`./scripts/check-proof-status.sh` fails on this branch.
+It needs the line `// gate:agda gated=<N> quarantined=0` in `docs/status/PROOF-STATUS.adoc`.
+The task forbids an edit of that file, so the line is absent.
+The failure is correct behaviour of the drift gate. It is not hidden and not bypassed.

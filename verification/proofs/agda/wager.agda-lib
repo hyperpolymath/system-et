@@ -1,0 +1,7 @@
+-- SPDX-License-Identifier: MPL-2.0
+-- Library file for the Wager development (Cubical Agda).
+-- No `flags:` line on purpose: every option is visible in each file's
+-- OPTIONS pragma, and no warning is silenced here.
+name: systemet-wager
+include: .
+depend: cubical-0.9

@@ -1,0 +1,5 @@
+# MANIFEST for verification/proofs/agda — read by scripts/check-proofs.sh
+# <source-root>|<module-path-relative-to-source-root>|gated|<note>
+# gated = must compile; quarantine = known-broken, must keep failing.
+verification/proofs/agda|Wager/Everything.agda|gated|import graph root (imports every Wager module)
+verification/proofs/agda|Wager/Toolchain.agda|gated|Stage 0 anchor: pinned toolchain resolves under --cubical --safe

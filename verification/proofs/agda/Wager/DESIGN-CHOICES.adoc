@@ -1,0 +1,84 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Wager: design choices
+Status: Stage 0 entries only.
+:toc: left
+:sectnums!:
+
+This file records each choice that the systemet documents do not make.
+A choice in this file is a choice of the experiment. It is not systemet doctrine.
+Each entry has an identifier `DC-<stage>.<n>`, the choice, the reason, and the alternatives.
+
+== Stage 0
+
+[[DC-0.1]]
+=== DC-0.1: Agda 2.8.0, not 2.8.0.1 or 2.8.0.2
+
+*Choice.* The development uses Agda 2.8.0 and cubical v0.9.
+
+*Reason.* The cubical compatibility table lists only `v2.8.0` for `v0.9`.
+The patch releases 2.8.0.1 and 2.8.0.2 exist, but the table does not list them.
+
+*Alternative.* Use 2.8.0.2. This is possible only after a test of the full library with it.
+
+[[DC-0.2]]
+=== DC-0.2: `--guardedness` in each file (PROVISIONAL, owner decision needed)
+
+*Choice.* Each file has a second pragma line, `{-# OPTIONS --guardedness #-}`.
+No file uses coinduction.
+
+*Reason.* The stock cubical v0.9 library sets `--guardedness` for all of its modules.
+Agda 2.8.0 then rejects an import from a module without the flag (`InfectiveImport`).
+`TOOLCHAIN.adoc` has the evidence.
+`--safe` accepts `--guardedness` when `--sized-types` is off.
+
+*Conflict.* The task says: add `--guardedness` only in a file that needs coinduction.
+The stock library makes that rule impossible to obey.
+
+*Alternatives.*
+
+. Keep the choice. Check the intent of the rule by a search for the keyword `coinductive` in `Wager/`.
+. Use a copy of the library with `--guardedness` removed from its `flags:` line.
+  A test showed that this works for the modules that this development needs.
+  The cost: the library configuration is not the released one, and a reviewer needs the same copy.
+. Use no library, only the Agda builtin cubical modules. This breaks the rule "use the cubical library".
+
+[[DC-0.3]]
+=== DC-0.3: `UnsupportedIndexedMatch` is silenced per file, with this reason
+
+*Choice.* A file that matches on indexed syntax may have the line
+`{-# OPTIONS -WnoUnsupportedIndexedMatch #-}`.
+The line is put only in the files that need it. It is not put in `wager.agda-lib`.
+No other warning is silenced.
+
+*Reason.* The warning says that a definition does not compute when its argument is a transport.
+It does not say that the definition is wrong, and `--safe` accepts it.
+Syntax with intrinsic kinds gives this warning for most definitions.
+Hundreds of copies of it hide the other warnings.
+
+*Why a green result stays meaningful.* All theorems of this development are paths (propositional equalities) or type inhabitants.
+If a proof needs a flagged function to compute on a transport, the proof does not type-check, and the gate fails.
+In that case the proof uses an explicit path lemma (for example `substRefl` or path induction).
+
+*Related rule.* Cubical Agda has no axiom K.
+A match that needs K is an error, not a warning.
+Thus the Lean proofs that use `castNf_diag` (an equality on `Δ = Δ` closed by `rfl`) cannot be copied directly.
+
+*Alternative.* Leave the warning on. This is honest but makes the output hard to read.
+
+[[DC-0.4]]
+=== DC-0.4: a library file outside `Wager/`
+
+*Choice.* Two files are outside `Wager/`: `verification/proofs/agda/wager.agda-lib` and `verification/proofs/agda/MANIFEST`.
+
+*Reason.* `scripts/check-proofs.sh` reads the manifest from that path and starts Agda from that directory.
+Agda needs the library file in the source root to find `cubical-0.9`.
+
+[[DC-0.5]]
+=== DC-0.5: identifier names that the danger scan accepts
+
+*Choice.* No identifier contains the whole words `axiom`, `Axiom`, `admit`, `sorry` or `postulate`.
+The coercion axioms of System FC get names that start with `ax`.
+
+*Reason.* `scripts/scan-dangerous.sh` searches the code (not the comments) for these words.
+A match fails the scan. The scan must stay meaningful, so the names avoid the words.
