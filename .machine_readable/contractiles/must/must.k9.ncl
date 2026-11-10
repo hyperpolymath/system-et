@@ -58,6 +58,7 @@ let base    = import "../_base.ncl" in
       allow_network = false,
       allow_filesystem_write = false,
       allow_subprocess = true,
+      signature_required = true,        # K9-S008: required at 'Hunt
       probe_scope = 'read_only,              # must probes NEVER mutate
       probe_kinds_allowed = [
         'file_existence,

@@ -76,6 +76,7 @@ let base    = import "../_base.ncl" in
       allow_network = false,            # verifications offline by default
       allow_filesystem_write = false,   # evidence sinks are indirected
       allow_subprocess = true,
+      signature_required = true,        # K9-S008: required at 'Hunt
       authorised_probes_only = true,    # probe section explicitly lists allowed targets + probe classes
       probe_scope_enforcement = 'this_repo_only,  # probes NEVER hit external systems
     },

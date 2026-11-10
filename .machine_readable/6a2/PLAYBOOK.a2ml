@@ -58,14 +58,14 @@ enforcement-workflow = ".github/workflows/estate-rules.yml"
 # CHANGELOG.md         One of the recognised .md exceptions (see below)
 # Justfile             Task runner — self-contained (build/ scaffolding retired;
 #                      build/just/proofs.just returns with the proof gate)
-# coordination.k9      Repo-local session binding
+# coordination.k9.ncl  Repo-local session binding
 
 # === Required directories ===
 # .github/             CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, workflows/
 # .machine_readable/   AI manifests (0.1-AI-MANIFEST.a2ml), 6a2/ checkpoints,
 #                      contractiles/, configs/, anchors/, policies/, scripts/, self-validating/
 # docs/                onboarding/, status/, architecture/, governance/  (all .adoc)
-# session/             dispatch.sh, custom-checks.k9, local-hooks.sh
+# session/             dispatch.sh, custom-checks.k9.ncl, local-hooks.sh
 # src/                 Project source (Idris2 ABI under abi/, Zig FFI under ffi/)
 # tests/, benches/, examples/, features/, scripts/, verification/, container/
 
