@@ -50,7 +50,7 @@ The descriptive family (working name *descriptiles*) describes what-is; the **co
 - **Before you invent, rename, or consolidate anything: STOP and check the map + IS-NOT.**
 
 ## Estate language policy (overridable per-repo via AGENTIC)
-Deny: **Nix, Node/npm, TypeScript, Python, Go, AGPL**. (Guix, not Nix.)
+Deny: **Nix, TypeScript, Python, Go, AGPL**. JS runtimes in preference order **Bun > Deno > pnpm > npm** — npm is last-resort, *not* banned (only when Bun *and* Deno *and* pnpm are all impossible). Packaging: **Guix**, not Nix.
 
 ---
 
