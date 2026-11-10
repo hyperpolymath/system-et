@@ -14,20 +14,30 @@ the template's own manifests. Git history retains them.
 [source]
 ----
 proofs/
-└── lean4/                       # the active development (hermetic, no deps)
-    ├── lean-toolchain           # pinned toolchain (elan)
-    ├── lakefile.toml
+├── lean4/                       # the active development (hermetic, no deps)
+│   ├── lean-toolchain           # pinned toolchain (elan)
+│   ├── lakefile.toml
+│   ├── MANIFEST                 # every file listed: gated | quarantine
+│   ├── Systemet.lean            # root import (coverage anchor)
+│   └── Systemet/
+│       ├── L1/...               # MECH-1: conversion for the core calculus
+│       │                        #   (ET-1, ET-2, part of ET-3)
+│       ├── L2/...               # MECH-2: grade-algebra laws + instances
+│       │                        #   (ET-4, ET-5)
+│       └── Audit.lean           # #print axioms over every headline theorem
+└── agda/                        # the wager experiment (Cubical Agda 2.8.0, cubical v0.9)
+    ├── wager.agda-lib           # library file: depends on cubical-0.9, no flags
     ├── MANIFEST                 # every file listed: gated | quarantine
-    ├── Systemet.lean            # root import (coverage anchor)
-    └── Systemet/
-        ├── L1/...               # MECH-1: conversion for the core calculus
-        │                        #   (ET-1, ET-2, part of ET-3)
-        ├── L2/...               # MECH-2: grade-algebra laws + instances
-        │                        #   (ET-4, ET-5)
-        └── Audit.lean           # #print axioms over every headline theorem
+    └── Wager/
+        ├── Statements.agda      # headline theorems as types only (review this file)
+        ├── Proofs.agda          # one inhabitant for each statement
+        ├── Grade/ L1/ L2/ ...   # the target calculus and its metatheory
+        ├── Examples/            # accepted and rejected closed examples
+        ├── VERDICT.adoc         # status of the experiment (it claims no ET obligation)
+        └── TOOLCHAIN.adoc       # pinned toolchain and the gate-failure record
 ----
 
-Other prover directories (idris2, agda, coq, tlaplus) are created only when
+Other prover directories (idris2, coq, tlaplus) are created only when
 a real systemet development lands in them, together with their MANIFEST.
 An on-disk proof file not listed in a MANIFEST fails the gate.
 
@@ -37,6 +47,7 @@ An on-disk proof file not listed in a MANIFEST fails the gate.
 ----
 just proof-check-all       # all provers with a MANIFEST (absent prover = FAIL)
 just proof-check-lean4     # the Lean4 development
+just proof-check-agda      # the wager experiment (Cubical Agda)
 just proof-scan-dangerous  # banned-construct scan (comment-aware)
 ----
 

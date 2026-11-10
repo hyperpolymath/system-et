@@ -20,6 +20,9 @@ open proof obligation.
 * Instantiated identity descriptiles (CLADE/ECOSYSTEM/ANCHOR/STATE/META)
 and the AFFIRMATION honesty snapshot with the systemet identity and an
 honest status (theory specified; proofs OPEN; no compiler here).
+* Added the wager experiment for coercions and roles in Cubical Agda
+(`+verification/proofs/agda/Wager/+`, stages 0 and 1), with an `+agda+` job
+in the proofs workflow. The experiment claims no ET obligation.
 
 ==== Changed
 

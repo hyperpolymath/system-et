@@ -7,6 +7,8 @@
 # with a checksum, the Lean toolchain from the committed lean-toolchain file,
 # and no floating setup action is involved. A missing prover FAILS (the gate
 # never skips), so this workflow existing is what makes green mean "proved".
+# The agda job follows the same pattern: Agda comes from a version-pinned
+# release tarball with a checksum, and the cubical library from a pinned commit.
 name: proofs
 
 on:
@@ -84,3 +86,55 @@ jobs:
 
       - name: Status drift gate (PROOF-STATUS must match MANIFEST)
         run: ./scripts/check-proof-status.sh
+
+  agda:
+    name: agda proof gate (wager experiment)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Pins. Keep them equal to verification/proofs/agda/Wager/TOOLCHAIN.adoc.
+      AGDA_VERSION: "2.8.0"
+      AGDA_SHA256: 824081b8dcbe431289a50ac6bd83e451f390c51c3884ac7a8c4a5c0df2632faf
+      CUBICAL_TAG: v0.9
+      CUBICAL_COMMIT: b150186d2544e7efeddd31e5d14a8b9ecbb100f7
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Cache Agda, the cubical library and its interface files (keyed on the pins)
+        uses: actions/cache@v6.1.0
+        with:
+          path: ~/.agda-toolchain
+          key: agda-2.8.0-cubical-b150186d-${{ runner.os }}
+
+      - name: Install Agda (pinned tarball, checksum-verified)
+        run: |
+          set -euo pipefail
+          T="$HOME/.agda-toolchain"
+          if [ ! -x "$T/bin/agda" ]; then
+            mkdir -p "$T/bin"
+            curl -sSfL --proto '=https' --tlsv1.2 -o /tmp/agda.tar.xz \
+              "https://github.com/agda/agda/releases/download/v${AGDA_VERSION}/Agda-v${AGDA_VERSION}-linux.tar.xz"
+            echo "${AGDA_SHA256}  /tmp/agda.tar.xz" | sha256sum -c -
+            tar -xJf /tmp/agda.tar.xz -C "$T/bin"
+          fi
+          echo "$T/bin" >> "$GITHUB_PATH"
+          "$T/bin/agda" --version
+
+      - name: Install the cubical library (pinned commit)
+        run: |
+          set -euo pipefail
+          T="$HOME/.agda-toolchain"
+          if [ ! -d "$T/cubical/.git" ]; then
+            git clone --depth 1 --branch "$CUBICAL_TAG" https://github.com/agda/cubical "$T/cubical"
+          fi
+          got="$(git -C "$T/cubical" rev-parse HEAD)"
+          if [ "$got" != "$CUBICAL_COMMIT" ]; then
+            echo "FAIL: cubical is at $got, expected $CUBICAL_COMMIT" >&2
+            exit 1
+          fi
+          appdir="$(agda --print-agda-app-dir)"
+          mkdir -p "$appdir"
+          echo "$T/cubical/cubical.agda-lib" > "$appdir/libraries"
+
+      - name: Proof gate (compile + coverage)
+        run: ./scripts/check-proofs.sh agda

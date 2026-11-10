@@ -13,6 +13,7 @@ summary from the per-prover MANIFESTs and fails if this file disagrees.
 // Machine-readable ground-truth markers — checked by scripts/check-proof-status.sh.
 // Do not edit by hand without changing the MANIFEST accordingly.
 // gate:lean4 gated=20 quarantined=0
+// gate:agda gated=29 quarantined=0
 
 == Summary
 
@@ -23,6 +24,7 @@ summary from the per-prover MANIFESTs and fails if this file disagrees.
 | ET obligations (DOM — the theory itself) | 15 | 2 | 2 | 11
 | MECH-1: L1 conversion, Lean4 (covers ET-1, ET-2, part of ET-3) | 1 | — | in progress | —
 | MECH-2: L2 grade algebras, Lean4 (covers ET-4, ET-5) | 1 | 1 | — | —
+| WAGER: the wager experiment for coercions and roles, Cubical Agda (claims no ET obligation) | 1 | - | in progress | -
 |===
 
 The Done/In-progress claims above are scoped to the *mechanized core
@@ -70,6 +72,49 @@ every theorem depends on nothing outside Lean's three-axiom trusted base
 | *Proven* (4 algebras + 1 generic construction)
 |===
 
+== The wager experiment (verified by `./scripts/check-proofs.sh agda`)
+
+This track is an experiment. It adds no ET obligation and it changes no ET
+status. A new obligation needs an ADR from the repository owner.
+
+The experiment decides, for a defined fragment, whether grades,
+conversion-only equality and tropes can replace the coercions and roles of
+System FC. Its own status file is
+`verification/proofs/agda/Wager/VERDICT.adoc`. The headline statements are
+types in `verification/proofs/agda/Wager/Statements.agda`.
+
+All items below compile under Agda 2.8.0 with `--cubical --safe` and
+`agda/cubical` v0.9 (pins in `verification/proofs/agda/Wager/TOOLCHAIN.adoc`).
+There is no `postulate`. The library forces `--guardedness` on each file, and
+no file uses coinduction. One warning class is silenced
+(`UnsupportedIndexedMatch`); `DESIGN-CHOICES.adoc` gives the reason.
+
+[cols="1,3,2", options="header"]
+|===
+| Stage | Artefact (Agda identifier) | Status
+
+| 1
+| `Wager.Proofs.l1-equality` : `DefEq t u ↔ nf t ≡ nf u`, for the L1 language
+  of the experiment (graded kind arrows, products, sums, a signature of
+  constants and total inspection primitives)
+| *Proven* for the experiment calculus. This is not the ET-2 calculus, and
+  it claims nothing for ET-2
+
+| 1
+| `Wager.Proofs.t0-substitution`, `t0-preservation`, `t0-progress` : graded
+  substitution, preservation and progress of the target calculus, for each
+  signature and each grade algebra
+| *Proven*
+
+| 1
+| `Wager.Proofs.affine-is-grade-algebra`, `level-is-grade-algebra`
+| *Proven* (law checks computed over the finite carriers)
+
+| 2 to 7
+| T1 to T7 of the experiment
+| not attempted
+|===
+
 == Mechanization slots
 
 [cols="1,3,2,2", options="header"]
@@ -115,6 +160,7 @@ just proof-check-all          # every prover with a MANIFEST; absent prover = FA
 just proof-check-lean4        # compile + coverage + lake build + axiom audit
 just proof-scan-dangerous     # comment-aware banned-construct scan
 ./scripts/check-proofs.sh lean4
+./scripts/check-proofs.sh agda    # the wager experiment (needs Agda 2.8.0 and cubical v0.9)
 ./scripts/check-proof-status.sh   # this file vs MANIFEST ground truth
 ----
 

@@ -1,0 +1,106 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Wager: relation ledger
+Status: Stage 1. Each later stage adds its entries in the same commit as its rules.
+:toc: left
+:sectnums:
+
+This file lists each judgement form and each relation of the target calculus.
+The baseline is the list in `docs/theory/00-notation.adoc`: kinding, conversion, the function `nf`, graded typing, trope transition.
+
+Each entry has one class:
+
+[cols="1,4",options="header"]
+|===
+| Class | Meaning
+| baseline | The form is in 00-notation and is used as written there.
+| baseline, changed | The form is in 00-notation. This experiment changes it. The change is named.
+| specification only | The relation is used in theorem statements. No typing or kinding rule uses it.
+| proof-internal | The relation is used in proofs only. No rule and no statement uses it.
+| ADDED | The relation is not in 00-notation, and a typing or kinding rule uses it.
+|===
+
+An ADDED entry counts against the wager. *Stage 1 has no ADDED entry.*
+Stage 1 has one "baseline, changed" entry (R1). The owner decides how it counts.
+
+== Judgement forms of the target calculus
+
+[cols="1,3,3,2,4",options="header"]
+|===
+| Id | Form (00-notation) | Agda identifier | Class | Notes
+
+| R1
+| `Γ ⊢ A : k` (kinding)
+| `Ty Γ k` in `Wager.L1.Syntax` (simple kind, intrinsic) and `_⊢ᵏ_` in `Wager.L1.Kinding` (grades)
+| baseline, changed
+| The context of the kinding judgement is graded: `γ ⊢ᵏ A` has a usage vector γ for the type variables.
+  The documents grade term contexts only. The task asks for this change (DC-1.3).
+  The form is the same form. No new relation between types exists.
+
+| R2
+| `Γ ⊢ A ≡ B : k` (conversion)
+| `DefEq` in `Wager.L1.Conversion`
+| baseline
+| β, equivalence, congruence, as in 02-l1-equality. No η.
+  New rules of the same relation: the δ-rules of the signature primitives (DC-1.1). They are computation rules of total type-level functions.
+
+| R3
+| `nf(A)`
+| `nf` in `Wager.L1.Eval`
+| baseline
+| A total function. `DefEq t u ↔ nf t ≡ nf u` is proved (`Wager.Proofs.l1-equality`).
+
+| R4
+| `Γ ⊢ᵣ t : A` (graded typing)
+| `_▸_⊢_∶_` in `Wager.L2.Typing`
+| baseline
+| Declarative, with a subusage rule and a conversion rule.
+  The only relation between types in a rule is `DefEq` (rule `t-conv`).
+
+| R5
+| `A@s ⟶ A@s'` (trope transition)
+| The premise and the conclusion of rule `t-step`: `carrier o at from o` and `carrier o at to o`, from `Wager.L2.Signature.TSig`
+| baseline
+| It is not a separate inductive relation. The signature gives, for each operation, one carrier type and two states.
+  The carrier type cannot change (DC-1.4). Thus an operation is never a cast between two different carrier types.
+|===
+
+== Other relations in the development
+
+[cols="1,3,2,5",options="header"]
+|===
+| Id | Agda identifier | Class | Notes
+
+| R6
+| `_⟶_` and `Value` in `Wager.L2.Term`
+| specification only
+| One-step reduction of terms (call by value) and the values. T0 (preservation, progress) is stated with them.
+  No typing or kinding rule uses them. 00-notation has no reduction relation.
+
+| R7
+| `_≤ᵘ_` in `Wager.L2.Usage`, `_≼ᵏ_` in `Wager.L1.Kinding`
+| baseline
+| The order `≤` of the grade algebra (03-l2-grades), pointwise on usage vectors. Rules `t-sub` and `k-sub` use it.
+  It is a relation between grades, not between types.
+
+| R8
+| `SemEq`, `EnvEq` in `Wager.L1.Completeness`
+| proof-internal
+| Kripke partial equivalence on values, for the completeness of `nf`.
+
+| R9
+| `Rel`, `SubRel` in `Wager.L1.Soundness`
+| proof-internal
+| Kripke logical relation between terms and values, for the soundness of `nf`.
+
+| R10
+| `SubTyping` in `Wager.L2.Substitution`
+| proof-internal
+| Typing of a parallel substitution with a usage matrix. It is a family of R4 judgements.
+|===
+
+== What is absent
+
+* There is no coercion relation and no cast judgement.
+* There is no representational equality. Stage 2 adds one as "specification only".
+* There is no subtyping relation between types.

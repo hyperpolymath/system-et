@@ -1,0 +1,79 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Wager: plan
+Status: Stage 0 deliverable. It is a proposal. It waits for the owner.
+:sectnums:
+
+== Goal
+
+Decide claim W for a defined fragment: grades, conversion-only equality and tropes replace the coercions and roles of System FC.
+A proof is a success. A checked counterexample is a success. A vague result is a failure.
+
+== What Stage 0 found
+
+. Agda 2.8.0 and cubical v0.9 are installed and recorded in `TOOLCHAIN.adoc`. The gate failed on a false lemma, a `postulate` and a hole, and passes on the restored file.
+. The stock cubical v0.9 library forces `--guardedness` on each importer (DC-0.2). This conflicts with a task rule.
+. `scripts/check-proof-status.sh` is red on this branch, because the task forbids the marker line in `PROOF-STATUS.adoc`.
+. The systemet `Affine` order (`0 ≤ ω`, `1 ≤ ω`, and `0`, `1` not comparable) differs from the anytype order (`0 ≤ 1 ≤ ω`). Stage 1 uses the systemet order.
+. The documents leave the L2 rule table open (doc 03) and say that a trope has a finite state set (doc 07). Both facts matter in stages 1 and 4.
+
+== Stages
+
+[cols="1,5,4",options="header"]
+|===
+| Stage | Method | Main risk or decision point
+
+| 1 (T0)
+| `Grade/`: the record with 16 laws, `Affine`, one two-point lattice.
+  `L1/`: kinds `k1 ⇒[r] k2`; types over a signature of constants; `DefEq`; `nf` by evaluation into β-normal forms (no η); `DefEq t u ↔ nf t ≡ nf u` by Kripke logical relations with function extensionality.
+  `L2/`: raw de Bruijn terms; one declarative judgement with the rules var, lam, app, pair, let-pair, inl, inr, case, conv, sub; usage vectors are functions `Fin n → R`; substitution, preservation, progress for an arbitrary algebra.
+| The Lean proof uses casts that UIP closes. Cubical Agda has no K, so `nf` uses evaluation, not hereditary substitution.
+  Decision D1: does `case` need a join? The declarative rule gives both branches one usage vector, and `sub` raises each branch to it. Stage 1 proves T0 with that rule or reports the lemma that fails.
+
+| 2 (T1, T2, T4)
+| Both role tables are decided by exhaustive case proofs, law by law.
+  Newtypes are base constants with a trope state. The inspection primitive is a signature entry with a graded kind.
+  T2 uses a logical relation indexed by kind and observer role.
+| Decision D2: conversion sees the argument of a generative constant, so can that parameter have grade `0`? The three outcomes of the task are tested with `Proxy`.
+  One more candidate is tested only if both tables fail: a 4-point carrier (absent, phantom, representational, nominal). It is checked by hand only at this time.
+  A change of the T1 or T2 statement stops the stage.
+
+| 3
+| Source fragment after Breitner et al.: types, roles, coercion derivations, `coerce`, typing, erasure to untyped terms. The classic unsound program and its rejection.
+| The size of the fragment decides the strength of W. Each limit is recorded.
+
+| 4 (T3, T5)
+| A coercion becomes a pair of linear terms (to, from), built from wrap, unwrap and the maps for `→`, `×`, `+`. Linear terms type in each algebra.
+  Behaviour after erasure is compared in a set model, with function extensionality.
+| Decision D3: a generative constructor with a phantom type parameter needs trope states indexed by types. Doc 07 says the state set is finite. A source program without translation becomes a checked counterexample.
+
+| 5 (T6)
+| Each axiom of a total type-level function becomes an equation of normal forms.
+| Low, if the Stage 2 primitive is general enough.
+
+| 6 (T7)
+| The choice between the two options is made after Stage 5 and is put to the owner first.
+| The source needs type variables and local assumptions. This is new syntax.
+
+| 7
+| Optional. Only if stages 1 to 5 are complete.
+| None.
+|===
+
+== Rules of work
+
+. `Statements.agda` gets the statements of a stage before the proofs. After that a statement is frozen. A change stops the stage.
+. `RELATION-LEDGER.adoc` and `RULE-DIFF-LEDGER.adoc` change in the same commit as the rule that they record.
+. Each theorem gets one accepted closed example and one rejected closed example, both checked by Agda.
+. The gate is watched to fail at the end of each stage.
+. Trust base: Agda 2.8.0 with `--cubical --safe`, cubical v0.9, no `postulate`. The only silenced warning is in DC-0.3.
+. Until 2026-11-10 nothing was pushed. Since that day the owner allows a push: each stage ends with a push of the branch `claude/systemet-wager-cubical-agda-nqsiff`.
+
+== Questions for the owner
+
+. DC-0.2: accept `--guardedness` in each file, or use a library copy without the flag?
+. Is the red status-drift gate acceptable on this branch?
+. May Stage 1 define the L1 language over a signature, so that Stage 2 adds entries and not constructors? The Stage 1 instance mirrors the Lean language.
+. May the calculus take two algebras, one for kind arrows and one for term binders? The alternative is one product algebra for both.
+
+*Answer of the owner (2026-11-10):* yes to the recommendation in each of the 4 questions.
