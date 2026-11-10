@@ -283,7 +283,8 @@ Stage 2 proved the laws of the candidate only. It did not prove that the candida
 | With `Proxy` declared representational the signature is valid, and `Proxy Age ≈ Proxy Int` holds.
   But `Proxy Int` and `Proxy Bool` are not related by `≈` (`Wager.Proofs.no-phantom-coercion`). GHC accepts a coercion between them.
   This result is about the relation `≈` only. It does not show that no term of the target calculus can do this coercion.
-  Stage 4 decided the question (finding F12): a phantom coercion between two instances of a newtype is a typed term of the target.
+  Stage 4 shows a related result (finding F12): with the row scheme, a phantom coercion between two instances of a source newtype is a typed term of the target.
+  Stage 4 does not translate the constant `Proxy` of the Stage 2 signature. The question stays open for that signature.
 
 | F9
 | Two notions of use. A 4-point structure with a separate grade "absent" for `0` has all 15 law fields and the GHC rule `nominal · phantom = nominal` (`Wager.Proofs.role4-lawful`, `Wager.Proofs.role4-has-ghc-rule`).
@@ -318,7 +319,7 @@ Stage 2 proved the laws of the candidate only. It did not prove that the candida
   The coercion is observationally the identity (T3). It is zero-cost only when the coercion has no map, or after a later optimisation that this development does not have.
 
 | F15
-| In this fragment the result of a type-level function is a base type. For this reason a finite number of states for each newtype is enough (DC-4.1).
+| In this fragment the result of a type-level function is a base type. For a signature with a finite number of base types and of type-level functions, a finite number of states for each newtype is then enough (DC-4.1). Agda did not check this sentence.
   A function that returns a part of its argument is outside the fragment, in the source and in the target. This development proves nothing about it.
 |===
 
