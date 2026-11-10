@@ -75,3 +75,5 @@ A proof is a success. A checked counterexample is a success. A vague result is a
 . Is the red status-drift gate acceptable on this branch?
 . May Stage 1 define the L1 language over a signature, so that Stage 2 adds entries and not constructors? The Stage 1 instance mirrors the Lean language.
 . May the calculus take two algebras, one for kind arrows and one for term binders? The alternative is one product algebra for both.
+
+*Answer of the owner (2026-11-10):* yes to the recommendation in each of the 4 questions.

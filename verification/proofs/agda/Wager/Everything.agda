@@ -26,3 +26,11 @@ import Wager.L2.Usage
 import Wager.L2.Term
 import Wager.L2.Typing
 import Wager.Statements
+import Wager.L2.UsageLaws
+import Wager.L2.Renaming
+import Wager.L2.Substitution
+import Wager.L2.Inversion
+import Wager.L2.Preservation
+import Wager.L2.Progress
+import Wager.Proofs
+import Wager.Examples.Stage1

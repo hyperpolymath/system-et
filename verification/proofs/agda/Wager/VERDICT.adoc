@@ -1,0 +1,93 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Wager: verdict
+Status: DRAFT after Stage 1. This file becomes final after the last stage.
+:toc: left
+:sectnums:
+
+== Status of each theorem
+
+[cols="1,2,6",options="header"]
+|===
+| Theorem | Status | Evidence
+
+| T0
+| PROVED
+| `Wager.Proofs.t0-substitution`, `Wager.Proofs.t0-preservation`, `Wager.Proofs.t0-progress`.
+  Each holds for each signature, each term signature and each `GradeAlgebra` on the term grades.
+  The statements are in `Wager.Statements.T0-Statements`. No statement changed.
+
+| T1 | NOT ATTEMPTED | Stage 2 is not started.
+| T2 | NOT ATTEMPTED | Stage 2 is not started.
+| T3 | NOT ATTEMPTED | Stage 4 is not started.
+| T4 | NOT ATTEMPTED | Stage 2 is not started.
+| T5 | NOT ATTEMPTED | Stage 4 is not started.
+| T6 | NOT ATTEMPTED | Stage 5 is not started.
+| T7 | NOT ATTEMPTED | Stage 6 is not started.
+|===
+
+Stage 1 also proved the L1 equivalence that the task asks for:
+`Wager.Proofs.l1-equality` : `DefEq t u ↔ nf t ≡ nf u`, for each signature.
+
+== Overall result
+
+Not available. W is not decided after Stage 1.
+
+== Ledgers after Stage 1
+
+* `RELATION-LEDGER.adoc`: no ADDED entry. One entry is "baseline, changed": the kinding judgement has a graded context (R1).
+* `RULE-DIFF-LEDGER.adoc`: empty.
+
+== Answers of Stage 1
+
+=== Are the laws enough for sums and `case`?
+
+Yes, for the declarative judgement.
+Rule `t-case` gives the two branches one usage vector, and rule `t-sub` raises each branch to that vector.
+The rule has no join. T0 is proved with this rule.
+
+The proofs of substitution and preservation use 14 of the 15 law fields. They do not use `le-antisym`.
+The proof of progress uses no law.
+
+A checker that computes a usage vector is a different matter.
+For `case` it must find one vector that is above the two branch vectors.
+The law set has no operation for this. This development has no such checker and proves nothing about one.
+
+== Findings
+
+[cols="1,8",options="header"]
+|===
+| Id | Finding
+
+| F1
+| The Lean class `GradeAlgebra` has 15 law fields and one derived law (`zero_add`). The documents say 16 laws.
+
+| F2
+| The systemet order of `Affine` has `0 ≤ ω` and `1 ≤ ω`, and `0` and `1` are not comparable.
+  With this order a binder of grade `1` that is not used is rejected (`Wager.Examples.Stage1.T0-Affine.drop-rejected`).
+  The grade `1` is thus linear, not affine. The anytype kernel uses the order `0 ≤ 1 ≤ ω`, which accepts the same term.
+
+| F3
+| T0 uses the law `a · 0 = 0` (`mul-zero`), in the product of a usage vector with a matrix.
+  A structure that fails this law is outside T0. Stage 2 examines such a structure.
+
+| F4
+| The stock cubical v0.9 library forces `--guardedness` on each importer (DC-0.2).
+
+| F5
+| `scripts/check-proof-status.sh` fails on this branch, because the task forbids the marker line in `PROOF-STATUS.adoc`.
+|===
+
+== Changes to theorem statements
+
+None.
+
+Process note: the statement `L1-Equality` was put in `Statements.agda` after its proof was complete. It is the statement that the task gives.
+The three T0 statements were put in `Statements.agda`, and committed, before their proofs.
+
+== Trust base
+
+* Agda 2.8.0 with `--cubical --safe`, and `agda/cubical` v0.9 (`TOOLCHAIN.adoc`).
+* No `postulate`, no hole, no termination pragma, no positivity pragma.
+* `--guardedness` is on in each file (DC-0.2). No file uses coinduction.
+* One warning is silenced, in 18 files: `UnsupportedIndexedMatch` (DC-0.3).

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: design choices
-Status: Stage 0 entries only.
+Status: entries of Stage 0 and Stage 1.
 :toc: left
 :sectnums!:
 
@@ -22,7 +22,7 @@ The patch releases 2.8.0.1 and 2.8.0.2 exist, but the table does not list them.
 *Alternative.* Use 2.8.0.2. This is possible only after a test of the full library with it.
 
 [[DC-0.2]]
-=== DC-0.2: `--guardedness` in each file (PROVISIONAL, owner decision needed)
+=== DC-0.2: `--guardedness` in each file (accepted by the owner)
 
 *Choice.* Each file has a second pragma line, `{-# OPTIONS --guardedness #-}`.
 No file uses coinduction.
@@ -34,6 +34,9 @@ Agda 2.8.0 then rejects an import from a module without the flag (`InfectiveImpo
 
 *Conflict.* The task says: add `--guardedness` only in a file that needs coinduction.
 The stock library makes that rule impossible to obey.
+
+*Decision.* The owner accepted alternative 1 on 2026-11-10.
+At the end of each stage a search for `coinductive` in `Wager/` checks the intent of the rule. The search found nothing at the end of Stage 1.
 
 *Alternatives.*
 
@@ -66,6 +69,9 @@ Thus the Lean proofs that use `castNf_diag` (an equality on `Δ = Δ` closed by 
 
 *Alternative.* Leave the warning on. This is honest but makes the output hard to read.
 
+*Audit at the end of Stage 1.* 18 of the 29 files have the line. A test without the line found the warning in each of the 18 files and found no other warning.
+The test also found 2 files that had the line and did not need it. The line was removed from them.
+
 [[DC-0.4]]
 === DC-0.4: a library file outside `Wager/`
 
@@ -82,3 +88,87 @@ The coercion axioms of System FC get names that start with `ax`.
 
 *Reason.* `scripts/scan-dangerous.sh` searches the code (not the comments) for these words.
 A match fails the scan. The scan must stay meaningful, so the names avoid the words.
+
+== Stage 1
+
+[[DC-1.1]]
+=== DC-1.1: the L1 language has a signature (accepted by the owner)
+
+*Choice.* The L1 language is defined over a record `Sig` (`Wager.L1.Signature`). The signature has:
+
+* two carrier types for grades: `KG` for kind arrows and `TG` for the object arrow and term binders;
+* base constants of kind `★`;
+* generative unary constants (`capp c A`), each with a parameter grade `cgrade c`;
+* total inspection primitives (`papp p A`), each with a parameter grade `pgrade p` and a table.
+
+A primitive looks at the head of its argument. On a base constant, an arrow, a product or a sum it gives a base constant.
+On `capp c A` it gives a base constant, or it gives the argument `A` to another primitive.
+The recursion is on the normal form, so each primitive is total.
+
+*Reason.* Stage 2 needs newtypes and an inspection primitive. With a signature, Stage 2 adds entries, and the proof of `DefEq t u ↔ nf t ≡ nf u` is done one time.
+
+*The Lean language as an instance.* The Lean language is the signature with base constants `ℕ`, no unary constant and no primitive.
+
+*Limits.* A generative constant has one parameter of kind `★`. A primitive has one parameter of kind `★`, and its results are base constants.
+A primitive cannot return a part of its argument.
+
+[[DC-1.2]]
+=== DC-1.2: `nf` by evaluation, not by hereditary substitution
+
+*Choice.* `nf` evaluates a term in a Kripke model and reads the normal form back (`Wager.L1.Eval`).
+A value of arrow kind is a pair of its normal form and its action on arguments. The normal forms are β-normal with no η-expansion.
+
+*Reason.* The Lean proof closes casts on context equalities by `rfl` (UIP). Cubical Agda has no K.
+Evaluation has no context cast. Each function is structurally recursive, so totality is by construction, as in the Lean development.
+
+*Not proved here.* The Lean development proves stability (`nf_emb`: a normal form is a fixed point of `nf`). This development does not prove it. The equivalence does not need it.
+
+[[DC-1.3]]
+=== DC-1.3: grades on kind arrows, and a graded kinding judgement
+
+*Choice.* A kind arrow is `k₁ ⇒[ g ] k₂`. The judgement `γ ⊢ᵏ A` (`Wager.L1.Kinding`) checks how a type uses its type variables.
+The simple kind of a type is intrinsic. The term typing judgement has no graded-kinding premise.
+
+*Reason.* The task asks for grades on kind arrows, because roles are on type parameters.
+The current kernel and the documents grade term binders only. Thus this is a choice of the experiment.
+
+*Consequence.* `RELATION-LEDGER.adoc` records kinding as "baseline, changed" (R1).
+
+[[DC-1.4]]
+=== DC-1.4: a trope state is a unary type constant, and the raw state is the bare type
+
+*Choice.* `A@s` is `capp s A`. The raw state has no wrapper: it is the type `A`.
+The term signature `TSig` gives each operation one closed carrier type and two states (`from`, `to`).
+The typing rule `t-step` moves a term from `carrier o at from o` to `carrier o at to o`.
+
+*Dynamics.* A transition to a state other than raw makes a value (`v-step`).
+A transition to the raw state reduces to the raw value under the transitions (`β-strip`, `peel`).
+
+*Reason.* Document 07 gives `A@s -> A@s'` and no dynamics. A newtype over a function type needs a raw value that is a function, or progress fails.
+
+*Limit.* The carrier of an operation is a closed type.
+
+[[DC-1.5]]
+=== DC-1.5: the L2 rule table, and two grade algebras (the second accepted by the owner)
+
+*Choice.* Document 03 leaves the rule table open. The rules follow the checker of the anytype kernel:
+a graded arrow `arr q A B` (not a separate modality `□ᵣ`), a binder with a declared grade, and a pair whose components are bound at `𝟙`.
+Added, as the task asks: sums, `case`, a subusage rule (`t-sub`) and a conversion rule (`t-conv`).
+The judgement is declarative: it does not compute a usage vector.
+
+*Two algebras.* Kind arrows have grades in `KG`. The object arrow and term binders have grades in `TG`. The two are separate parameters.
+
+*Types of terms.* The type of a term is a closed type of kind `★`. Terms have no type variables.
+
+*Reduction.* Call by value, left to right.
+
+[[DC-1.6]]
+=== DC-1.6: operations and laws are separate records, and `≤` is a type family
+
+*Choice.* `GradeOps R` has the 5 operations. `GradeLaws ops` has the 15 law fields of the Lean class, in the same order. `GradeAlgebra R` has both.
+`_≤_` has values in `Type`. The Lean class has `le` in `Prop`.
+
+*Reason.* The judgements take `GradeOps` only. Stage 2 must examine structures that fail a law.
+No proof of Stage 1 needs `≤` to be a proposition.
+
+*Count of laws.* The Lean class has 15 law fields and derives `zero_add`. The documents say 16 laws. This development has the same 15 fields and the same derived law.

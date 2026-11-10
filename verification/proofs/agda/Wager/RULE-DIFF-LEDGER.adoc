@@ -1,0 +1,56 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Wager: rule-diff ledger
+Status: Stage 1. *The ledger is empty.*
+:toc: left
+:sectnums:
+
+This file lists each typing rule or kinding rule that names a grade element other than `0` and `1`, or that has a side condition for one algebra.
+Each entry counts against the wager.
+
+== Entries
+
+None.
+
+== Evidence
+
+The evidence is structural, and Agda checks it.
+
+* `Wager.L2.Typing` is a module with the parameter `ops : GradeOps (Sig.TG S)`. The carrier is abstract.
+  A rule of the module can name a grade only as `𝟘`, as `𝟙`, or as a variable.
+* `Wager.L1.Kinding` is a module with the parameter `K : GradeOps (Sig.KG S)`. The same argument holds.
+* The two modules take the operations only. They do not take the laws, and they cannot assume a law of one algebra.
+
+== The rules and the grade elements that they name
+
+[cols="2,2,5",options="header"]
+|===
+| Rule | Names | Remark
+
+| `t-var` | `𝟙`, `𝟘` | The usage vector is `unit i`.
+| `t-lam` | none | The binder grade `q` is a variable.
+| `t-app` | none | Uses `+` and `·` on variables.
+| `t-pair` | none | Uses `+`.
+| `t-letp` | `𝟙` | Each component is bound at the grade `𝟙`, as in the anytype checker.
+| `t-inj₁`, `t-inj₂` | none |
+| `t-case` | `𝟙` | The two branches have one usage vector. The rule has no join.
+| `t-lit` | `𝟘` | The usage vector is `0ᵘ`.
+| `t-step` | none |
+| `t-conv` | none |
+| `t-sub` | none | Uses `≤` on variables.
+| `k-var` | `𝟙`, `𝟘` |
+| `k-base` | `𝟘` |
+| `k-capp` | none | The grade is the signature entry `cgrade c`.
+| `k-papp` | none | The grade is the signature entry `pgrade p`.
+| `k-arr`, `k-prod`, `k-sum` | none | Uses `+`. Each component counts one time.
+| `k-lam` | none | The binder grade `g` is a variable.
+| `k-app` | none | Uses `+` and `·` on variables.
+| `k-sub` | none |
+|===
+
+== Grades that come from the signature
+
+`cgrade` and `pgrade` give the parameter grade of a constant and of a primitive.
+They are data of the signature, not of a rule.
+A later stage chooses these entries for a specific algebra.
+If a theorem then needs a condition on the entries, `VERDICT.adoc` records the condition with the class "signature primitive".
