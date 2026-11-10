@@ -172,3 +172,21 @@ The judgement is declarative: it does not compute a usage vector.
 No proof of Stage 1 needs `≤` to be a proposition.
 
 *Count of laws.* The Lean class has 15 law fields and derives `zero_add`. The documents say 16 laws. This development has the same 15 fields and the same derived law.
+
+[[DC-1.7]]
+=== DC-1.7: repository files outside `Wager/` (on the request of the owner)
+
+*Context.* The task first said: do not push, and do not edit `docs/status/PROOF-STATUS.adoc`.
+On 2026-11-10 the owner asked for the push and for the updates that put the repository in a consistent state.
+
+*Choice.* These files outside `verification/proofs/agda/` changed:
+
+* `docs/status/PROOF-STATUS.adoc`: the marker line for Agda, one summary row and one section for the experiment. The section says that the experiment claims no ET obligation.
+* `.github/workflows/proofs.yml`: an `agda` job with pinned downloads.
+* `verification/proofs/README.adoc`: the layout now shows the `agda/` directory.
+* `Justfile`: the `test` recipe also runs the Agda gate.
+* `CHANGELOG.adoc`: one entry.
+
+*Not changed.* `docs/theory/OBLIGATIONS.adoc`, `AFFIRMATION.adoc` and each `.a2ml` file. A new obligation needs an ADR from the owner.
+
+*Reason.* The drift gate compares `PROOF-STATUS.adoc` with the manifests, and the repository rule says that a gated proof must run in CI.

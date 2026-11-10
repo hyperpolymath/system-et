@@ -67,7 +67,7 @@ A proof is a success. A checked counterexample is a success. A vague result is a
 . Each theorem gets one accepted closed example and one rejected closed example, both checked by Agda.
 . The gate is watched to fail at the end of each stage.
 . Trust base: Agda 2.8.0 with `--cubical --safe`, cubical v0.9, no `postulate`. The only silenced warning is in DC-0.3.
-. Nothing is pushed. Each stage ends with local commits and a `git bundle` file for the owner.
+. Until 2026-11-10 nothing was pushed. Since that day the owner allows a push: each stage ends with a push of the branch `claude/systemet-wager-cubical-agda-nqsiff`.
 
 == Questions for the owner
 

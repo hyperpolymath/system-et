@@ -107,6 +107,7 @@ clean-all: clean
 # An absent prover FAILS (never skips) — see scripts/check-proofs.sh.
 test *args:
     ./scripts/check-proofs.sh lean4
+    ./scripts/check-proofs.sh agda
     ./scripts/check-proof-status.sh
 
 # Run tests with verbose output

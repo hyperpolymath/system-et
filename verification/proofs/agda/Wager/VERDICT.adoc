@@ -75,7 +75,8 @@ The law set has no operation for this. This development has no such checker and 
 | The stock cubical v0.9 library forces `--guardedness` on each importer (DC-0.2).
 
 | F5
-| `scripts/check-proof-status.sh` fails on this branch, because the task forbids the marker line in `PROOF-STATUS.adoc`.
+| Resolved on 2026-11-10. The owner asked for the repository update, so `docs/status/PROOF-STATUS.adoc` now has the marker line for Agda and a section for the experiment.
+  `scripts/check-proof-status.sh` passes. The proofs workflow has an `agda` job, so CI runs the Agda gate.
 |===
 
 == Changes to theorem statements

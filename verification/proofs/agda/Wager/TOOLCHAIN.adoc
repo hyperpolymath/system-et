@@ -171,12 +171,18 @@ Each test added text to `Wager/Toolchain.agda`, ran the gate, and removed the te
 
 `./scripts/scan-dangerous.sh` also failed on the `postulate` test and passes on the restored file.
 
-=== Known red gate: status drift
+=== Status drift gate
 
-`./scripts/check-proof-status.sh` fails on this branch.
-It needs the line `// gate:agda gated=<N> quarantined=0` in `docs/status/PROOF-STATUS.adoc`.
-The task forbids an edit of that file, so the line is absent.
-The failure is correct behaviour of the drift gate. It is not hidden and not bypassed.
+Until 2026-11-10 `./scripts/check-proof-status.sh` failed on this branch, because the task did not allow an edit of `docs/status/PROOF-STATUS.adoc`.
+On 2026-11-10 the owner asked for the repository update.
+The file now has the line `// gate:agda gated=<N> quarantined=0`, and the gate passes.
+Each commit that changes the manifest changes this line too.
+
+=== CI
+
+The workflow `.github/workflows/proofs.yml` has an `agda` job.
+It installs the pinned Agda tarball (with the checksum above) and the pinned cubical commit, and then runs `./scripts/check-proofs.sh agda`.
+A local run of the same steps with an empty home directory passed in about 66 seconds.
 
 === Gate watch at the end of Stage 1
 
