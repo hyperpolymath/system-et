@@ -476,3 +476,62 @@ The reason: no type-level function of the signature tells the two types apart, s
 *Consequence.* The translation can give one target type to two source types that the source keeps apart nominally.
 
 *Not proved here.* This development does not prove the general sentence "two source types with one target normal form have one erased type".
+
+== Stage 6
+
+[[DC-6.1]]
+=== DC-6.1: the owner chose the two options, the separation first
+
+The task gives two options for Stage 6: (1) an identity type at the grade `0`, with a proof that erasure of its proofs is sound; (2) a separation.
+`PLAN.adoc` says that the owner makes the choice. On 2026-11-10 the owner chose: the two options, option 2 first, with a stop and a report between the two parts.
+
+T7 thus has two parts. Part 1 is the separation (`Wager.Statements.T7-Statements.T7-Separation`). Part 2 is the identity type. Part 2 has no statement yet.
+
+[[DC-6.2]]
+=== DC-6.2: a type is closed, and the type variable of the task is an Agda variable
+
+*The task text.* "A GADT match in System FC brings an equality such as `a ~ Int` into scope." The type `a` is a type variable.
+
+*The limit.* The source calculus of Stage 3 has closed types only (DC-3.1). A term of the target calculus has closed types only (`Wager.L2.Typing`: a context gives a closed type to each variable). The systemet documents have no quantifier over types.
+This stage does not add type variables to a term of the source or of the target.
+
+*Choice.* The program of the stage is a family of closed programs. The Agda variable α is the type variable `a` of the Haskell text: `Wager.Local.Gadt.gadt-eval b α` is the function `eval` at the closed instance `a := α`.
+The erased term does not depend on α. A checked example of this sentence is added with the proofs.
+
+*Consequence.* At a closed instance, a local equality is true or it is false. The program has one branch for each constructor, so one of the two branches of `gadt-eval b α` has a false assumption for each α. That branch cannot run. It is a part of the program text, and its typing needs the assumption.
+
+*Not done.* A source or a target with a quantifier over types. A statement about one target term for all instances that has one polymorphic type.
+
+[[DC-6.3]]
+=== DC-6.3: the source calculus of Stage 6
+
+*Choice.* `Wager.Local.Source` is a new small calculus. It has base types, functions, sums, and the type `⟨ τ ~ σ ⟩ ρ`.
+
+* `⟨ τ ~ σ ⟩ ρ` is the type of a GADT constructor field of System FC: a value of the type ρ, with evidence that τ and σ are equal. `lpack` makes such a value from an equality that holds in the current assumptions.
+* `lopen` is the match. Its body has the equality `τ ~ σ` as a local assumption (`Eqs`).
+* `Coˡ` is equality of two types under assumptions: an assumption, reflexivity, symmetry, transitivity, and congruence for functions and sums. It is a nominal coercion of System FC. It has no role.
+* A GADT with more than one constructor is a sum of such types (`Wager.Local.Gadt.G`).
+
+*What the calculus does not have.* The newtypes, the roles and the type-level functions of Stage 3. The separation does not need them. The calculus is not an extension of the Agda definitions of Stage 3, so no definition of stages 3 to 5 changes.
+
+*Erasure.* Evidence has no erased type and no erased term: `erˡ (⟨ τ ~ σ ⟩ ρ)` is `erˡ ρ`, and `lpack` and `lcast` vanish. The match becomes a β-redex, so the scrutinee is evaluated before the body.
+
+*Not proved here.* Type safety of this source calculus. In particular this development has no proof of the sentence "no closed term has the type `⟨ τ ~ σ ⟩ ρ` when τ and σ are different".
+
+[[DC-6.4]]
+=== DC-6.4: what "the target cannot type" means
+
+*Choice.* `Wager.L2.Erasure.erT` gives the erased type of a closed target type. It is read from the normal form: a trope state vanishes (`A@s` has the erased type of `A`) and a grade vanishes. `eraseᵗ` gives the erased term: a type, a grade and a trope transition vanish.
+`eraseᵗ` has the equations of `Wager.Trans.Coercion.eraseT` of Stage 4. It is a new definition, because the definition of Stage 4 is in a module for one family of target signatures.
+
+"The target cannot type the program" means: no typed target term has the erased term of the source program together with a type that has the erased type of the source type.
+The statement is for each target signature and each set of grade operations.
+
+*Reason.* Claim W asks for a translation that preserves types and that preserves behaviour after erasure. A translation that keeps the erased type and the erased term does this in the most direct way. The separation is about this kind of translation.
+
+*What the statement does not exclude.*
+
+* A translation that changes the erased type of the data. The erased program has a simple type with another argument type. A checked example of this sentence is added with the proofs.
+* A translation that changes the text of the branch that cannot run.
+
+The statement is thus weaker than "the program has no translation". The verdict file says this again at T7.

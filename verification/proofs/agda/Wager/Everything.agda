@@ -71,3 +71,5 @@ import Wager.Trans.TwoStateProofs
 import Wager.Examples.Stage4
 import Wager.Examples.Stage5
 import Wager.L2.Erasure
+import Wager.Local.Source
+import Wager.Local.Gadt

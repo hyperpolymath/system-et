@@ -51,6 +51,10 @@ import Wager.Trans.Scheme
 import Wager.Trans.Target
 import Wager.Trans.Coercion
 import Wager.Trans.TwoState
+open import Cubical.Data.Empty using (⊥)
+import Wager.L2.Erasure
+import Wager.Local.Source
+import Wager.Local.Gadt
 
 ------------------------------------------------------------------------
 -- STAGE 1
@@ -600,3 +604,60 @@ module T6-Statements
   T6-No-Term =
     ∀ {n} {Γ : SCx n} {τ σ} (γ : Co nom τ σ) (e : STm Γ τ) →
     tr (cast (c-sub γ) e) ≡ tr e
+
+------------------------------------------------------------------------
+-- STAGE 6: local equality assumptions (theorem T7)
+------------------------------------------------------------------------
+
+-- The owner asked for the two options of the stage, the separation
+-- first (DESIGN-CHOICES.adoc, DC-6.1). This part is the separation.
+--
+-- The source calculus of the stage is `Wager.Local.Source`. It has the
+-- type `⟨ τ ~ σ ⟩ ρ` of a GADT constructor field: a value of the type
+-- ρ with evidence that the types τ and σ are equal. The match `lopen`
+-- brings the equality into scope as a local assumption.
+--
+-- The program is `Wager.Local.Gadt.gadt-eval`. In Haskell, for a base
+-- type b:
+--
+--   data G a where
+--     GI :: (a ~ b)          => a -> G a
+--     GB :: (a ~ Either b b) => a -> G a
+--
+--   eval :: G a -> b
+--   eval (GI x) = x
+--   eval (GB x) = case x of { Left y -> y ; Right y -> y }
+--
+-- `gadt-eval b α` is `eval` at the closed instance a := α. It is a term
+-- of the source calculus, so it is well typed there.
+--
+--   erT     the erased type of a closed target type
+--   eraseᵗ  the erasure of a target term
+--   erˡ     the erased type of a source type
+--   eraseˡ  the erasure of a source term
+module T7-Statements
+  (S : Sig) (TS : Wager.L2.Signature.TSig S) (ops : GradeOps (Sig.TG S)) where
+  open Sig S using (Base)
+  open Wager.L1.Syntax S using (Ty; []; ★)
+  open Wager.L2.Typing S TS ops using (_▸_⊢_∶_; Tm; Usage; Cx; Lit; litTy)
+  open Wager.L2.Erasure S TS ops using (erT; eraseᵗ)
+  open Wager.Local.Source Base Lit litTy using (LTy; lbase; _⇒ˡ_; erˡ; eraseˡ)
+  open Wager.Local.Gadt Base Lit litTy using (G; gadt-eval)
+
+  -- English (T7, the separation): the target cannot type this program.
+  -- For each base type b and each closed type α, no typed target term
+  -- has these two properties together:
+  --   its type has the erased type of the source type `G b α → b`;
+  --   its erasure is the erasure of the source program.
+  -- This holds for each target signature and each set of grade
+  -- operations.
+  --
+  -- The statement does not exclude a translation that changes the
+  -- erased type or the erased term of the program.
+  T7-Separation : Type
+  T7-Separation =
+    (b : Base) (α : LTy) {γ : Usage 0} {Γ : Cx 0} {t : Tm 0} {A : Ty [] ★} →
+    γ ▸ Γ ⊢ t ∶ A →
+    erT A ≡ erˡ (G b α ⇒ˡ lbase b) →
+    eraseᵗ t ≡ eraseˡ (gadt-eval b α) →
+    ⊥

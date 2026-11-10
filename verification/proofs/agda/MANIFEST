@@ -67,3 +67,5 @@ verification/proofs/agda|Wager/Trans/TwoStateProofs.agda|gated|Stage 4: the tagg
 verification/proofs/agda|Wager/Examples/Stage4.agda|gated|Stage 4: accepted and rejected closed examples
 verification/proofs/agda|Wager/Examples/Stage5.agda|gated|Stage 5 (T6): accepted and rejected closed examples; the converse of T6 is false for the row scheme
 verification/proofs/agda|Wager/L2/Erasure.agda|gated|Stage 6 (lemma): a typed target term erases to a simply typed term, for each signature and each grade algebra
+verification/proofs/agda|Wager/Local/Source.agda|gated|Stage 6: the source calculus with local equality assumptions (types, equalities, terms, erasure)
+verification/proofs/agda|Wager/Local/Gadt.agda|gated|Stage 6: the GADT program of the separation (definitions only)
