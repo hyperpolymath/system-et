@@ -41,12 +41,13 @@ scalar() {
 DEED="$DIR6A2/../../$(scalar 'canonical-name' "$CLADE")_chora.deed"
 JOURNAL="$DIR6A2/../../docs/status/JOURNAL.adoc"
 for f in "$DEED" "$JOURNAL"; do
-  [ -f "$f" ] || { echo "extract-facts.sh: missing required file: $f" >&2; exit 2; }
+  [[ -f "$f" ]] || { echo "extract-facts.sh: missing required file: $f" >&2; exit 2; }
 done
 
 # deed_sym CLAUSE KEYWORD -> the symbol after `(CLAUSE ... :KEYWORD ` on the clause's opening line
 deed_sym() {
-  grep -oP "^\s*\($1\s+:$2\s+\K[A-Za-z0-9_-]+" "$DEED" | head -1 || true
+  local clause="$1" keyword="$2"
+  grep -oP "^\s*\($clause\s+:$keyword\s+\K[A-Za-z0-9_-]+" "$DEED" | head -1 || true
 }
 
 # journal_phase -> the first word of the journal's `phase::` value (the phase label)

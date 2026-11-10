@@ -38,11 +38,12 @@ scalar() {
 # The repo deed, <canonical-name>_chora.deed at the repo root (two levels above the
 # descriptiles directory), carries the lifecycle (status) and maturity clauses.
 DEED="$DIR6A2/../../$(scalar 'canonical-name' "$CLADE")_chora.deed"
-[ -f "$DEED" ] || { echo "extract.sh: missing required deed: $DEED" >&2; exit 2; }
+[[ -f "$DEED" ]] || { echo "extract.sh: missing required deed: $DEED" >&2; exit 2; }
 
 # deed_sym CLAUSE KEYWORD -> the symbol after `(CLAUSE ... :KEYWORD ` on the clause's opening line
 deed_sym() {
-  grep -oP "^\s*\($1\s+:$2\s+\K[A-Za-z0-9_-]+" "$DEED" | head -1 || true
+  local clause="$1" keyword="$2"
+  grep -oP "^\s*\($clause\s+:$keyword\s+\K[A-Za-z0-9_-]+" "$DEED" | head -1 || true
 }
 
 # arr KEY FILE SEP -> join all quoted strings in the `KEY = [ ... ]` block
