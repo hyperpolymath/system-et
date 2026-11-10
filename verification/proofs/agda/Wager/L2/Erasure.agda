@@ -18,8 +18,7 @@
 --          transition vanish.
 --
 -- The target calculus has conversion only (`t-conv`). Two convertible
--- types have one normal form, so they have one erased type. This is the
--- reason why a target term cannot use a value at two erased types.
+-- types have one normal form, so they have one erased type.
 open import Wager.L1.Signature
 open import Wager.Grade.Algebra
 import Wager.L2.Signature
@@ -131,8 +130,8 @@ erase-typed d = erase-typed′ d _ (λ i → refl)
 ------------------------------------------------------------------------
 -- A corollary: the target has no hypothetical equality.
 --
--- A typed target term that erases to the identity function has an arrow
--- type, and the two sides of the arrow have one erased type.
+-- If a target term has the type `A → B` and erases to the identity
+-- function, then A and B have one erased type.
 identity-one-type : ∀ {γ} {Γ : Cx n} {t q A B} → γ ▸ Γ ⊢ t ∶ arr q A B →
                     eraseᵗ t ≡ ulam (uvar zero) → erT A ≡ erT B
 identity-one-type {A = A} {B = B} d p =

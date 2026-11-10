@@ -73,3 +73,5 @@ import Wager.Examples.Stage5
 import Wager.L2.Erasure
 import Wager.Local.Source
 import Wager.Local.Gadt
+import Wager.Local.Separation
+import Wager.Examples.Stage6

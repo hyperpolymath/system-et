@@ -71,6 +71,8 @@ Thus the Lean proofs that use `castNf_diag` (an equality on `Δ = Δ` closed by 
 
 *Audit at the end of Stage 5.* 36 of the 65 files have the line. The one new file has the line. A test without the line found the warning in it and found no other warning.
 
+*Audit at the end of Stage 6, part 1.* 39 of the 70 files have the line. Of the 5 new files, 3 have the line (`L2/Erasure`, `Local/Source`, `Local/Separation`): a test without the line found the warning in each of the 3. The other 2 (`Local/Gadt`, `Examples/Stage6`) have no line and build with no warning.
+
 *Audit at the end of Stage 4.* 35 of the 64 files have the line. A test of the 13 new files without the line found the warning in 6 of them. It found no other warning, and it found 2 new files that had the line and did not need it. The line was removed from them. The other 5 new files compile without a warning.
 
 *Audit at the end of Stage 3.* 29 of the 51 files have the line. A test of the 10 new files without the line found the warning in each of the 6 new files that have the line. It found no other warning. The other 4 new files compile without a warning.
@@ -496,9 +498,10 @@ T7 thus has two parts. Part 1 is the separation (`Wager.Statements.T7-Statements
 This stage does not add type variables to a term of the source or of the target.
 
 *Choice.* The program of the stage is a family of closed programs. The Agda variable α is the type variable `a` of the Haskell text: `Wager.Local.Gadt.gadt-eval b α` is the function `eval` at the closed instance `a := α`.
-The erased term does not depend on α. A checked example of this sentence is added with the proofs.
+The erased term does not depend on α (`Wager.Examples.Stage6.one-erased-text`, and `Wager.Local.Separation.erased-program` for each base type).
 
-*Consequence.* At a closed instance, a local equality is true or it is false. The program has one branch for each constructor, so one of the two branches of `gadt-eval b α` has a false assumption for each α. That branch cannot run. It is a part of the program text, and its typing needs the assumption.
+*Consequence.* At a closed instance, a local equality is true or it is false. The two constructors of the program have two different right sides (`b` and `b + b`), so at least one of the two branches of `gadt-eval b α` has a false assumption, for each α.
+In System FC such a branch cannot run. This development has no proof of this sentence for its source calculus (DC-6.3). The branch is a part of the program text, and its typing needs the assumption.
 
 *Not done.* A source or a target with a quantifier over types. A statement about one target term for all instances that has one polymorphic type.
 
@@ -522,7 +525,7 @@ The erased term does not depend on α. A checked example of this sentence is add
 === DC-6.4: what "the target cannot type" means
 
 *Choice.* `Wager.L2.Erasure.erT` gives the erased type of a closed target type. It is read from the normal form: a trope state vanishes (`A@s` has the erased type of `A`) and a grade vanishes. `eraseᵗ` gives the erased term: a type, a grade and a trope transition vanish.
-`eraseᵗ` has the equations of `Wager.Trans.Coercion.eraseT` of Stage 4. It is a new definition, because the definition of Stage 4 is in a module for one family of target signatures.
+`eraseᵗ` has the equations of `Wager.Trans.Coercion.eraseT` of Stage 4, by inspection of the two definitions. Agda does not check that the two functions are equal. It is a new definition, because the definition of Stage 4 is in a module for one family of target signatures.
 
 "The target cannot type the program" means: no typed target term has the erased term of the source program together with a type that has the erased type of the source type.
 The statement is for each target signature and each set of grade operations.
@@ -531,7 +534,7 @@ The statement is for each target signature and each set of grade operations.
 
 *What the statement does not exclude.*
 
-* A translation that changes the erased type of the data. The erased program has a simple type with another argument type. A checked example of this sentence is added with the proofs.
-* A translation that changes the text of the branch that cannot run.
+* A translation that changes the erased type of the data. The erased program has a simple type with another argument type (`Wager.Examples.Stage6.other-erased-type`), and a typed target term with the same erasure exists at that type (`other-typed`, `other-same-erasure`).
+* A translation that changes the text of the branch with the false assumption.
 
 The statement is thus weaker than "the program has no translation". The verdict file says this again at T7.

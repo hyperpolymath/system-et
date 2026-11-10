@@ -181,6 +181,29 @@ The translated terms use the rules of Stage 1 only: the rule `t-step` types each
 
 Stage 5 adds no relation. T6 is stated with conversion (R2) and with the function `nf` (R3), which are baseline entries.
 
+== Relations of the source calculus of Stage 6
+
+Stage 6, part 1 (the separation) adds no relation and no rule to the target calculus. It adds a second source calculus (DC-6.3).
+
+[cols="1,3,2,5",options="header"]
+|===
+| Id | Agda identifier | Class | Notes
+
+| R21
+| `Coˡ` and `_∋_~_` in `Wager.Local.Source`
+| source
+| Equality of two types under local equality assumptions (a nominal coercion of System FC with hypotheses), and the membership of an assumption in a list.
+  This is a hypothetical equality. The target calculus does not have it: the conversion `DefEq` (R2) has no assumption.
+
+| R22
+| `LTm` in `Wager.Local.Source`
+| source
+| Typing of the terms of the source calculus of Stage 6 (by construction). The match `lopen` adds a local assumption.
+|===
+
+`erT` and `eraseᵗ` (`Wager.L2.Erasure`), and `erˡ` and `eraseˡ` (`Wager.Local.Source`), are functions. They are not relations.
+The proof of T7, part 1 uses the typing of untyped terms (R16).
+
 == What is absent
 
 * The target calculus has no coercion relation and no cast judgement. The coercion relation `Co` (R14) is in the source calculus only. The translation of Stage 4 makes each representational coercion a term of the target, with no new judgement.

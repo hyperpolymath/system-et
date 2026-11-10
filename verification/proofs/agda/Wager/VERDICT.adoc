@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: verdict
-Status: DRAFT after Stage 5. This file becomes final after the last stage.
+Status: DRAFT after Stage 6, part 1 (the separation). This file becomes final after the last stage.
 :toc: left
 :sectnums:
 
@@ -63,8 +63,19 @@ Status: DRAFT after Stage 5. This file becomes final after the last stage.
   `Wager.Proofs.t6-conversion`: the two translated types are convertible. `Wager.Proofs.t6-no-term`: the translation of a cast along a nominal coercion is the translation of the term under the cast.
   Each holds for each source signature, each state scheme and each set of grade operations. None needs the role check.
   T6 is one direction. The converse is false for the row scheme (finding F16, DC-5.2).
-| T7 | NOT ATTEMPTED | T7 has no statement yet. The choice between the two options of Stage 6 is with the owner (PLAN.adoc).
-  Stage 6 has one lemma about the unchanged target: `Wager.L2.Erasure.erase-typed`.
+| T7
+| Part 1 (the separation): PROVED. Part 2 (the identity type): NOT ATTEMPTED
+| The owner asked for the two options of Stage 6, the separation first (DC-6.1).
+
+  *Part 1.* `Wager.Proofs.t7-separation`: for each base type b and each closed type α, no typed closed term of the target has the erasure of the source program `gadt-eval b α` together with a type that has the erased type of the source type.
+  This holds for each target signature and each set of grade operations.
+  The program is a term of the source calculus of Stage 6 (`Wager.Local.Source`), so it is well typed there. That calculus has local equality assumptions (DC-6.3).
+
+  *What part 1 does not say.* It does not say "the program has no translation". It excludes a translation that keeps the erased type and the erased term, and no other translation (DC-6.4).
+  The erased program has a simple type with another type of the data (`Wager.Examples.Stage6.other-erased-type`), and a typed target term with the same erasure exists at that type, for the signature of Stage 5 and the one-point grade algebra (`other-typed`, `other-same-erasure`).
+  A type is closed in this development (DC-6.2). The statement is about each closed instance of the program. It is not about a polymorphic program.
+
+  *Part 2.* The identity type at the grade `0` has no statement yet.
 |===
 
 Stage 1 also proved the L1 equivalence that the task asks for:
@@ -191,13 +202,36 @@ Checked examples (`Wager.Examples.Stage5`):
 * The converse of T6. It is false for the row scheme (finding F16).
 * The sentence "two source types with one target normal form have one erased type". This development has no proof of it and no counterexample to it.
 
+== Results of Stage 6, part 1: the separation
+
+The first result is about the target calculus as it is (`Wager.L2.Erasure`):
+
+* `erase-typed`: a typed target term erases to a term with a simple type, the erased type of its target type. This holds for each signature and each set of grade operations.
+* `identity-one-type`: if a target term has the type `A → B` and erases to the identity function, then `A` and `B` have one erased type.
+
+The reason is the rule `t-conv`: the target calculus has conversion and no other equality of types, and two convertible types have one normal form.
+
+Checked examples (`Wager.Examples.Stage6`):
+
+* The source program at two instances (`eval-at-int`, `eval-at-sum`). The erased text is the same at each instance (`one-erased-text`).
+* The first branch runs: the erased program, applied to the constructor GI with the literal `ℓint`, gives that literal (`live-branch-runs`).
+* Rejected in the source: with no assumption, `Int ~ Int + Int` has no evidence (`no-evidence-for-gb`), because a closed equality of the source calculus is the identity of types (`closed-equality-is-identity`).
+* Rejected in the target, for the signature of Stage 5 and the one-point grade algebra: the instance of T7 (`no-target-term`), and the identity function at the type `Int → Int + Int` (`identity-rejected`).
+* Accepted in the target with another type of the data, for the same signature and algebra: `other-typed` and `other-same-erasure`.
+
+=== Not proved in Stage 6, part 1
+
+* Type safety of the source calculus of Stage 6. In particular: "no closed term has the type `⟨ τ ~ σ ⟩ ρ` when τ and σ are different". `no-evidence-for-gb` is about evidence of the form `Coˡ`. It is not about each closed term.
+* A separation for a translation that changes the erased type or the erased term.
+* A statement about a polymorphic program. The development has no type variable in a term (DC-6.2).
+
 == Overall result
 
-Not available. W is not decided after Stage 5. T7 is not attempted, and Stage 6 leaves a decision to the owner.
+Not available. W is not decided after Stage 6, part 1. Part 2 of T7 (the identity type) is not attempted, and Stage 6 leaves a decision to the owner.
 
-Status after Stage 5: T0, T1, T3, T4 and T6 are PROVED. T2 and T5 are PROVED WITH CHANGE (class: signature primitive).
+Status after Stage 6, part 1: T0, T1, T3, T4 and T6 are PROVED. T2 and T5 are PROVED WITH CHANGE (class: signature primitive). Part 1 of T7 is PROVED.
 
-Results that bear on W after Stage 5:
+Results that bear on W after Stage 6, part 1:
 
 * Parts (a) and (b) of W hold for the fragment, for each source signature that passes the role check: T5. They hold with one change (a newtype with a parameter needs more than one wrapped state) and one condition (an unrestricted grade `𝟙` for whole programs).
 * Part (c) of W holds in the sense of T3: each erased coercion is observationally the identity. It is not the empty term (finding F14).
@@ -205,13 +239,16 @@ Results that bear on W after Stage 5:
 * The target calculus has the judgement forms of Stage 1 only. No relation is added and no rule is added.
 * T2 and T5 are "PROVED WITH CHANGE", so the condition "T2 to T6 are PROVED" of the task does not hold as written. The hypothesis of T2 holds for each signature that the translation gives (`target-signature-valid`).
 * A nominal coercion becomes conversion, and no term remains: T6.
+* A local equality assumption is outside the fragment of W. The target calculus as it is cannot type one GADT match in the direct way: part 1 of T7, with the limits of DC-6.2 and DC-6.4. Agda checked one program, at each closed instance.
 
-== Ledgers after Stage 5
+== Ledgers after Stage 6, part 1
 
 * `RELATION-LEDGER.adoc`: no ADDED entry. One entry is "baseline, changed": the kinding judgement has a graded context (R1). Stage 2 added two "specification only" entries (`≈`, and the observers with `Valid`).
   Stage 3 added the relations of the source calculus with the class "source" (the coercion relation `Co` is one of them), and the evaluation and the typing of erased terms as "specification only".
-  Stage 4 added observational equality (`𝒱`) and the definition of a translation as "specification only". Stage 5 added no relation. Stages 3, 4 and 5 added nothing to the target calculus.
-* `RULE-DIFF-LEDGER.adoc`: empty. Stages 2, 3, 4 and 5 added no rule to the target calculus.
+  Stage 4 added observational equality (`𝒱`) and the definition of a translation as "specification only". Stage 5 added no relation.
+  Stage 6, part 1 added the relations of a second source calculus with the class "source". One of them is the equality `Coˡ` with local assumptions, a hypothetical equality.
+  Stages 3, 4 and 5 and Stage 6, part 1 added nothing to the target calculus.
+* `RULE-DIFF-LEDGER.adoc`: empty. Stages 2, 3, 4 and 5 and Stage 6, part 1 added no rule to the target calculus.
 
 == Answers of Stage 1
 
@@ -355,6 +392,17 @@ Stage 2 proved the laws of the candidate only. It did not prove that the candida
 | The converse of T6 is false for the row scheme, in the signature `taggedS rep`.
   `Tag Char` and `Tag Unit` have no nominal coercion (`Wager.Examples.Stage5.tag-char-unit-rejected`), and they have one target type (`tag-char-unit-one-type`). They do have a representational coercion (`tag-char-unit-rep`).
   The translation thus does not keep each nominal difference of the source. Agda checked this one pair of types.
+
+| F17
+| The example of the task, `a ~ Int`, has a type variable. The source fragment and the terms of the target have closed types only (DC-6.2).
+  A text search of `docs/theory` found no quantifier over types. Agda does not check this sentence.
+  Stage 6 is thus about each closed instance of a GADT match. The two constructors of the program have two different right sides (`b` and `b + b`), so at a closed instance at least one of the two assumptions is false.
+  In System FC a branch with a false assumption cannot run. This development has no proof of this sentence for its source calculus (see "Not proved in Stage 6, part 1").
+  The typing of the two branches together is the part that the target cannot do.
+
+| F18
+| The target calculus has no hypothetical equality. A typed target term erases to a term with a simple type (`Wager.L2.Erasure.erase-typed`). If a target term has the type `A → B` and erases to the identity function, then `A` and `B` have one erased type (`identity-one-type`).
+  The source calculus of Stage 6 types the two branches of a GADT match with two local assumptions. This is the separation of T7, part 1.
 |===
 
 == Changes to theorem statements
@@ -368,10 +416,11 @@ The statements of T0, T1, T2 and T4 were put in `Statements.agda`, and committed
 The statements of Stage 3 were put in `Statements.agda`, and committed, before their proofs.
 The statements of Stage 4 were put in `Statements.agda`, and committed, before their proofs. One proof was complete at that time: the lemma `nominal-defeq`, which is not a statement of Stage 4.
 The statements of Stage 5 (T6) were put in `Statements.agda`, and committed, before their inhabitants in `Proofs.agda`. The proof of the first two statements is the lemma of Stage 4, so it existed before the statements. This is not the order "statement before proof" (DC-5.1).
+The statement of T7, part 1 was put in `Statements.agda`, and committed, before its proof (`Wager.Local.Separation`) was written. One lemma that the proof uses was complete before the statement: `Wager.L2.Erasure.erase-typed`.
 
 == Trust base
 
 * Agda 2.8.0 with `--cubical --safe`, and `agda/cubical` v0.9 (`TOOLCHAIN.adoc`).
 * No `postulate`, no hole, no termination pragma, no positivity pragma.
 * `--guardedness` is on in each file (DC-0.2). No file uses coinduction.
-* One warning is silenced, in 37 of the 66 files: `UnsupportedIndexedMatch` (DC-0.3). The one file of Stage 6 has the line, and a test without the line found the warning in it.
+* One warning is silenced, in 39 of the 70 files: `UnsupportedIndexedMatch` (DC-0.3). Of the 5 files of Stage 6, 3 have the line, and a test without the line found the warning in each of the 3.

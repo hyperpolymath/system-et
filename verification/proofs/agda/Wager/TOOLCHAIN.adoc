@@ -319,3 +319,30 @@ A clean build of `Wager/Everything.agda` (65 modules) takes about 35 seconds and
 |===
 
 The third test shows that the proof of T6 depends on the table of the target primitives.
+
+=== Gate watch at the end of Stage 6, part 1 (the separation)
+
+A clean build of `Wager/Everything.agda` (70 modules) takes about 39 seconds and prints no warning.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/Examples/Stage6.agda`: a false lemma (the erased program has the simple type `(Int + Int) → Int`), with the derivation of `other-erased-type`
+| `[UnequalTerms] (ebase bInt) != (esum (ebase bInt) (ebase bInt))`
+| FAIL
+
+| `Wager/Examples/Stage6.agda`: `postulate t7-by-fiat : ⊥`
+| `[SafeFlagPostulate]`. `scan-dangerous.sh` also fails.
+| FAIL
+
+| `Wager/Local/Gadt.agda`: the second constructor has the assumption `α ~ b`, and the second branch gives the value back
+| `[UnequalTerms] UTm.uvar zero != UTm.ucase (uvar zero) (uvar zero) (uvar zero)` in `Wager/Local/Separation.agda`
+| FAIL
+
+| All changes removed
+| None
+| PASS, 70 files
+|===
+
+The third test shows that the proof of the separation depends on the text of the program.

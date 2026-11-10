@@ -13,7 +13,7 @@ summary from the per-prover MANIFESTs and fails if this file disagrees.
 // Machine-readable ground-truth markers — checked by scripts/check-proof-status.sh.
 // Do not edit by hand without changing the MANIFEST accordingly.
 // gate:lean4 gated=20 quarantined=0
-// gate:agda gated=68 quarantined=0
+// gate:agda gated=70 quarantined=0
 
 == Summary
 
@@ -165,12 +165,14 @@ no file uses coinduction. One warning class is silenced
 | *Proven*. The converse is false for one checked pair of types
 
 | 6
-| T7 of the experiment (local equality assumptions). T7 has no statement
-  yet: the choice between the two options of the stage is with the owner.
-  One lemma about the unchanged target is checked:
-  `Wager.L2.Erasure.erase-typed` : a typed target term erases to a term
-  with a simple type, for each signature and each grade algebra
-| started. T7 is not stated and not proved
+| T7 of the experiment (local equality assumptions), part 1, a separation.
+  `Wager.Proofs.t7-separation` : for each closed instance of one GADT
+  program of a source calculus with local equality assumptions, no typed
+  closed target term has the erasure of the program together with a type
+  that has the erased type of the source type. Part 2 (an identity type at the
+  grade `0`) has no statement yet
+| Part 1 *Proven*. It excludes a translation that keeps the erased type
+  and the erased term, and no other translation. Part 2 not attempted
 
 | 7
 | the optional cross-check

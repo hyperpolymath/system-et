@@ -69,3 +69,5 @@ verification/proofs/agda|Wager/Examples/Stage5.agda|gated|Stage 5 (T6): accepted
 verification/proofs/agda|Wager/L2/Erasure.agda|gated|Stage 6 (lemma): a typed target term erases to a simply typed term, for each signature and each grade algebra
 verification/proofs/agda|Wager/Local/Source.agda|gated|Stage 6: the source calculus with local equality assumptions (types, equalities, terms, erasure)
 verification/proofs/agda|Wager/Local/Gadt.agda|gated|Stage 6: the GADT program of the separation (definitions only)
+verification/proofs/agda|Wager/Local/Separation.agda|gated|Stage 6 (T7, the separation): no typed target term has the erasure and the erased type of the GADT program
+verification/proofs/agda|Wager/Examples/Stage6.agda|gated|Stage 6 (T7, the separation): accepted and rejected closed examples

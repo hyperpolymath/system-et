@@ -85,3 +85,9 @@ They name the grades `𝟘` and `𝟙` only. They are hypotheses of a theorem an
 == Stage 5
 
 Stage 5 adds no typing rule and no kinding rule to the target calculus. T6 is a statement about the translation of types and about conversion.
+
+== Stage 6
+
+Stage 6, part 1 (the separation) adds no typing rule and no kinding rule to the target calculus. The separation is a statement about the rules of Stage 1.
+
+The rule of the match (`lopen`) in the source calculus of Stage 6 has a local equality assumption. It is a rule of a source calculus, so it is not an entry of this ledger.

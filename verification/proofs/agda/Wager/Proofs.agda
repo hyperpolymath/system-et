@@ -73,6 +73,7 @@ import Wager.Trans.Simulation
 import Wager.Trans.RoleCorrespondence
 import Wager.Trans.TwoStateProofs
 import Wager.Trans.Nominal
+import Wager.Local.Separation
 
 module _ where
   open T1-Statements
@@ -266,3 +267,14 @@ module _ (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
   -- coercion is the identity.
   t6-no-term : T6-No-Term
   t6-no-term γ e = refl
+
+------------------------------------------------------------------------
+-- STAGE 6
+------------------------------------------------------------------------
+
+module _ (S : Sig) (TS : Wager.L2.Signature.TSig S) (ops : GradeOps (Sig.TG S)) where
+  open T7-Statements S TS ops
+  private module Sep = Wager.Local.Separation S TS ops
+
+  t7-separation : T7-Separation
+  t7-separation = Sep.separation
