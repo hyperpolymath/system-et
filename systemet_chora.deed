@@ -14,11 +14,11 @@
 ;;                 per state-v1-decision.adoc, OPTION B  [RULED 2026-11-10, owner]
 ;;                 Carried: [position] maturity -> (maturity :level ...);
 ;;                 [metadata] status "active" dedupes into (status :phase active).
-;;                 NOT carried (journal / derivable; they go to the archive
-;;                 surface, never the deed): [route-to-mvp], [blockers-and-issues],
-;;                 [critical-next-actions], [maintenance-status],
-;;                 completion-percentage. [position] phase "implementation" has
-;;                 no home under B (see the (status) comment below).
+;;                 NOT carried (journal / derivable, never the deed): milestones
+;;                 stay in docs/status/ROADMAP.adoc; blockers, the next action and
+;;                 the free-text [position] phase "implementation" go to the thin
+;;                 journal, docs/status/JOURNAL.adoc; [maintenance-status] and
+;;                 completion-percentage are derivable and dropped.
 ;;   0-AI-MANIFEST.a2ml (root) -> (manifest)(agent)(policy)(work)
 ;;                 per ai-manifest-decision.adoc, OPTION A  [RULED 2026-11-10, owner]
 ;;                 Agent seen-set: open, flag-any-unknown (the spec's default; the
@@ -61,11 +61,10 @@
   ; CLADE.a2ml carries no [status] section, so :phase comes from STATE v1
   ; [metadata] status = "active", which dedupes into this clause under
   ; state-v1-decision option B (one lifecycle truth, in the registry surface).
-  ; QUESTION FOR THE OWNER: STATE's separate [position] phase = "implementation"
-  ; uses a different vocabulary (design | implementation | testing | maintenance
-  ; | archived) from this closed lifecycle enum (reserved incubating active
-  ; dormant | merged superseded archived extinct), and maturity has its own
-  ; clause. Option B gives it no home, so it is preserved only in the archive.
+  ; STATE's separate [position] phase = "implementation" is a development-stage
+  ; label in a different vocabulary (design | implementation | testing |
+  ; maintenance | archived) from this closed lifecycle enum, so it is not written
+  ; here. It lives in the journal's free-text phase (docs/status/JOURNAL.adoc).
   (status   :phase         active
             :since         "2026-06-28"
             :present       #t
