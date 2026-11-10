@@ -21,6 +21,8 @@ open import Wager.L1.SyntaxLemmas S
 open import Wager.L1.Conversion S
 open import Wager.L2.Term S TS using (Lit; litTy; Op; carrier; from; to; _at_)
 import Wager.L2.Typing S TS ops as C
+import Wager.L2.Progress
+import Wager.L2.Preservation
 open import Wager.Poly.Typing S TS ops
 open import Wager.Poly.Statements S TS ops
 
@@ -152,3 +154,20 @@ t8-closed (t-step o d) =
     (C.t-step o (tyᶜ (⇑-closed (carrier o at from o)) (t8-closed d)))
 t8-closed (t-conv d e) = C.t-conv (t8-closed d) e
 t8-closed (t-sub d le) = C.t-sub (t8-closed d) le
+
+------------------------------------------------------------------------
+-- The second freeze: each closed instance is a term of the target, so
+-- the theorems of the target apply to it.
+
+t8-closed-instance : T8-Closed-Instance
+t8-closed-instance σ d = t8-closed (t8-inst σ d)
+
+-- Progress uses the operations only, and no law.
+t8-instance-progress : T8-Instance-Progress
+t8-instance-progress σ d =
+  Wager.L2.Progress.progress S TS ops (t8-closed-instance σ d)
+
+t8-instance-preservation : T8-Instance-Preservation
+t8-instance-preservation laws σ d r =
+  Wager.L2.Preservation.preservation S TS (record { ops = ops ; laws = laws })
+    (t8-closed-instance σ d) r
