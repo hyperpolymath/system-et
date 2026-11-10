@@ -1,0 +1,83 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= systemet — thin session journal
+:updated: 2026-11-10
+
+What the next agent or human needs to resume work, and nothing that can be
+derived. This is the STATE v2 thin journal
+(`1-formats/templates/STATE.a2ml.v2.spec.adoc` in `standards`: phase, blockers,
+last action, next action), written as AsciiDoc because A2ML is retired.
+
+Where this file and the journal sections of
+`.machine_readable/descriptiles/STATE.a2ml` disagree, **this file governs**
+(`state-v1-decision`, option B, ruled 2026-11-10). `STATE.a2ml` stays only
+until the checks and scripts that still require it are rewired.
+
+Kept elsewhere, on purpose: milestones in `ROADMAP.adoc`, history in the git
+log, evidence and the completion census in `PROOF-STATUS.adoc`, task lists in
+the GitHub issues.
+
+phase::
+implementation. The mechanized core is in place: the L2 grade algebras (ET-4,
+ET-5) and L1 conversion for the β-fragment of the core calculus (ET-1, ET-2).
+The η extension, the gates beyond L2, tropes and TEA erasure (ET-14) are open.
+Census, with its denominator: 2 of 15 ET obligations done and 2 in progress
+(`docs/status/PROOF-STATUS.adoc`).
+
+last_action::
+Finished the wager experiment in Cubical Agda: stages 5 to 7 and the final
+verdict (#89, 2026-11-10). W does not hold as written. It holds for the
+fragment with 2 additions: trope states with an index, and, for a whole
+program, a grade algebra in which the grade 𝟙 is unrestricted.
+
+next_action::
+Land the η-long normalizer `nfE` (issue #32). It is blocked on an `adjWkv`
+weakening-exchange lemma (`docs/status/PROOF-STATUS.adoc`).
+
+session_marker::
+next_action taken from PROOF-STATUS (open items) and STATE v1 (2026-07-29);
+owner to confirm it is still the intended next step.
+
+updated::
+2026-11-10
+
+== Blockers
+
+[cols="2,5,3,2",options="header"]
+|===
+| id | description | waiting_on | since
+
+| `wager-owner-decisions`
+| Two decisions are with the owner: the class of the kinding judgement (R1),
+  and the class of the extension of Stage 6, part 2 (R23, R24). The verdict
+  gives the facts for each answer and does not decide
+  (`verification/proofs/agda/Wager/VERDICT.adoc`, which also holds draft ADR
+  text that is not filed).
+| owner
+| 2026-11-10
+
+| `et-16-further-adr`
+| ET-14 (TEA erasure) is OPEN, a research target. ET-16, the L0 observation
+  interface, is adopted narrowly and is specified, with mechanization not
+  started (ADR-0002). The broader claim, that lowering preserves L1 conversion,
+  is unadopted and needs its own ADR.
+| owner (a further ADR)
+| 2026-07-27 (ADR-0002)
+
+| `state-archive-rewire`
+| `STATE.a2ml` cannot be archived yet. `openssf-compliance.yml`, the Must
+  invariant, `scripts/validate-template.sh`, the e2e template test and the
+  arrival-pack generator still require it.
+| rewiring those consumers (several are derived from the estate canon)
+| 2026-11-10
+|===
+
+== Provenance
+
+* `phase` comes from `docs/status/PROOF-STATUS.adoc` (summary table and the
+  ET-1/ET-2 rows).
+* `last_action` and the `wager-owner-decisions` blocker come from the merge
+  commit of #89 and `Wager/VERDICT.adoc` (R1, R23, R24 checked there).
+* `et-16-further-adr` comes from `docs/theory/OBLIGATIONS.adoc` (ET-14, ET-16).
+* `next_action` is in `PROOF-STATUS.adoc`; that it is the *intended* next step
+  is carried from STATE v1 and not re-verified.
