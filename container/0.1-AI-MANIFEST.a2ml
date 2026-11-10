@@ -38,7 +38,7 @@ canonical_locations:
   secrets_gate: "container/stapeln/rokur.toml"
   build_pipeline: "container/stapeln/ct-build.sh"
   monitoring: "container/stapeln/vordr.toml"
-  deployment: "container/stapeln/deploy.k9.ncl"
+  deployment: "container/stapeln/deploy.k9.ncl.in"
   # Just module + opt-out
   just_module: "none"  # build/just/container.just retired with the build/ scaffolding removal
 
@@ -101,7 +101,7 @@ files:
       detection, resource thresholds, and structured log output.
     depends_on: []
 
-  - name: "deploy.k9.ncl"
+  - name: "deploy.k9.ncl.in"
     role: "Deployment Component"
     description: |
       k9-svc deployment specification at Hunt trust level. Full pedigree

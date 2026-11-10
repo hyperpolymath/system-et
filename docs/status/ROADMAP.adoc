@@ -3,7 +3,7 @@
 = systemet Roadmap
 
 Milestones mirror the `route-to-mvp` phases in
-`.machine_readable/6a2/STATE.a2ml` (the single source for phase percentages)
+`.machine_readable/descriptiles/STATE.a2ml` (the single source for phase percentages)
 and the obligation ledger `docs/theory/OBLIGATIONS.adoc` (ET-1..ET-15).
 
 == Current status
@@ -42,8 +42,9 @@ Honest completion figure lives in STATE.a2ml, evidence in
 
 == Estate-alignment items
 
-* Pending decision: migrate `.machine_readable/6a2/` to the descriptiles
-  layout (deferred — see the tracking issue; contractiles.mjs needs a Node
+* The descriptiles are in `.machine_readable/descriptiles/` (moved from the former
+  `6a2` directory by pure renames). Pending decision: validate them against the
+  contractiles (deferred — see the tracking issue; contractiles.mjs needs a Node
   exception this repo has not taken).
 * Downstream: anytype must pin systemet (EXPLAINME §Relationship); audit
   findings tracked as `[ET-*]` issues on hyperpolymath/anytype.
