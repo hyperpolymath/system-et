@@ -74,6 +74,25 @@ sub-⇑ σ A =
   ∙ sym (sub-ren ids εᵣ A)
   ∙ sub-id (ren εᵣ A)
 
+-- Transport of a derivation along a path of contexts or of types.
+-- The usage, the term and the other index are explicit in each motive.
+private
+  cxᵖ : ∀ {n} {γ : Usage n} {G G' : Cxᵖ Δ n} {t : Tmᵖ Δ n} {A : Ty Δ ★} →
+        G ≡ G' → γ ▸ G ⊢ᵖ t ∶ A → γ ▸ G' ⊢ᵖ t ∶ A
+  cxᵖ {γ = γ} {t = t} {A = A} p d = subst (λ G → γ ▸ G ⊢ᵖ t ∶ A) p d
+
+  tyᵖ : ∀ {n} {γ : Usage n} {G : Cxᵖ Δ n} {t : Tmᵖ Δ n} {A A' : Ty Δ ★} →
+        A ≡ A' → γ ▸ G ⊢ᵖ t ∶ A → γ ▸ G ⊢ᵖ t ∶ A'
+  tyᵖ {γ = γ} {G = G} {t = t} p d = subst (λ T → γ ▸ G ⊢ᵖ t ∶ T) p d
+
+  cxᶜ : ∀ {n} {γ : Usage n} {G G' : C.Cx n} {t : C.Tm n} {A : Ty [] ★} →
+        G ≡ G' → γ C.▸ G ⊢ t ∶ A → γ C.▸ G' ⊢ t ∶ A
+  cxᶜ {γ = γ} {t = t} {A = A} p d = subst (λ G → γ C.▸ G ⊢ t ∶ A) p d
+
+  tyᶜ : ∀ {n} {γ : Usage n} {G : C.Cx n} {t : C.Tm n} {A A' : Ty [] ★} →
+        A ≡ A' → γ C.▸ G ⊢ t ∶ A → γ C.▸ G ⊢ t ∶ A'
+  tyᶜ {γ = γ} {G = G} {t = t} p d = subst (λ T → γ C.▸ G ⊢ t ∶ T) p d
+
 private
   cx-▹ : ∀ {n} (σ : TySub Δ' Δ) (Γ : Cxᵖ Δ n) (A : Ty Δ ★) →
          (λ i → sub σ ((Γ ▹ᵖ A) i)) ≡ ((λ i → sub σ (Γ i)) ▹ᵖ sub σ A)
@@ -82,24 +101,24 @@ private
 t8-inst : T8-Inst
 t8-inst σ (t-var i) = t-var i
 t8-inst σ {Γ = Γ} (t-lam {A = A} d) =
-  t-lam (subst (λ G → _ ▸ G ⊢ᵖ _ ∶ _) (cx-▹ σ Γ A) (t8-inst σ d))
+  t-lam (cxᵖ (cx-▹ σ Γ A) (t8-inst σ d))
 t8-inst σ (t-app d e) = t-app (t8-inst σ d) (t8-inst σ e)
 t8-inst σ (t-pair d e) = t-pair (t8-inst σ d) (t8-inst σ e)
 t8-inst σ {Γ = Γ} (t-letp {A = A} {B = B} d e) =
   t-letp (t8-inst σ d)
-    (subst (λ G → _ ▸ G ⊢ᵖ _ ∶ _)
+    (cxᵖ
       (cx-▹ σ (Γ ▹ᵖ A) B ∙ cong (_▹ᵖ sub σ B) (cx-▹ σ Γ A))
       (t8-inst σ e))
 t8-inst σ (t-inj₁ d) = t-inj₁ (t8-inst σ d)
 t8-inst σ (t-inj₂ d) = t-inj₂ (t8-inst σ d)
 t8-inst σ {Γ = Γ} (t-case {A = A} {B = B} d l r) =
   t-case (t8-inst σ d)
-    (subst (λ G → _ ▸ G ⊢ᵖ _ ∶ _) (cx-▹ σ Γ A) (t8-inst σ l))
-    (subst (λ G → _ ▸ G ⊢ᵖ _ ∶ _) (cx-▹ σ Γ B) (t8-inst σ r))
+    (cxᵖ (cx-▹ σ Γ A) (t8-inst σ l))
+    (cxᵖ (cx-▹ σ Γ B) (t8-inst σ r))
 t8-inst σ (t-lit ℓ) = t-lit ℓ
 t8-inst σ (t-step o d) =
-  subst (λ T → _ ▸ _ ⊢ᵖ _ ∶ T) (sym (sub-⇑ σ (carrier o at to o)))
-    (t-step o (subst (λ T → _ ▸ _ ⊢ᵖ _ ∶ T) (sub-⇑ σ (carrier o at from o)) (t8-inst σ d)))
+  tyᵖ (sym (sub-⇑ σ (carrier o at to o)))
+    (t-step o (tyᵖ (sub-⇑ σ (carrier o at from o)) (t8-inst σ d)))
 t8-inst σ (t-conv d e) = t-conv (t8-inst σ d) (t8-conv σ e)
 t8-inst σ (t-sub d le) = t-sub (t8-inst σ d) le
 
@@ -114,22 +133,22 @@ private
 t8-closed : T8-Closed
 t8-closed (t-var i) = C.t-var i
 t8-closed {Γ = Γ} (t-lam {A = A} d) =
-  C.t-lam (subst (λ G → _ C.▸ G ⊢ _ ∶ _) (cx-C Γ A) (t8-closed d))
+  C.t-lam (cxᶜ (cx-C Γ A) (t8-closed d))
 t8-closed (t-app d e) = C.t-app (t8-closed d) (t8-closed e)
 t8-closed (t-pair d e) = C.t-pair (t8-closed d) (t8-closed e)
 t8-closed {Γ = Γ} (t-letp {A = A} {B = B} d e) =
   C.t-letp (t8-closed d)
-    (subst (λ G → _ C.▸ G ⊢ _ ∶ _)
+    (cxᶜ
       (cx-C (Γ ▹ᵖ A) B ∙ cong (C._▹ᶜ B) (cx-C Γ A)) (t8-closed e))
 t8-closed (t-inj₁ d) = C.t-inj₁ (t8-closed d)
 t8-closed (t-inj₂ d) = C.t-inj₂ (t8-closed d)
 t8-closed {Γ = Γ} (t-case {A = A} {B = B} d l r) =
   C.t-case (t8-closed d)
-    (subst (λ G → _ C.▸ G ⊢ _ ∶ _) (cx-C Γ A) (t8-closed l))
-    (subst (λ G → _ C.▸ G ⊢ _ ∶ _) (cx-C Γ B) (t8-closed r))
+    (cxᶜ (cx-C Γ A) (t8-closed l))
+    (cxᶜ (cx-C Γ B) (t8-closed r))
 t8-closed (t-lit ℓ) = C.t-lit ℓ
 t8-closed (t-step o d) =
-  subst (λ T → _ C.▸ _ ⊢ _ ∶ T) (sym (⇑-closed (carrier o at to o)))
-    (C.t-step o (subst (λ T → _ C.▸ _ ⊢ _ ∶ T) (⇑-closed (carrier o at from o)) (t8-closed d)))
+  tyᶜ (sym (⇑-closed (carrier o at to o)))
+    (C.t-step o (tyᶜ (⇑-closed (carrier o at from o)) (t8-closed d)))
 t8-closed (t-conv d e) = C.t-conv (t8-closed d) e
 t8-closed (t-sub d le) = C.t-sub (t8-closed d) le
