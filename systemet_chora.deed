@@ -1,7 +1,7 @@
 ;; SPDX-License-Identifier: MPL-2.0
 ;; SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 ;;
-;; DRAFT (Slice-2 prep) — not yet wired; the .machine_readable/6a2/ a2ml files
+;; DRAFT (Slice-2 prep) — not yet wired; the .machine_readable/descriptiles/ a2ml files
 ;; stay live and authoritative until the estate wave + kyX (D313) land. Clauses
 ;; are translated field-for-field from those descriptiles under the RULED mapping
 ;; specs in standards 1-formats/deed/mappings/ (the only authority a family
@@ -10,12 +10,27 @@
 ;;                 per clade-to-repo-deed.adoc  [RULED 2026-10-27]
 ;;   AGENTIC/NEUROSYM/PLAYBOOK.a2ml -> (agentic)(neurosym)(playbook)
 ;;                 per agentic-neurosym-playbook-to-repo-deed.adoc  [RULED 2026-10-27]
-;; NOT translated here, pending their specs/rulings (kept live in 6a2/):
+;;   STATE.a2ml (v1) -> (maturity), and (status) deduped
+;;                 per state-v1-decision.adoc, OPTION B  [RULED 2026-11-10, owner]
+;;                 Carried: [position] maturity -> (maturity :level ...);
+;;                 [metadata] status "active" dedupes into (status :phase active).
+;;                 NOT carried (journal / derivable; they go to the archive
+;;                 surface, never the deed): [route-to-mvp], [blockers-and-issues],
+;;                 [critical-next-actions], [maintenance-status],
+;;                 completion-percentage. [position] phase "implementation" has
+;;                 no home under B (see the (status) comment below).
+;;   0-AI-MANIFEST.a2ml (root) -> (manifest)(agent)(policy)(work)
+;;                 per ai-manifest-decision.adoc, OPTION A  [RULED 2026-11-10, owner]
+;;                 Agent seen-set: open, flag-any-unknown (the spec's default; the
+;;                 owner has not ruled ask (ii)). All four agents here are the
+;;                 known CLAUDE/CHATGPT/GEMINI/VIBE set.
+;; NOT translated here, pending a ruling (kept live in descriptiles/):
 ;;   META.a2ml + ECOSYSTEM.a2ml  — family 2, meta-ecosystem-to-repo-deed.adoc
 ;;                                 (PROPOSAL, not yet owner-ruled)
-;;   STATE.a2ml                  — family 3, state-v1-decision.adoc (A/B/C open)
-;;   0-AI-MANIFEST.a2ml          — family 7, ai-manifest-decision.adoc (option A
-;;                                 unconfirmed)
+;; The STATE.a2ml and 0-AI-MANIFEST.a2ml SOURCES stay live: gates still require
+;; them (openssf-compliance, the Must invariant, validate-template.sh, the
+;; arrival-pack generator). They are archived with a tombstone only once those
+;; consumers are rewired, so this deed adds no double-tracked state of its own.
 (repo-deed
   :schema-version  "1.0.0"
   :canonical-name  "systemet"
@@ -43,10 +58,14 @@
             :parent "Split out of the combined 'EveryType' draft (2026-06-28): systemet is the theory half; the kernel half is the anytype repo."
             :born   "2026-06-28")
 
-  ; CLADE.a2ml carries no [status] section and STATE (family 3) is not yet ruled,
-  ; so :phase is BACKFILLED from the repo's declared lifecycle (active) — a
-  ; provisional registry surface, not a revalidated readiness claim. Confirm
-  ; against the CLADE-003/P-5 gate when state-v1-decision.adoc is ruled.
+  ; CLADE.a2ml carries no [status] section, so :phase comes from STATE v1
+  ; [metadata] status = "active", which dedupes into this clause under
+  ; state-v1-decision option B (one lifecycle truth, in the registry surface).
+  ; QUESTION FOR THE OWNER: STATE's separate [position] phase = "implementation"
+  ; uses a different vocabulary (design | implementation | testing | maintenance
+  ; | archived) from this closed lifecycle enum (reserved incubating active
+  ; dormant | merged superseded archived extinct), and maturity has its own
+  ; clause. Option B gives it no home, so it is preserved only in the archive.
   (status   :phase         active
             :since         "2026-06-28"
             :present       #t
@@ -58,7 +77,7 @@
             (history
               (entry :phase active
                      :since "2026-06-28"
-                     :note  "backfilled from STATE pending state-v1-decision.adoc; not a CLADE registry claim")))
+                     :note  "lifecycle phase active, from STATE v1 [metadata] status (state-v1-decision option B)")))
 
   (agentic
             :version "0.1.0" :last-updated "2026-04-11"
@@ -87,4 +106,32 @@
                       :authority-allowlist  ".machine_readable/root-allow.txt"
                       :enforcement-workflow ".github/workflows/estate-rules.yml")
             (deployment) (incident-response) (release-process) (docs-format) (maintenance-operations))
+
+  ; STATE v1 [position] maturity. No :since: STATE carries no date for it, and
+  ; the vocabulary makes :since optional rather than inviting an invented one.
+  (maturity :level experimental)
+
+  ; 0-AI-MANIFEST.a2ml (family 7, option A). Text is verbatim: the agent table
+  ; and the policy rules are estate-greppable constants, so nothing is
+  ; deduplicated or tidied. (The spec's table shows (agent)/(policy)/(work)
+  ; without a (manifest) wrapper, so they sit beside it, not inside it.)
+  ; NOTE: the VIBE role below still says "ReScript components" — ReScript is
+  ; banned and AffineScript is its destination. Carried verbatim on purpose
+  ; (translators tidy nothing); the fix belongs in the source and the generator.
+  (manifest :version "0.1.0"
+            :last-updated "2026-06-28"
+            :project "systemet"
+            :purpose "Equality Theory — the stratified type theory (equality is conversion at L1; discipline in layers) that the anytype kernel implements. This repo is the semantic authority; it carries the spec and proof obligations, not a compiler.")
+  (agent :name CLAUDE  :role "proofs, compilers, repo-local implementation, CI/CD, formal verification, Rust/Idris2/Zig")
+  (agent :name CHATGPT :role "prose, papers, publication review, standards docs, outreach drafts, letters")
+  (agent :name GEMINI  :role "estate audits, cross-repo sweeps, long-context triage, pattern detection")
+  (agent :name VIBE    :role "UI/frontend, PanLL panels, ReScript components, theming, rapid prototyping")
+  ; The spec's table writes (policy (rules ("…" "…"))), which deed.abnf rejects:
+  ; a list is only a value after a :keyword. :rules keeps its meaning and order.
+  (policy :rules ("Do not duplicate tasks across sections. If a task needs multiple LLMs, note the handoff."
+                  "Update THIS file during sessions. Do NOT recreate per-repo TODO files."))
+  (work :agent CLAUDE  :task "proofs, compilers, repo-local implementation, CI/CD, formal verification, Rust/Idris2/Zig")
+  (work :agent CHATGPT :task "prose, papers, publication review, standards docs, outreach drafts, letters")
+  (work :agent GEMINI  :task "estate audits, cross-repo sweeps, long-context triage, pattern detection")
+  (work :agent VIBE    :task "UI/frontend, PanLL panels, ReScript components, theming, rapid prototyping")
 )
