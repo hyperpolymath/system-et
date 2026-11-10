@@ -48,7 +48,7 @@ info:
     @echo "Version: {{version}}"
     @echo "RSR Tier: {{tier}}"
     @echo "Recipes: $(just --summary | wc -w)"
-    @[ -f ".machine_readable/descriptiles/STATE.a2ml" ] && grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/descriptiles/STATE.a2ml | head -1 | xargs -I{} echo "Phase: {}" || true
+    @[ -f "docs/status/JOURNAL.adoc" ] && awk '/^phase::$/{getline; split($0,a,/[ .:]/); print "Phase: " a[1]; exit}' docs/status/JOURNAL.adoc || true
 
 # Run Invariant Path overlay tools for this repository
 invariant-path *ARGS:
@@ -386,16 +386,17 @@ sbom:
 # STATE MANAGEMENT
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Update STATE.a2ml timestamp
+# Update the thin journal's date (the STATE v2 `updated` field)
 state-touch:
-    @if [ -f ".machine_readable/descriptiles/STATE.a2ml" ]; then \
-        sed -i 's/last-updated = "[^"]*"/last-updated = "'"$(date +%Y-%m-%d)"'"/' .machine_readable/descriptiles/STATE.a2ml && \
-        echo "STATE.a2ml timestamp updated"; \
+    @if [ -f "docs/status/JOURNAL.adoc" ]; then \
+        d="$(date +%Y-%m-%d)"; \
+        sed -i -e "s/^:updated: .*/:updated: $d/" -e '/^updated::$/{n;s/.*/'"$d"'/}' docs/status/JOURNAL.adoc && \
+        echo "JOURNAL.adoc date updated"; \
     fi
 
-# Show current phase from STATE.a2ml
+# Show the current phase label from the thin journal
 state-phase:
-    @grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/descriptiles/STATE.a2ml 2>/dev/null | head -1 || echo "unknown"
+    @awk '/^phase::$/{getline; split($0,a,/[ .:]/); print a[1]; exit}' docs/status/JOURNAL.adoc 2>/dev/null || echo "unknown"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # HYBRID AUTOMATION

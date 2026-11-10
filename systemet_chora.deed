@@ -1,8 +1,9 @@
 ;; SPDX-License-Identifier: MPL-2.0
 ;; SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 ;;
-;; DRAFT (Slice-2 prep) — not yet wired; the .machine_readable/descriptiles/ a2ml files
-;; stay live and authoritative until the estate wave + kyX (D313) land. Clauses
+;; DRAFT — read only for (status) and (maturity), by the arrival-pack generator and the
+;; coaptation extractor; every other clause is inert. The .machine_readable/descriptiles/ a2ml
+;; files stay live and authoritative until the estate wave + kyX (D313) land. Clauses
 ;; are translated field-for-field from those descriptiles under the RULED mapping
 ;; specs in standards 1-formats/deed/mappings/ (the only authority a family
 ;; translation may cite):
@@ -19,6 +20,8 @@
 ;;                 the free-text [position] phase "implementation" go to the thin
 ;;                 journal, docs/status/JOURNAL.adoc; [maintenance-status] and
 ;;                 completion-percentage are derivable and dropped.
+;;                 STATE.a2ml is ARCHIVED (2026-11-10, tombstoned, content verbatim):
+;;                 .machine_readable/archive/state-v1.a2ml.
 ;;   0-AI-MANIFEST.a2ml (root) -> (manifest)(agent)(policy)(work)
 ;;                 per ai-manifest-decision.adoc, OPTION A  [RULED 2026-11-10, owner]
 ;;                 Agent seen-set: open, flag-any-unknown (the spec's default; the
@@ -27,10 +30,10 @@
 ;; NOT translated here, pending a ruling (kept live in descriptiles/):
 ;;   META.a2ml + ECOSYSTEM.a2ml  — family 2, meta-ecosystem-to-repo-deed.adoc
 ;;                                 (PROPOSAL, not yet owner-ruled)
-;; The STATE.a2ml and 0-AI-MANIFEST.a2ml SOURCES stay live: gates still require
-;; them (openssf-compliance, the Must invariant, validate-template.sh, the
-;; arrival-pack generator). They are archived with a tombstone only once those
-;; consumers are rewired, so this deed adds no double-tracked state of its own.
+;; The gates (openssf-compliance, the Must invariant, validate-template.sh, the e2e
+;; test), the arrival-pack generator and the coaptation extractor now read this deed
+;; (status, maturity) and docs/status/JOURNAL.adoc (phase). The 0-AI-MANIFEST.a2ml
+;; SOURCE stays live: its consumers are not rewired (family 7 is generator-first).
 (repo-deed
   :schema-version  "1.0.0"
   :canonical-name  "systemet"

@@ -8,10 +8,10 @@ derived. This is the STATE v2 thin journal
 (`1-formats/templates/STATE.a2ml.v2.spec.adoc` in `standards`: phase, blockers,
 last action, next action), written as AsciiDoc because A2ML is retired.
 
-Where this file and the journal sections of
-`.machine_readable/descriptiles/STATE.a2ml` disagree, **this file governs**
-(`state-v1-decision`, option B, ruled 2026-11-10). `STATE.a2ml` stays only
-until the checks and scripts that still require it are rewired.
+STATE v1 is archived at `.machine_readable/archive/state-v1.a2ml` (2026-11-10,
+`state-v1-decision`, option B), and nothing in it is current. This file replaces
+its journal sections. The lifecycle and maturity it carried are in the repo deed,
+`systemet_chora.deed`.
 
 Kept elsewhere, on purpose: milestones in `ROADMAP.adoc`, history in the git
 log, evidence and the completion census in `PROOF-STATUS.adoc`, task lists in
@@ -63,13 +63,6 @@ updated::
   is unadopted and needs its own ADR.
 | owner (a further ADR)
 | 2026-07-27 (ADR-0002)
-
-| `state-archive-rewire`
-| `STATE.a2ml` cannot be archived yet. `openssf-compliance.yml`, the Must
-  invariant, `scripts/validate-template.sh`, the e2e template test and the
-  arrival-pack generator still require it.
-| rewiring those consumers (several are derived from the estate canon)
-| 2026-11-10
 |===
 
 == Provenance

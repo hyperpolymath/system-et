@@ -2,16 +2,18 @@
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = systemet Roadmap
 
-Milestones mirror the `route-to-mvp` phases in
-`.machine_readable/descriptiles/STATE.a2ml` (the single source for phase percentages)
-and the obligation ledger `docs/theory/OBLIGATIONS.adoc` (ET-1..ET-15).
+This file is the home of the milestones (`state-v1-decision`, option B). The
+`route-to-mvp` rows of the archived STATE v1 are kept verbatim, with their phase
+percentages, in `.machine_readable/archive/state-v1.a2ml`. The obligation ledger
+is `docs/theory/OBLIGATIONS.adoc` (ET-1..ET-15); the current phase, blockers and
+next action are in `JOURNAL.adoc`.
 
 == Current status
 
 Theory specified in `docs/theory/` (L3 sketched, pending ADR); mechanization
 of the tractable core (MECH-1, MECH-2) staged; TEA erasure (ET-14) OPEN.
-Honest completion figure lives in STATE.a2ml, evidence in
-`docs/status/PROOF-STATUS.adoc`.
+There is no single completion figure (it was derivable and was dropped with
+STATE v1); the evidence is in `docs/status/PROOF-STATUS.adoc`.
 
 == Milestones
 
