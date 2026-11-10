@@ -65,3 +65,18 @@ verification/proofs/agda|Wager/Trans/Simulation.agda|gated|Stage 4 (T3, T5): an 
 verification/proofs/agda|Wager/Trans/RoleCorrespondence.agda|gated|Stage 4: the inferred source role is the least grade that target kinding accepts; the target signature is valid
 verification/proofs/agda|Wager/Trans/TwoStateProofs.agda|gated|Stage 4: the tagged signature has no translation with two-state tropes (checked counterexample)
 verification/proofs/agda|Wager/Examples/Stage4.agda|gated|Stage 4: accepted and rejected closed examples
+verification/proofs/agda|Wager/Examples/Stage5.agda|gated|Stage 5 (T6): accepted and rejected closed examples; the converse of T6 is false for the row scheme
+verification/proofs/agda|Wager/L2/Erasure.agda|gated|Stage 6 (lemma): a typed target term erases to a simply typed term, for each signature and each grade algebra
+verification/proofs/agda|Wager/Local/Source.agda|gated|Stage 6: the source calculus with local equality assumptions (types, equalities, terms, erasure)
+verification/proofs/agda|Wager/Local/Gadt.agda|gated|Stage 6: the GADT program of the separation (definitions only)
+verification/proofs/agda|Wager/Local/Separation.agda|gated|Stage 6 (T7, the separation): no typed target term has the erasure and the erased type of the GADT program
+verification/proofs/agda|Wager/Examples/Stage6.agda|gated|Stage 6 (T7, the separation): accepted and rejected closed examples
+verification/proofs/agda|Wager/Identity/Family.agda|gated|Stage 6, part 2: the identity type as a family of base constants of a signature (definitions only)
+verification/proofs/agda|Wager/Identity/Term.agda|gated|Stage 6, part 2: the terms of the target with the cast, and the two erasures (definitions only)
+verification/proofs/agda|Wager/Identity/Typing.agda|gated|Stage 6, part 2: the target judgement with the rule t-cast, which uses the evidence at the grade 0 (definitions only)
+verification/proofs/agda|Wager/Identity/Soundness.agda|gated|Stage 6, part 2 (T7, the identity type): the erasure of proofs is sound for each signature with an identity family and each set of grade operations; canonicity; the grade lemma needs the laws
+verification/proofs/agda|Wager/Identity/Instance.agda|gated|Stage 6, part 2: one signature that has an identity family (the record is not empty)
+verification/proofs/agda|Wager/Examples/Stage6Identity.agda|gated|Stage 6, part 2 (T7, the identity type): accepted and rejected closed examples
+verification/proofs/agda|Wager/Univalent/Model.agda|gated|Stage 7 (optional): the model of target types in the cubical universe, realisers, and the path of a coercion (definitions only)
+verification/proofs/agda|Wager/Univalent/CrossCheck.agda|gated|Stage 7 (optional): the translation of a representational coercion denotes transport along its path, for each source signature, state scheme, grade algebra and interpretation of the base constants
+verification/proofs/agda|Wager/Examples/Stage7.agda|gated|Stage 7 (optional): accepted and rejected closed examples

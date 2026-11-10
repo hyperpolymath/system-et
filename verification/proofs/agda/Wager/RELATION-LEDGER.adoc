@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: relation ledger
-Status: Stage 4. Each later stage adds its entries in the same commit as its rules.
+Status: Stage 7 (the last stage). Each stage added its entries in the same commit as its rules.
 :toc: left
 :sectnums:
 
@@ -21,7 +21,8 @@ Each entry has one class:
 | source | The relation belongs to the source calculus (the fragment of System FC). The target calculus does not have it. It does not count against the wager.
 |===
 
-An ADDED entry counts against the wager. *Stages 1, 2, 3 and 4 have no ADDED entry.*
+An ADDED entry counts against the wager. *Stages 1 to 5 and Stage 6, part 1 have no ADDED entry.*
+Stage 6, part 2 has 2 entries with no class (R23, R24). The task says that the owner decides how they count.
 The ledger has one "baseline, changed" entry (R1). The owner decides how it counts.
 
 == Judgement forms of the target calculus
@@ -177,8 +178,76 @@ The translated terms use the rules of Stage 1 only: the rule `t-step` types each
 
 `StateScheme` (`Wager.Trans.Scheme`) is data of the translation: an index type and a table. It is not a relation.
 
+== Stage 5
+
+Stage 5 adds no relation. T6 is stated with conversion (R2) and with the function `nf` (R3), which are baseline entries.
+
+== Relations of the source calculus of Stage 6
+
+Stage 6, part 1 (the separation) adds no relation and no rule to the target calculus. It adds a second source calculus (DC-6.3).
+
+[cols="1,3,2,5",options="header"]
+|===
+| Id | Agda identifier | Class | Notes
+
+| R21
+| `Coˡ` and `_∋_~_` in `Wager.Local.Source`
+| source
+| Equality of two types under local equality assumptions (a nominal coercion of System FC with hypotheses), and the membership of an assumption in a list.
+  This is a hypothetical equality. The target calculus does not have it: the conversion `DefEq` (R2) has no assumption.
+
+| R22
+| `LTm` in `Wager.Local.Source`
+| source
+| Typing of the terms of the source calculus of Stage 6 (by construction). The match `lopen` adds a local assumption.
+|===
+
+`erT` and `eraseᵗ` (`Wager.L2.Erasure`), and `erˡ` and `eraseˡ` (`Wager.Local.Source`), are functions. They are not relations.
+The proof of T7, part 1 uses the typing of untyped terms (R16).
+
+== The extension of Stage 6, part 2 (the identity type)
+
+*The 2 entries of this section have no class. The class is the decision of the owner.* The task says: "Do not decide whether option 1 adds a relation." The entries give the facts. `VERDICT.adoc` gives the trade.
+
+EQUALITY EVIDENCE IS NOW A TERM (DC-6.5).
+
+[cols="1,3,2,5",options="header"]
+|===
+| Id | Agda identifier | Class | Notes
+
+| R23
+| `_▸_⊢ⁱ_∶_` in `Wager.Identity.Typing`
+| OWNER DECIDES
+| The typing judgement of the target with the identity family. It has the form of R4 (`Γ ⊢ᵣ t : A` of 00-notation). It is a new Agda data type (DC-6.6), with the 12 rules of R4 and one more rule, `t-cast`.
+  `γ ▸ Γ ⊢ⁱ e ∶ base (Id A B)` reads: in the context Γ, the term e is evidence that the closed types A and B are equal. A variable of the type `base (Id A B)` in Γ is a local equality assumption.
+  The judgement thus does the work of a hypothetical equality. It has no new judgement form.
+
+| R24
+| `IdFamily` in `Wager.Identity.Family`
+| OWNER DECIDES
+| Not a relation in Agda. It is a record of signature entries: the base constants `Id A B`, the literals `rfl A`, and 3 laws.
+  It is in this ledger because the family is conversion in the form of a type: for a closed term, the type `base (Id A B)` has a term exactly when `DefEq A B` holds (`T7-Intro`, `T7-Canonicity`).
+|===
+
+`keepⁱ` and `eraseⁱ` (`Wager.Identity.Term`) are functions. They are not relations.
+The statements of T7, part 2 use the evaluation of untyped terms (R16) and observational equality (R18).
+== Stage 7 (the optional cross-check)
+
+[cols="1,3,2,5",options="header"]
+|===
+| Id | Agda identifier | Class | Notes
+
+| R25
+| `𝓡`, `Real` and `Denotes` in `Wager.Univalent.Model` (with `RLit`, `RFun`, `RPair`, `RSum`)
+| specification only
+| Realisability: an untyped value realises an element of the interpretation of a closed target type in the cubical universe. `Denotes` says that a term transformer denotes a function of the model.
+  No typing rule and no kinding rule uses these relations. They are in the statements of Stage 7 only.
+|===
+
+`⟦_⟧`, `pathOf` and `unboxEquiv` (`Wager.Univalent.Model`) are a function, a path and an equivalence. They are not relations.
 == What is absent
 
 * The target calculus has no coercion relation and no cast judgement. The coercion relation `Co` (R14) is in the source calculus only. The translation of Stage 4 makes each representational coercion a term of the target, with no new judgement.
 * Representational equivalence exists as "specification only" (R11). It is not a judgement of the calculus.
 * There is no subtyping relation between types.
+* The extension of Stage 6, part 2 has no equality judgement with assumptions and no cast judgement. It has a term former (`cast`) and a rule of the typing judgement (R23).

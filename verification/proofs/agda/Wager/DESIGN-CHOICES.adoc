@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: design choices
-Status: entries of Stage 0, Stage 1, Stage 2, Stage 3 and Stage 4.
+Status: entries of Stage 0 to Stage 5.
 :toc: left
 :sectnums!:
 
@@ -36,7 +36,7 @@ Agda 2.8.0 then rejects an import from a module without the flag (`InfectiveImpo
 The stock library makes that rule impossible to obey.
 
 *Decision.* The owner accepted alternative 1 on 2026-11-10.
-At the end of each stage a search for `coinductive` in `Wager/` checks the intent of the rule. The search found nothing at the end of Stage 1, of Stage 2, of Stage 3 and of Stage 4.
+At the end of each stage a search for `coinductive` in `Wager/` checks the intent of the rule. The search found nothing at the end of each of the stages 1 to 5.
 
 *Alternatives.*
 
@@ -68,6 +68,10 @@ A match that needs K is an error, not a warning.
 Thus the Lean proofs that use `castNf_diag` (an equality on `Δ = Δ` closed by `rfl`) cannot be copied directly.
 
 *Alternative.* Leave the warning on. This is honest but makes the output hard to read.
+
+*Audit at the end of Stage 5.* 36 of the 65 files have the line. The one new file has the line. A test without the line found the warning in it and found no other warning.
+
+*Audit at the end of Stage 6, part 1.* 39 of the 70 files have the line. Of the 5 new files, 3 have the line (`L2/Erasure`, `Local/Source`, `Local/Separation`): a test without the line found the warning in each of the 3. The other 2 (`Local/Gadt`, `Examples/Stage6`) have no line and build with no warning.
 
 *Audit at the end of Stage 4.* 35 of the 64 files have the line. A test of the 13 new files without the line found the warning in 6 of them. It found no other warning, and it found 2 new files that had the line and did not need it. The line was removed from them. The other 5 new files compile without a warning.
 
@@ -442,3 +446,227 @@ Kinding has a subusage rule, so it accepts each grade above the least one. "The 
 
 *Reason.* "This program has no translation" needs a definition of "translation". The three conditions are properties that claim W asks for. The fourth condition is the form of Stage 2.
 The translation with the row scheme meets the three conditions (`Wager.Proofs.row-translation-exists`), so the conditions are not empty.
+
+== Stage 5
+
+[[DC-5.1]]
+=== DC-5.1: the form of T6
+
+*Choice.* T6 has three statements (`Wager.Statements.T6-Statements`):
+
+* `T6`: for each nominal coercion of the source, the two translated types have one normal form;
+* `T6-Conversion`: the two translated types are convertible (`DefEq`);
+* `T6-No-Term`: the translation of a cast along a nominal coercion is the translation of the term under the cast.
+
+Each holds for each source signature, each state scheme and each set of grade operations. None needs the role check.
+
+*Reading of the task text.* The task says: "every source coercion at nominal role built from the axioms of total type-level functions".
+In this fragment each nominal coercion (`Co nom`) is built from reflexivity, symmetry, transitivity, congruence and the equations of the type-level functions. T6 is thus stated for each nominal coercion.
+
+*Reason for the proof.* The normal form of a translated type is a function of the nominal value of the source type (`Wager.Trans.Nominal.nf-T`). A nominal coercion keeps the nominal value (`Wager.Proofs.source-nominal-soundness`).
+
+*Process.* The proof of the first two statements is the lemma of Stage 4 (DC-4.4). It existed before the statements of T6 were put in `Statements.agda`.
+
+[[DC-5.2]]
+=== DC-5.2: T6 is one direction
+
+*Choice.* T6 says: a nominal coercion gives one normal form. This development does not state the converse, because the converse is false for the row scheme.
+
+*Checked example.* `Tag Char` and `Tag Unit` have no nominal coercion in the source (`Wager.Examples.Stage5.tag-char-unit-rejected`). They have one target type (`tag-char-unit-one-type`), and they have a representational coercion (`tag-char-unit-rep`).
+The reason: no type-level function of the signature tells the two types apart, so they have one row and one state.
+
+*Consequence.* The translation can give one target type to two source types that the source keeps apart nominally.
+
+*Not proved here.* This development does not prove the general sentence "two source types with one target normal form have one erased type".
+
+== Stage 6
+
+[[DC-6.1]]
+=== DC-6.1: the owner chose the two options, the separation first
+
+The task gives two options for Stage 6: (1) an identity type at the grade `0`, with a proof that erasure of its proofs is sound; (2) a separation.
+`PLAN.adoc` says that the owner makes the choice. On 2026-11-10 the owner chose: the two options, option 2 first, with a stop and a report between the two parts.
+
+T7 thus has two parts. Part 1 is the separation (`Wager.Statements.T7-Statements.T7-Separation`). Part 2 is the identity type (`Wager.Statements.T7-Identity-Statements`). The statements of part 2 were frozen on 2026-11-10, after the report on part 1 and after the owner said to continue.
+
+[[DC-6.2]]
+=== DC-6.2: a type is closed, and the type variable of the task is an Agda variable
+
+*The task text.* "A GADT match in System FC brings an equality such as `a ~ Int` into scope." The type `a` is a type variable.
+
+*The limit.* The source calculus of Stage 3 has closed types only (DC-3.1). A term of the target calculus has closed types only (`Wager.L2.Typing`: a context gives a closed type to each variable). The systemet documents have no quantifier over types.
+This stage does not add type variables to a term of the source or of the target.
+
+*Choice.* The program of the stage is a family of closed programs. The Agda variable α is the type variable `a` of the Haskell text: `Wager.Local.Gadt.gadt-eval b α` is the function `eval` at the closed instance `a := α`.
+The erased term does not depend on α (`Wager.Examples.Stage6.one-erased-text`, and `Wager.Local.Separation.erased-program` for each base type).
+
+*Consequence.* At a closed instance, a local equality is true or it is false. The two constructors of the program have two different right sides (`b` and `b + b`), so at least one of the two branches of `gadt-eval b α` has a false assumption, for each α.
+In System FC such a branch cannot run. This development has no proof of this sentence for its source calculus (DC-6.3). The branch is a part of the program text, and its typing needs the assumption.
+
+*Not done.* A source or a target with a quantifier over types. A statement about one target term for all instances that has one polymorphic type.
+
+[[DC-6.3]]
+=== DC-6.3: the source calculus of Stage 6
+
+*Choice.* `Wager.Local.Source` is a new small calculus. It has base types, functions, sums, and the type `⟨ τ ~ σ ⟩ ρ`.
+
+* `⟨ τ ~ σ ⟩ ρ` is the type of a GADT constructor field of System FC: a value of the type ρ, with evidence that τ and σ are equal. `lpack` makes such a value from an equality that holds in the current assumptions.
+* `lopen` is the match. Its body has the equality `τ ~ σ` as a local assumption (`Eqs`).
+* `Coˡ` is equality of two types under assumptions: an assumption, reflexivity, symmetry, transitivity, and congruence for functions and sums. It is a nominal coercion of System FC. It has no role.
+* A GADT with more than one constructor is a sum of such types (`Wager.Local.Gadt.G`).
+
+*What the calculus does not have.* The newtypes, the roles and the type-level functions of Stage 3. The separation does not need them. The calculus is not an extension of the Agda definitions of Stage 3, so no definition of stages 3 to 5 changes.
+
+*Erasure.* Evidence has no erased type and no erased term: `erˡ (⟨ τ ~ σ ⟩ ρ)` is `erˡ ρ`, and `lpack` and `lcast` vanish. The match becomes a β-redex, so the scrutinee is evaluated before the body.
+
+*Not proved here.* Type safety of this source calculus. In particular this development has no proof of the sentence "no closed term has the type `⟨ τ ~ σ ⟩ ρ` when τ and σ are different".
+
+[[DC-6.4]]
+=== DC-6.4: what "the target cannot type" means
+
+*Choice.* `Wager.L2.Erasure.erT` gives the erased type of a closed target type. It is read from the normal form: a trope state vanishes (`A@s` has the erased type of `A`) and a grade vanishes. `eraseᵗ` gives the erased term: a type, a grade and a trope transition vanish.
+`eraseᵗ` has the equations of `Wager.Trans.Coercion.eraseT` of Stage 4, by inspection of the two definitions. Agda does not check that the two functions are equal. It is a new definition, because the definition of Stage 4 is in a module for one family of target signatures.
+
+"The target cannot type the program" means: no typed target term has the erased term of the source program together with a type that has the erased type of the source type.
+The statement is for each target signature and each set of grade operations.
+
+*Reason.* Claim W asks for a translation that preserves types and that preserves behaviour after erasure. A translation that keeps the erased type and the erased term does this in the most direct way. The separation is about this kind of translation.
+
+*What the statement does not exclude.*
+
+* A translation that changes the erased type of the data. The erased program has a simple type with another argument type (`Wager.Examples.Stage6.other-erased-type`), and a typed target term with the same erasure exists at that type (`other-typed`, `other-same-erasure`).
+* A translation that changes the text of the branch with the false assumption.
+
+The statement is thus weaker than "the program has no translation". The verdict file says this again at T7.
+
+[[DC-6.5]]
+=== DC-6.5: the identity type is a family of base constants of a signature
+
+*The task text.* "Add an identity type as an ordinary indexed family used at grade `0`."
+
+*The documents.* They have no identity type and no rule for an indexed family. `03-l2-grades.adoc` says that `0` is "the grade of an unused assumption".
+
+*Choice.* DC-1.1 says that a later stage adds entries to a signature and does not add constructors to the language. The identity type is thus a family of entries (`Wager.Identity.Family.IdFamily`):
+
+* `Id A B` is a base constant, for each pair of closed types A and B of the kind ★. The family respects conversion in each index (`Id-conv`).
+* `rfl A` is a literal of the base type `Id A A`. It is the one constructor. The existing rule `t-lit` types it, so there is no introduction rule.
+* `diagonal`: a literal of the base type `Id A B` shows that A and B are convertible. The family thus has no constructor off the diagonal.
+
+*EQUALITY EVIDENCE IS NOW A TERM.* A term of the type `base (Id A B)` is evidence that A and B are equal. It is an ordinary value: a function can take it, a pair can hold it, and a variable can stand for it. A variable of such a type is a local equality assumption.
+
+*What does not change.* The type language (`Wager.L1.Syntax.Ty`), the conversion relation `DefEq`, normal forms, and the 12 rules of the target judgement.
+
+*Consequence.* Evidence is a value at run time: a literal. The erased type of `Id A B` is the base type `Id A B`.
+
+*The record is a hypothesis on a signature.* It does not say that a signature has a family. DC-6.8 gives one signature that has one.
+
+*Not chosen.* A new type former in `Ty`: it changes each definition of Stage 1. An encoding of `Id A B` as a trope state of `A ⊗ B`: a trope state is a different notion in the documents.
+
+[[DC-6.6]]
+=== DC-6.6: one new term former and one new rule
+
+*Choice.* `cast e t` is the eliminator: e is evidence, t is the payload. The rule is `Wager.Identity.Typing.t-cast`:
+
+----
+γ ▸ Γ ⊢ⁱ e ∶ base (Id A B)      δ ▸ Γ ⊢ⁱ t ∶ A
+-----------------------------------------------
+((𝟘 ·ᵘ γ) +ᵘ δ) ▸ Γ ⊢ⁱ cast e t ∶ B
+----
+
+The rule uses the evidence at the grade `𝟘`. It names no other grade, and it has no side condition for one algebra.
+
+*The Agda judgement is a new data type.* An Agda data type cannot get a constructor later. `_▸_⊢ⁱ_∶_` has the 12 rules of `Wager.L2.Typing` and the rule `t-cast`. The term syntax `ITm` has the 10 formers of `Wager.L2.Term.Tm` and `cast`.
+`T7-Conservative` says that each typed target term is a typed term of the extension. Agda does not check that the 12 rules have the same text; this is by inspection of the two files.
+
+*Not done.*
+
+* The other direction: that a derivation with no cast is a derivation of the target.
+* A reduction relation for the extension. The relation `_⟶_` of the target is not extended, and progress and preservation are not proved for the extension. The two erasures and the evaluation of the untyped calculus give the meaning of a term of the extension.
+
+[[DC-6.7]]
+=== DC-6.7: what "erasure of its proofs is sound" means
+
+*The task text.* "Prove that erasure of its proofs is sound, by totality and the grade."
+
+*Choice.* A term of the extension has two erasures into the untyped calculus (`Wager.Identity.Term`):
+
+* `keepⁱ` is the reference. For `cast e t` it evaluates the evidence, then the payload, and it gives the value of the payload. It does not inspect the value of the evidence, because the untyped calculus has no test on a literal.
+* `eraseⁱ` is the erasure of proofs: `eraseⁱ (cast e t)` is `eraseⁱ t`. The evidence is absent from the program.
+
+"Sound" is `T7-Erasure`: for a closed typed term, the two programs evaluate, and the two values are observationally equal at the erased type.
+
+*By totality.* The statement includes that the reference program has a value. If the evidence of a cast has no value, then the reference program has no value. The erased program can have a value. The statement is then false.
+The proof also uses the value of the evidence: it is a literal of the type `Id A B`, so A and B are convertible (`diagonal`), so the payload type and the result type have one erased type. `T7-Canonicity` is this fact for a closed term.
+
+*By the grade.* `T7-Grade`: in a grade algebra, the usage vector of `cast e t` is the usage vector of the payload `t`, which is the term that remains after the erasure. The grade thus makes the resource count of the typed term equal to the resource count of the erased term at each cast.
+
+The proof of `T7-Erasure` does not use the grade. A test shows this: with the grade `𝟙` in the rule `t-cast`, the proofs of `T7-Erasure` and `T7-Canonicity` check, and the proof of `T7-Grade` does not (`TOOLCHAIN.adoc`, gate watch of part 2).
+The behaviour comes from totality, and the resource count comes from the grade. This development has no semantics that counts resources, so it has no theorem that joins the two.
+
+*What the erasure does not remove.* Evidence that is data: an argument of a function, a component of a pair. Such evidence stays in the erased program as a literal. To remove it, the erasure must read the grade of a binder. Its soundness then needs a property of the grade algebra: in the one-point algebra each binder has the grade `𝟘`, and not each binder is unused. This is not done.
+
+*The separation of part 1.* `T7-Separation` is a statement about the target with no identity family. This part does not prove and does not refute the same statement for the extension.
+
+[[DC-6.8]]
+=== DC-6.8: one signature that has an identity family
+
+*Choice.* `Wager.Identity.Instance` builds a signature from a set of base constants and a set of literals. Its base constants are codes:
+
+* `cb b` is a base constant of the start.
+* `cid x y` is the family, at the codes of two closed normal forms.
+* The other codes are the code of a closed normal form (`enc`). The function `enc` is injective (`enc-inj`).
+
+`Id A B` is `cid (enc (nf A)) (enc (nf B))`. The family is thus about the types of the same signature, also about a type that has an identity type in it.
+The literals are the literals of the start and one literal for each code `c`, of the base type `cid c c`.
+
+*Reason.* A base constant cannot hold a type of its own signature directly: the type language is made after the signature. A code is a first-order copy of a closed normal form, so the set of base constants is an ordinary data type.
+
+*Limits.*
+
+* The signature has no generative constant, no primitive and no trope operation. It is one signature for the purpose. This development does not show that each signature has an extension with a family.
+* Each code is a base constant, also a code that `enc` does not give.
+* A literal exists for each code `c`, also when `c` is not the code of a type. Its base type `cid c c` is on the diagonal, so `diagonal` holds.
+
+== Stage 7
+
+[[DC-7.1]]
+=== DC-7.1: the model of types in the cubical universe
+
+*The task text.* "Interpret target types in the cubical universe and newtype transitions as equivalences. Show that the denotation of a translated coercion equals transport along the path from `ua`." The stage is optional. The owner asked for it on 2026-11-10.
+
+*Choice.* `Wager.Univalent.Model` interprets a closed type of the target of Stage 4 as a type of the cubical universe, by its normal form:
+
+* A base constant `b` is `El b`. `El` is a parameter of the model, with an element `elLit ℓ` for each literal.
+* A function, a pair and a sum are the function type, the product and the sum.
+* A newtype instance `capp s A` is `Box X`, where X is the interpretation of A. `Box` is a record with one field. It is a different type from X, and `unboxEquiv : Box X ≃ X` is an equivalence.
+
+A trope transition (wrap, unwrap) is thus an equivalence, and `ua unboxEquiv` is a path between the two types.
+
+*Not chosen.* The interpretation of `capp s A` as the interpretation of A. Each transition is then the identity equivalence, and the statement of the stage says no more than T3.
+
+*Limit.* The model has one wrapper for each state. It does not have a different type for each newtype name: two newtypes with one content have one interpretation.
+
+[[DC-7.2]]
+=== DC-7.2: the denotation of a term is by realisers
+
+*The gap.* The development has no function from a typed term to an element of the model. The typing judgement of the target is declarative: it has a conversion rule and a subusage rule. A denotation by recursion on a derivation needs a proof that two derivations of one term give one element. This is not done.
+
+*Choice.* The model is a realisability model. `𝓡 u v x` says that the untyped value v realises the element x of the interpretation of the normal form u. A wrapper is not seen at run time: v realises `box x` when v realises x.
+`Denotes X Y f g` says that the term transformer f denotes the function g: on a term that evaluates to a realiser of x, the term `f t` evaluates to a realiser of `g x`.
+
+"The denotation of a translated coercion equals transport along the path" is thus: the transformer of the coercion denotes the function `transport (pathOf wr γ)`.
+
+*Limits.* The statement is about an element that has a realiser. The development does not show that each element of the model has a realiser, and it does not show that a realiser has one element only. It has no fundamental lemma for each typed term of the target.
+
+[[DC-7.3]]
+=== DC-7.3: the path of a coercion
+
+*Choice.* `pathOf wr γ` is a path between the interpretations of the two translated types, by recursion on the coercion:
+
+* a newtype axiom gives `ua unboxEquiv`, moved along the equation of the type translation (`T-embE`, `T-inst`);
+* symmetry gives `sym`, transitivity gives the composition of paths;
+* a function, a pair and a sum give the congruence of the type former;
+* a nominal coercion gives the path of two types with one normal form;
+* congruence for a newtype gives the path of the body below the wrapper, by the role of the parameter.
+
+The path needs the source role check, as the typing of a translated coercion does (T3).

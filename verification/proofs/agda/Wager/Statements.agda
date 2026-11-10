@@ -51,6 +51,13 @@ import Wager.Trans.Scheme
 import Wager.Trans.Target
 import Wager.Trans.Coercion
 import Wager.Trans.TwoState
+open import Cubical.Data.Empty using (⊥)
+import Wager.L2.Erasure
+import Wager.Local.Source
+import Wager.Local.Gadt
+import Wager.Identity.Family
+import Wager.Identity.Typing
+import Wager.Univalent.Model
 
 ------------------------------------------------------------------------
 -- STAGE 1
@@ -566,3 +573,269 @@ module Two-State-Statements where
   No-Two-State-Translation =
     (S : Sig) (t : Translation S) → ¬ TwoState S t
     where open Wager.Trans.TwoState (Wager.FC.Tagged.taggedS rep)
+
+------------------------------------------------------------------------
+-- STAGE 5: nominal coercions from type-level functions (theorem T6)
+------------------------------------------------------------------------
+
+-- A nominal coercion of the source is built from reflexivity, symmetry,
+-- transitivity, congruence and the equations of the type-level
+-- functions. `T` is the translation of types of Stage 4.
+module T6-Statements
+  (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+  {R : Type} (ops : GradeOps R) where
+  open Wager.FC.Types SS
+  open Wager.FC.Coercion SS
+  open Wager.FC.Term SS
+  open Wager.Trans.Target SS Sc ops using (tSig; T)
+  open Wager.Trans.Coercion SS Sc ops using (tr)
+  open Wager.L1.Conversion tSig using (DefEq)
+  open Wager.L1.Eval tSig using (nf)
+
+  -- English (T6): for each nominal coercion of the source, the two
+  -- translated types have one normal form.
+  T6 : Type
+  T6 = ∀ {τ σ} → Co nom τ σ → nf (T τ) ≡ nf (T σ)
+
+  -- English: the coercion becomes conversion of the target.
+  T6-Conversion : Type
+  T6-Conversion = ∀ {τ σ} → Co nom τ σ → DefEq (T τ) (T σ)
+
+  -- English: no term remains. The translation of a cast along a nominal
+  -- coercion is the translation of the term under the cast.
+  T6-No-Term : Type
+  T6-No-Term =
+    ∀ {n} {Γ : SCx n} {τ σ} (γ : Co nom τ σ) (e : STm Γ τ) →
+    tr (cast (c-sub γ) e) ≡ tr e
+
+------------------------------------------------------------------------
+-- STAGE 6: local equality assumptions (theorem T7)
+------------------------------------------------------------------------
+
+-- The owner asked for the two options of the stage, the separation
+-- first (DESIGN-CHOICES.adoc, DC-6.1). This part is the separation.
+--
+-- The source calculus of the stage is `Wager.Local.Source`. It has the
+-- type `⟨ τ ~ σ ⟩ ρ` of a GADT constructor field: a value of the type
+-- ρ with evidence that the types τ and σ are equal. The match `lopen`
+-- brings the equality into scope as a local assumption.
+--
+-- The program is `Wager.Local.Gadt.gadt-eval`. In Haskell, for a base
+-- type b:
+--
+--   data G a where
+--     GI :: (a ~ b)          => a -> G a
+--     GB :: (a ~ Either b b) => a -> G a
+--
+--   eval :: G a -> b
+--   eval (GI x) = x
+--   eval (GB x) = case x of { Left y -> y ; Right y -> y }
+--
+-- `gadt-eval b α` is `eval` at the closed instance a := α. It is a term
+-- of the source calculus, so it is well typed there.
+--
+--   erT     the erased type of a closed target type
+--   eraseᵗ  the erasure of a target term
+--   erˡ     the erased type of a source type
+--   eraseˡ  the erasure of a source term
+module T7-Statements
+  (S : Sig) (TS : Wager.L2.Signature.TSig S) (ops : GradeOps (Sig.TG S)) where
+  open Sig S using (Base)
+  open Wager.L1.Syntax S using (Ty; []; ★)
+  open Wager.L2.Typing S TS ops using (_▸_⊢_∶_; Tm; Usage; Cx; Lit; litTy)
+  open Wager.L2.Erasure S TS ops using (erT; eraseᵗ)
+  open Wager.Local.Source Base Lit litTy using (LTy; lbase; _⇒ˡ_; erˡ; eraseˡ)
+  open Wager.Local.Gadt Base Lit litTy using (G; gadt-eval)
+
+  -- English (T7, the separation): the target cannot type this program.
+  -- For each base type b and each closed type α, no typed target term
+  -- has these two properties together:
+  --   its type has the erased type of the source type `G b α → b`;
+  --   its erasure is the erasure of the source program.
+  -- This holds for each target signature and each set of grade
+  -- operations.
+  --
+  -- The statement does not exclude a translation that changes the
+  -- erased type or the erased term of the program.
+  T7-Separation : Type
+  T7-Separation =
+    (b : Base) (α : LTy) {γ : Usage 0} {Γ : Cx 0} {t : Tm 0} {A : Ty [] ★} →
+    γ ▸ Γ ⊢ t ∶ A →
+    erT A ≡ erˡ (G b α ⇒ˡ lbase b) →
+    eraseᵗ t ≡ eraseˡ (gadt-eval b α) →
+    ⊥
+
+------------------------------------------------------------------------
+-- STAGE 6, PART 2: the identity type at the grade 𝟘 (theorem T7)
+------------------------------------------------------------------------
+
+-- This part is the other option of the stage (DESIGN-CHOICES.adoc,
+-- DC-6.1 and DC-6.5): the target gets an identity type.
+--
+-- EQUALITY EVIDENCE IS NOW A TERM. A term of the type `base (Id A B)`
+-- is evidence that the closed types A and B are equal.
+--
+--   Id A B        a base constant of the signature (`IdFamily`)
+--   rfl A         a literal of the base type `Id A A`
+--   cast e t      the one new term former: the evidence e, the payload t
+--   _▸_⊢ⁱ_∶_      the target judgement with one new rule, `t-cast`, which
+--                 uses the evidence at the grade 𝟘
+--   keepⁱ         the reference erasure: each cast evaluates its
+--                 evidence, then its payload
+--   eraseⁱ        the erasure of proofs: the evidence of each cast is
+--                 absent
+--   𝒱 a           observational equality of untyped values at the
+--                 erased type a (Wager.Erased.LogRel)
+--
+-- The statements hold for each signature that has an identity family,
+-- and for each set of grade operations. Two statements need the laws
+-- of a grade algebra, and they say so.
+module T7-Identity-Statements
+  (S : Sig) (TS : Wager.L2.Signature.TSig S) (ops : GradeOps (Sig.TG S))
+  (F : Wager.Identity.Family.IdFamily S TS) where
+  open Wager.L1.Syntax S using (Ty; []; ★; base; arr)
+  open Wager.L1.Conversion S using (DefEq)
+  open Wager.L2.Typing S TS ops using (_▸_⊢_∶_; Tm)
+  open Wager.L2.Erasure S TS ops using (erT; eraseᵗ)
+  open Wager.Identity.Typing S TS ops F
+  open GradeOps ops using (𝟘; 𝟙)
+  open Wager.Erased.Untyped.Terms Lit using (UVal; ∅ᵉ; _⊢_⇓_)
+  open Wager.Erased.LogRel litTy using (𝒱; FO)
+
+  -- English (the target is a part): each typed term of the target is a
+  -- typed term of the extension, with the same usage and the same type.
+  T7-Conservative : Type
+  T7-Conservative =
+    ∀ {n} {γ : Usage n} {Γ : Cx n} {t : Tm n} {A : Ty [] ★} →
+    γ ▸ Γ ⊢ t ∶ A → γ ▸ Γ ⊢ⁱ emb t ∶ A
+
+  -- English: on a term of the target, the two erasures of the
+  -- extension are the erasure of the target.
+  T7-Conservative-Erasure : Type
+  T7-Conservative-Erasure =
+    ∀ {n} (t : Tm n) → (keepⁱ (emb t) ≡ eraseᵗ t) × (eraseⁱ (emb t) ≡ eraseᵗ t)
+
+  -- English (introduction): a conversion gives evidence. If A and B
+  -- are convertible, the literal `rfl A` has the type `Id A B`, in each
+  -- context, and it uses no variable.
+  T7-Intro : Type
+  T7-Intro =
+    ∀ {n} {Γ : Cx n} {A B : Ty [] ★} → DefEq A B →
+    0ᵘ ▸ Γ ⊢ⁱ ilit (rfl A) ∶ base (Id A B)
+
+  -- English (canonicity): closed evidence gives a conversion. If a
+  -- closed term has the type `Id A B`, then A and B are convertible.
+  -- The identity family thus adds no equality between closed types.
+  T7-Canonicity : Type
+  T7-Canonicity =
+    ∀ {γ : Usage 0} {Γ : Cx 0} {e : ITm 0} {A B : Ty [] ★} →
+    γ ▸ Γ ⊢ⁱ e ∶ base (Id A B) → DefEq A B
+
+  -- English (T7, the erasure of proofs is sound): for a closed typed
+  -- term, the reference program and the program with no evidence in its
+  -- casts evaluate, and the two values are observationally equal at the
+  -- erased type.
+  --
+  -- Totality is a part of the statement: the reference program, which
+  -- evaluates the evidence of each cast, has a value.
+  T7-Erasure : Type
+  T7-Erasure =
+    ∀ {γ : Usage 0} {Γ : Cx 0} {t : ITm 0} {A : Ty [] ★} →
+    γ ▸ Γ ⊢ⁱ t ∶ A →
+    Σ[ v ∈ UVal ] Σ[ w ∈ UVal ]
+      (∅ᵉ ⊢ keepⁱ t ⇓ v) × (∅ᵉ ⊢ eraseⁱ t ⇓ w) × 𝒱 (erT A) v w
+
+  -- English (T7 at a first-order type): the two programs evaluate to
+  -- one value.
+  T7-Erasure-First-Order : Type
+  T7-Erasure-First-Order =
+    ∀ {γ : Usage 0} {Γ : Cx 0} {t : ITm 0} {A : Ty [] ★} →
+    γ ▸ Γ ⊢ⁱ t ∶ A → FO (erT A) →
+    Σ[ v ∈ UVal ] (∅ᵉ ⊢ keepⁱ t ⇓ v) × (∅ᵉ ⊢ eraseⁱ t ⇓ v)
+
+  -- English (the grade): in a grade algebra, evidence costs nothing.
+  -- The usage vector of `cast e t` is the usage vector of the payload t,
+  -- which is the term that remains after the erasure of proofs.
+  T7-Grade : Type
+  T7-Grade =
+    GradeLaws ops →
+    ∀ {n} {γ δ : Usage n} {Γ : Cx n} {e t : ITm n} {A B : Ty [] ★} →
+    γ ▸ Γ ⊢ⁱ e ∶ base (Id A B) → δ ▸ Γ ⊢ⁱ t ∶ A →
+    δ ▸ Γ ⊢ⁱ cast e t ∶ B
+
+  -- English (a local equality assumption): in a grade algebra, for each
+  -- pair of closed types A and B, this closed function is typed:
+  --
+  --   λ (e : Id A B) at the grade 𝟘. λ (x : A) at the grade 𝟙. cast e x
+  --
+  -- It has the type `Id A B → A → B`. The types A and B are any types.
+  -- The first parameter is the local assumption that A and B are equal.
+  T7-Assumption : Type
+  T7-Assumption =
+    GradeLaws ops → ∀ (A B : Ty [] ★) {Γ : Cx 0} →
+    0ᵘ ▸ Γ ⊢ⁱ use-assumption A B ∶ arr 𝟘 (base (Id A B)) (arr 𝟙 A B)
+
+------------------------------------------------------------------------
+-- STAGE 7: the optional univalent cross-check
+------------------------------------------------------------------------
+
+-- The task: "Interpret target types in the cubical universe and newtype
+-- transitions as equivalences. Show that the denotation of a translated
+-- coercion equals transport along the path from `ua`."
+--
+-- The model is `Wager.Univalent.Model` (DESIGN-CHOICES.adoc, DC-7.1 to
+-- DC-7.3). It is for the target of Stage 4, for each source signature,
+-- each state scheme and each grade algebra, and for each interpretation
+-- `El` of the base constants with an element `elLit ℓ` for each literal.
+--
+--   ⟦ X ⟧          the interpretation of a closed target type: a type of
+--                  the cubical universe. A newtype instance is a wrapper
+--                  `Box`, and `unboxEquiv : Box Z ≃ Z` is its transition.
+--   Real X ρ u x   the untyped term u, in the environment ρ, evaluates
+--                  to a value that realises the element x of ⟦ X ⟧
+--   Denotes X Y f g
+--                  the term transformer f denotes the function g: on a
+--                  term that evaluates to a realiser of x, the term
+--                  `f t` evaluates to a realiser of `g x`
+--   pathOf wr γ    the path ⟦ T τ ⟧ ≡ ⟦ T σ ⟧ of a representational
+--                  coercion γ. It is made from `ua unboxEquiv` (a newtype
+--                  axiom), `sym`, composition, and congruence of the
+--                  type formers. It needs the source role check `wr`.
+module Stage7-Statements
+  (SS : SSig) (Sc : Wager.Trans.Scheme.StateScheme SS)
+  {R : Type} (A : GradeAlgebra R)
+  (El : SSig.Base SS → Type)
+  (elLit : (ℓ : SSig.Lit SS) → El (SSig.litTy SS ℓ)) where
+  private
+    ops = GradeAlgebra.ops A
+  open GradeOps ops using (𝟙)
+  open Wager.FC.Types SS
+  open Wager.FC.Coercion SS
+  open Wager.Trans.Target SS Sc ops using (T; arr)
+  open Wager.Trans.Coercion SS Sc ops using (coI; fwd; bwd; coerceT; eraseT)
+  open Wager.Univalent.Model SS Sc A El elLit
+  open Wager.Erased.Untyped.Terms Lit using (UEnv)
+
+  -- English (the cross-check): the translation of a representational
+  -- coercion denotes transport along its path. On a term that evaluates
+  -- to a realiser of x, the transformed term evaluates to a realiser of
+  -- `transport (pathOf wr γ) x`.
+  Coercion-Denotes-Transport : Type
+  Coercion-Denotes-Transport =
+    (wr : WellRoled) → ∀ {τ σ} (γ : Co rep τ σ) →
+    Denotes (T τ) (T σ) (fwd (coI rep γ)) (transport (pathOf wr γ))
+
+  -- English: the transformer in the other direction denotes transport
+  -- along the inverse path.
+  Coercion-Denotes-Transport-Back : Type
+  Coercion-Denotes-Transport-Back =
+    (wr : WellRoled) → ∀ {τ σ} (γ : Co rep τ σ) →
+    Denotes (T σ) (T τ) (bwd (coI rep γ)) (transport (sym (pathOf wr γ)))
+
+  -- English: the erased coercion function evaluates, in each
+  -- environment, to a closure that realises the function
+  -- `transport (pathOf wr γ)`.
+  Coerce-Function-Is-Transport : Type
+  Coerce-Function-Is-Transport =
+    (wr : WellRoled) → ∀ {τ σ} (γ : Co rep τ σ) {n} {ρ : UEnv n} →
+    Real (arr 𝟙 (T τ) (T σ)) ρ (eraseT (coerceT γ)) (transport (pathOf wr γ))

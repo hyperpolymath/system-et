@@ -292,3 +292,135 @@ A clean build of `Wager/Everything.agda` (64 modules) takes about 35 seconds and
 |===
 
 The third test shows that the proofs of T3 and T5 depend on the terms that the translation gives.
+
+=== Gate watch at the end of Stage 5
+
+A clean build of `Wager/Everything.agda` (65 modules) takes about 35 seconds and prints no warning.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/Examples/Stage5.agda`: a false lemma (the translations of `Age` and `Int` have one normal form), with the proof `refl`
+| `[UnequalTerms]`: the normal form of the first type starts with `ncapp`
+| FAIL
+
+| `Wager/Examples/Stage5.agda`: `postulate t6-by-fiat : …`
+| `[SafeFlagPostulate] Cannot postulate t6-by-fiat with safe flag`. `scan-dangerous.sh` also fails.
+| FAIL
+
+| `Wager/Trans/Target.agda`: a target primitive ignores the index of a state
+| `[UnequalTerms] obs F N (idx N v) != fOther F` in `Wager/Trans/Nominal.agda`
+| FAIL
+
+| All changes removed
+| None
+| PASS, 65 files
+|===
+
+The third test shows that the proof of T6 depends on the table of the target primitives.
+
+=== Gate watch at the end of Stage 6, part 1 (the separation)
+
+A clean build of `Wager/Everything.agda` (70 modules) takes about 39 seconds and prints no warning.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/Examples/Stage6.agda`: a false lemma (the erased program has the simple type `(Int + Int) → Int`), with the derivation of `other-erased-type`
+| `[UnequalTerms] (ebase bInt) != (esum (ebase bInt) (ebase bInt))`
+| FAIL
+
+| `Wager/Examples/Stage6.agda`: `postulate t7-by-fiat : ⊥`
+| `[SafeFlagPostulate]`. `scan-dangerous.sh` also fails.
+| FAIL
+
+| `Wager/Local/Gadt.agda`: the second constructor has the assumption `α ~ b`, and the second branch gives the value back
+| `[UnequalTerms] UTm.uvar zero != UTm.ucase (uvar zero) (uvar zero) (uvar zero)` in `Wager/Local/Separation.agda`
+| FAIL
+
+| All changes removed
+| None
+| PASS, 70 files
+|===
+
+The third test shows that the proof of the separation depends on the text of the program.
+
+=== Gate watch at the end of Stage 6, part 2 (the identity type)
+
+A clean build of `Wager/Everything.agda` (76 modules) takes about 43 seconds and prints no warning.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/Examples/Stage6Identity.agda`: a false lemma (no closed term is evidence that `Int` is `Int`)
+| `[UnequalTerms]` in `no-evidence`
+| FAIL
+
+| `Wager/Identity/Term.agda`: `eraseⁱ (cast e t)` is the erasure of the evidence
+| `[UnequalTerms]` in the case of the cast of `Wager.Identity.Soundness.fund`
+| FAIL
+
+| `Wager/Identity/Typing.agda`: the rule `t-cast` takes evidence of the type `Id A A`
+| `[UnequalTerms]` in the case of the cast of `fund`
+| FAIL
+
+| `Wager/Identity/Typing.agda`: the rule `t-cast` uses the evidence at the grade `𝟙`
+| `[MismatchedProjectionsError]` in `cast-free`
+| FAIL
+
+| `Wager/Identity/Instance.agda`: the literal of the code `c` has the base type `cid c (cq c)`, off the diagonal
+| `[UnequalTerms]` in `diag`
+| FAIL
+
+| `Wager/Identity/Soundness.agda`: `postulate evidence-bad : erT A ≡ erT B`
+| `[SafeFlagPostulate]`. `scan-dangerous.sh` also fails.
+| FAIL
+
+| All changes removed
+| None
+| PASS, 76 files
+|===
+
+The second and the third test show that the proof of `T7-Erasure` depends on the erasure and on the rule.
+
+The fourth test has a second part. With the grade `𝟙` in the rule, sections 1 to 4 of `Wager.Identity.Soundness` were checked alone: they pass. These are the embedding of the target, `intro`, `fund`, `erasure-sound`, `erasure-sound-fo` and `canonicity`. Section 5 (`cast-free`, `assumption`) does not pass.
+The behaviour statements of part 2 thus do not depend on the grade of the rule, and the grade statements do (DC-6.7).
+
+=== Gate watch at the end of Stage 7 (the optional cross-check)
+
+A clean build of `Wager/Everything.agda` (79 modules) takes about 48 seconds and prints no warning.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/Examples/Stage7.agda`: a false lemma (transport along the path of `Age ~ Int` gives 8 from `box 7`)
+| `[UnequalTerms]` in `age-transport`
+| FAIL
+
+| `Wager/Univalent/Model.agda`: a wrapper has no realiser
+| `[UnequalTerms]` in `Wager.Univalent.CrossCheck.step-den`
+| FAIL
+
+| `Wager/Univalent/Model.agda`: the path of a pair coercion uses the path of its first part two times
+| `[UnequalTerms]` in `pathAt`
+| FAIL
+
+| `Wager/Examples/Stage7.agda`: the model gives the number 8 to the literal `ℓint`
+| `[UnequalTerms]` in `age-literal`
+| FAIL
+
+| `Wager/Univalent/CrossCheck.agda`: `postulate cross-check-bad : ⊥`
+| `[SafeFlagPostulate]`. `scan-dangerous.sh` also fails.
+| FAIL
+
+| All changes removed
+| None
+| PASS, 79 files
+|===
+
+The second test shows that the proof depends on the rule "a wrapper is not seen at run time".
+The third test fails in the model, before the proof: a wrong path does not have the type of a path between the two interpretations.
