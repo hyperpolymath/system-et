@@ -41,11 +41,12 @@ just doctor     # environment diagnostics
 
 === Machine-readable artefacts
 
-This repo carries `+.machine_readable/+` A2ML files (`+STATE.a2ml+`,
-`+META.a2ml+`, `+ECOSYSTEM.a2ml+`, `+AGENTIC.a2ml+`, `+NEUROSYM.a2ml+`,
-`+PLAYBOOK.a2ml+`). If your change alters project state, architecture,
-or operational steps, update the corresponding file in the same PR — CI
-validates them.
+This repo carries `+.machine_readable/+` A2ML files (`+META.a2ml+`,
+`+ECOSYSTEM.a2ml+`, `+AGENTIC.a2ml+`, `+NEUROSYM.a2ml+`, `+PLAYBOOK.a2ml+`).
+If your change alters architecture or operational steps, update the
+corresponding file in the same PR — CI validates them. The project phase,
+blockers and next action live in `+docs/status/JOURNAL.adoc+`; update it in
+the same PR when they change.
 
 === Language policy
 

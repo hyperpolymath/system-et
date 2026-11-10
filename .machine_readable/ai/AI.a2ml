@@ -7,9 +7,9 @@
 - Prefer to keep generated files out of source control, and regenerate them with the documented commands before committing.
 
 ## Workflow
-1. Inspect `.machine_readable/descriptiles/STATE.a2ml` for blockers and next actions.
+1. Inspect `docs/status/JOURNAL.adoc` for the phase, blockers and next action.
 2. Respect any constraints listed inside `.machine_readable/descriptiles/AGENTIC.a2ml` when tooling changes are requested.
-3. After finishing edits, update STATE with your outcomes and commit with a concise, imperative message.
+3. After finishing edits, update the thin journal (docs/status/JOURNAL.adoc) with your outcomes and commit with a concise, imperative message.
 
 ## Delivery Promises
 - Mention in summaries whether STATE, `.machine_readable/contractiles/`, or `.machine_readable/bot_directives/` changed.

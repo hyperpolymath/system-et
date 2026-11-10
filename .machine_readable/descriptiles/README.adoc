@@ -11,7 +11,7 @@ This directory contains the 6 core A2ML machine-readable metadata files for this
 - `META.a2ml` - Architecture decisions (ADRs), development practices, design rationale
 - `NEUROSYM.a2ml` - Symbolic semantics, composition algebra
 - `PLAYBOOK.a2ml` - Executable plans, operational runbooks
-- `STATE.a2ml` - Project state, phase, milestones, session history
+- `STATE.a2ml` - archived 2026-11-10 to ../archive/state-v1.a2ml; the live successor is docs/status/JOURNAL.adoc
 
 ## Standards Compliance
 

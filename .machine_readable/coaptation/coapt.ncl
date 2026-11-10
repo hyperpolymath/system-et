@@ -111,7 +111,7 @@ let clause_lines = std.string.join "\n" (std.array.map (fun e => e.id ++ " = " +
 let cp = clauses_doc.provenance in
 let fp = facts_doc.provenance in
 let contractile_prov = "intend@%{cp.intend} must@%{cp.must} trust@%{cp.trust} adjust@%{cp.adjust} dust@%{cp.dust} bust@%{cp.bust}" in
-let descriptile_prov = "clade@%{fp.clade} state@%{fp.state} ecosystem@%{fp.ecosystem} agentic@%{fp.agentic} anchor@%{fp.anchor}" in
+let descriptile_prov = "clade@%{fp.clade} deed@%{fp.deed} ecosystem@%{fp.ecosystem} agentic@%{fp.agentic} anchor@%{fp.anchor}" in
 
 let s = std.to_string in
 m%"
