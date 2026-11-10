@@ -63,7 +63,8 @@ Status: DRAFT after Stage 5. This file becomes final after the last stage.
   `Wager.Proofs.t6-conversion`: the two translated types are convertible. `Wager.Proofs.t6-no-term`: the translation of a cast along a nominal coercion is the translation of the term under the cast.
   Each holds for each source signature, each state scheme and each set of grade operations. None needs the role check.
   T6 is one direction. The converse is false for the row scheme (finding F16, DC-5.2).
-| T7 | NOT ATTEMPTED | Stage 6 is not started.
+| T7 | NOT ATTEMPTED | T7 has no statement yet. The choice between the two options of Stage 6 is with the owner (PLAN.adoc).
+  Stage 6 has one lemma about the unchanged target: `Wager.L2.Erasure.erase-typed`.
 |===
 
 Stage 1 also proved the L1 equivalence that the task asks for:
@@ -373,4 +374,4 @@ The statements of Stage 5 (T6) were put in `Statements.agda`, and committed, bef
 * Agda 2.8.0 with `--cubical --safe`, and `agda/cubical` v0.9 (`TOOLCHAIN.adoc`).
 * No `postulate`, no hole, no termination pragma, no positivity pragma.
 * `--guardedness` is on in each file (DC-0.2). No file uses coinduction.
-* One warning is silenced, in 36 of the 65 files: `UnsupportedIndexedMatch` (DC-0.3).
+* One warning is silenced, in 37 of the 66 files: `UnsupportedIndexedMatch` (DC-0.3). The one file of Stage 6 has the line, and a test without the line found the warning in it.
