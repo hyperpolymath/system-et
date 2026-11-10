@@ -33,7 +33,7 @@ command in the session that filled this anchor, against the anchor SHA.
 | *ADR-0002 is accepted*: ET-14's item (3) — the L0 observational equivalence — is fixed as the `≈` of a parametric `L0Observation`, and ET-16 enters the ledger narrowly | affirmed | `docs/decisions/0002-…adoc` (Status: Accepted), `docs/theory/OBLIGATIONS.adoc`
 | The proof gate FAILS on: broken proof, smuggled `axiom`, absent prover, unlisted proof file, status drift | affirmed-ran | watched-to-fail runs recorded in PR #17; drift gate `./scripts/check-proof-status.sh` — PASS
 | The golden path is real: `just test && just quality` runs the proof gates, scans, shape checks — no echo-stub greens | affirmed-ran | Justfile recipes wired to `scripts/*` (this PR); both PASS at the anchor SHA
-| The theory is the semantic authority; `anytype` is the implementation | affirmed | `.machine_readable/6a2/anchors/ANCHOR.a2ml`, `ECOSYSTEM.a2ml`; anytype pins systemet (its issue #13 tracks the pin refresh)
+| The theory is the semantic authority; `anytype` is the implementation | affirmed | `.machine_readable/descriptiles/anchors/ANCHOR.a2ml`, `ECOSYSTEM.a2ml`; anytype pins systemet (its issue #13 tracks the pin refresh)
 |===
 
 == What we do NOT claim
