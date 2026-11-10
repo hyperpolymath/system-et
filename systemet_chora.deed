@@ -1,0 +1,90 @@
+;; SPDX-License-Identifier: MPL-2.0
+;; SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+;;
+;; DRAFT (Slice-2 prep) — not yet wired; the .machine_readable/6a2/ a2ml files
+;; stay live and authoritative until the estate wave + kyX (D313) land. Clauses
+;; are translated field-for-field from those descriptiles under the RULED mapping
+;; specs in standards 1-formats/deed/mappings/ (the only authority a family
+;; translation may cite):
+;;   CLADE.a2ml -> (identity)(clade)(forges)(lineage)(status)
+;;                 per clade-to-repo-deed.adoc  [RULED 2026-10-27]
+;;   AGENTIC/NEUROSYM/PLAYBOOK.a2ml -> (agentic)(neurosym)(playbook)
+;;                 per agentic-neurosym-playbook-to-repo-deed.adoc  [RULED 2026-10-27]
+;; NOT translated here, pending their specs/rulings (kept live in 6a2/):
+;;   META.a2ml + ECOSYSTEM.a2ml  — family 2, meta-ecosystem-to-repo-deed.adoc
+;;                                 (PROPOSAL, not yet owner-ruled)
+;;   STATE.a2ml                  — family 3, state-v1-decision.adoc (A/B/C open)
+;;   0-AI-MANIFEST.a2ml          — family 7, ai-manifest-decision.adoc (option A
+;;                                 unconfirmed)
+(repo-deed
+  :schema-version  "1.0.0"
+  :canonical-name  "systemet"
+  :repo-uuid       #u8"gv-clade-index:github.com/hyperpolymath/systemet"
+  :beholding-chora #u5"estate/chora"
+
+  (identity :primary-forge github
+            :owner         "hyperpolymath"
+            :prefixed-name "et-systemet")
+
+  ; PROVISIONAL clade: `et` is this repo's self-assigned code, NOT in the estate's
+  ; 12-code closed taxonomy (fv nl rm gv db ap ix dx pt ax gm sc). Carried verbatim
+  ; per the mapping; gv-clade-index must assign/confirm the real clade before the
+  ; CLADE-003/P-5 registry gate can pass (owner + registry act).
+  (clade    :primary   et
+            :secondary ()
+            :assigned  "2026-06-28"
+            :rationale "et = Equality Theory; systemet is the theory itself (the spec/semantic authority). PROVISIONAL pending gv-clade-index registration.")
+
+  (forges   :github    "hyperpolymath/systemet"
+            :gitlab    "hyperpolymath/systemet"
+            :bitbucket "hyperpolymath/systemet")
+
+  (lineage  :type   standalone
+            :parent "Split out of the combined 'EveryType' draft (2026-06-28): systemet is the theory half; the kernel half is the anytype repo."
+            :born   "2026-06-28")
+
+  ; CLADE.a2ml carries no [status] section and STATE (family 3) is not yet ruled,
+  ; so :phase is BACKFILLED from the repo's declared lifecycle (active) — a
+  ; provisional registry surface, not a revalidated readiness claim. Confirm
+  ; against the CLADE-003/P-5 gate when state-v1-decision.adoc is ruled.
+  (status   :phase         active
+            :since         "2026-06-28"
+            :present       #t
+            :aliases       ()
+            :merged-into   ""
+            :superseded-by ""
+            :successors    ()
+            :ended         ""
+            (history
+              (entry :phase active
+                     :since "2026-06-28"
+                     :note  "backfilled from STATE pending state-v1-decision.adoc; not a CLADE registry claim")))
+
+  (agentic
+            :version "0.1.0" :last-updated "2026-04-11"
+            (permissions  :source       #t
+                          :tests        #t
+                          :docs         #t
+                          :config       #t
+                          :create-files #t)
+            (integrity    :fail-closed                      #t
+                          :require-evidence-per-step        #t
+                          :allow-silent-skip                #f
+                          :require-rerun-after-fix          #t
+                          :release-claim-requires-hard-pass #t)
+            (methodology :instructions-dir ".machine_readable/bot_directives/" :default-mode hybrid))
+
+  (neurosym
+             :version "0.1.0" :last-updated "2026-04-11"
+             (hypatia :scan-enabled  #t
+                      :scan-depth    standard
+                      :report-format "logtalk"))
+
+  (playbook
+            :version "0.1.0" :last-updated "2026-04-11"
+            (skeleton :version              "1.0"
+                      :last-updated         "2026-04-30"
+                      :authority-allowlist  ".machine_readable/root-allow.txt"
+                      :enforcement-workflow ".github/workflows/estate-rules.yml")
+            (deployment) (incident-response) (release-process) (docs-format) (maintenance-operations))
+)

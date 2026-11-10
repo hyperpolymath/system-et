@@ -99,7 +99,7 @@ REQUIRED_WORKFLOWS=(
     "security-policy.yml"
     "wellknown-enforcement.yml"
     "workflow-linter.yml"
-    "npm-bun-blocker.yml"
+    "runtime-policy.yml"
     "ts-blocker.yml"
     "secret-scanner.yml"
 )
