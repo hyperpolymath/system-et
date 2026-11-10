@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: toolchain record
-Status: Stage 0 record. Checked on 2026-11-10.
+Status: toolchain record, with the gate watch of each stage. Checked on 2026-11-10.
 :toc: left
 :sectnums:
 
@@ -75,8 +75,10 @@ git clone --depth 1 --branch v0.9 https://github.com/agda/cubical /opt/agda/cubi
 git -C /opt/agda/cubical-0.9 rev-parse HEAD   # b150186d2544e7efeddd31e5d14a8b9ecbb100f7
 
 mkdir -p "$(agda --print-agda-app-dir)"
-echo "/opt/agda/cubical-0.9/cubical.agda-lib" > "$(agda --print-agda-app-dir)/libraries"
+echo "/opt/agda/cubical-0.9/cubical.agda-lib" >> "$(agda --print-agda-app-dir)/libraries"
 ----
+
+The last command adds one line to the file `libraries`. It does not replace the libraries that a developer has there.
 
 The project library file is `verification/proofs/agda/wager.agda-lib`.
 It names the dependency `cubical-0.9` and has no `flags:` line.
@@ -115,7 +117,7 @@ Importing module Cubical.Foundations.Prelude using the
 
 Thus the rule "add `--guardedness` only in a file that needs coinduction" cannot hold with the stock library.
 Stage 0 uses a second pragma line, `{-# OPTIONS --guardedness #-}`, in each file.
-This is provisional. The owner decides (see `DESIGN-CHOICES.adoc`, DC-0.2).
+The owner accepted this on 2026-11-10 (see `DESIGN-CHOICES.adoc`, DC-0.2).
 
 One alternative was tested.
 A copy of the library tree with `--guardedness` removed from its `flags:` line lets a `--cubical --safe` file import `Cubical.Foundations.Prelude` and `Cubical.Data.List`.
@@ -210,7 +212,7 @@ A clean build of `Wager/Everything.agda` (29 modules) takes about 20 seconds and
 |===
 
 The third test shows that the Boolean law checker of `Wager.Grade.Finite` rejects a structure that fails a law.
-The status-drift gate now asks for the line `// gate:agda gated=29 quarantined=0`.
+At the end of Stage 1 the status-drift gate asked for the line `// gate:agda gated=29 quarantined=0`.
 
 === Gate watch at the end of Stage 2
 
