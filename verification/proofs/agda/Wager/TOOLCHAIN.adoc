@@ -424,3 +424,96 @@ A clean build of `Wager/Everything.agda` (79 modules) takes about 48 seconds and
 
 The second test shows that the proof depends on the rule "a wrapper is not seen at run time".
 The third test fails in the model, before the proof: a wrong path does not have the type of a path between the two interpretations.
+
+=== Gate watch at the end of Stage 8 (terms with open types)
+
+The toolchain was installed again on a new machine on 2026-11-10, by the steps of this file. The checksum of the archive matched, the commit of the library matched, and `agda --version` printed the text above.
+
+A clean build of `Wager/Everything.agda` at the end of Stage 8 (91 modules) takes about 56 seconds and prints no warning.
+
+Each row is one change, alone. After each change the 2 commands `agda --safe Wager/Everything.agda` and `scripts/check-proofs.sh agda` ran, and the change was removed.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/Examples/Stage8.agda`: a false lemma (the instance of the polymorphic identity at Int has the binder type Bool)
+| `[UnequalTerms] bInt != bBool` in `id-at-int`
+| FAIL
+
+| `Wager/Poly/Term.agda`: `⌊ tapp f a ⌋` swaps the function and the argument
+| `[UnequalTerms] f != a` in `Wager.Poly.Proofs.t8-closed`
+| FAIL
+
+| `Wager/Poly/Typing.agda`: the rule `t-app` does not scale the usage of the argument
+| `[UnequalTerms]` in `Wager.Poly.Proofs.t8-closed`, the case of `t-app`
+| FAIL
+
+| `Wager/Poly/Coercion.agda`: the translation of a symmetric open coercion does not swap the 2 directions
+| `[MismatchedProjectionsError]` (`bwdᵖ` and `fwdᵖ`) in `Wager.Poly.CoercionProofs.coIᵒ-typed`
+| FAIL
+
+| `Wager/Poly/Coercion.agda`: `opsOfᵖ` drops the operation of a `step`
+| `[UnequalTerms]` in `Wager.Poly.CoercionProofs.t8-ops-rigid`
+| FAIL
+
+| `Wager/Poly/Coercion.agda`: `coerceᵒ` gives its binder the type of the result
+| `[UnequalTerms] φ != θ` in `Wager.Poly.CoercionProofs.t8-coercion-typed`
+| FAIL
+
+| `Wager/Examples/Stage8.agda`: a kinding derivation for `isAge a` with the variable at the grade representational
+| `[UnequalTerms] false != true` in the subusage proof
+| FAIL
+
+| `Wager/Examples/Stage8.agda`: the base constant `Id Int Int` as an open type with the evidence type at each instance
+| `[UnequalTerms]`: the code of `Int` is not the code of the normal form of α
+| FAIL
+
+| `Wager/Poly/Role.agda`: the phantom lemma uses the observer representational
+| `[UnequalTerms]`: `≈` is not `≡`, in `t8-role-phantom`
+| FAIL
+
+| `Wager/Poly/Proofs.agda`: `postulate t8-by-fiat : T8-Closed`
+| `[SafeFlagPostulate]`. `scan-dangerous.sh` also fails.
+| FAIL
+
+| `Wager/Poly/CoercionProofs.agda`: a hole in `t8-type-instance`
+| `[SolvedButOpenHoles]` in `Wager/Proofs.agda`: the module cannot be imported
+| FAIL
+
+| All changes removed
+| None
+| PASS. The gate passed with 91 files before the watch. After the watch it ran with the 5 files of the side item: PASS, 96 files.
+|===
+
+The second and the third test show that the proof of `T8-Closed` depends on the map `⌊_⌋` and on the text of a rule.
+The fifth test shows that the limit `T8-No-Uniform-Unwrap` depends on the list of operations.
+
+The machine was restarted during the tenth test. The tenth and the eleventh test ran again after the restart, with the same 2 commands.
+
+=== Gate watch for the side item after Stage 8 (the variant with a grade q)
+
+A build of `Wager/Everything.agda` (96 modules) prints no warning.
+
+[cols="3,3,1",options="header"]
+|===
+| Change | Error from Agda | Gate
+
+| `Wager/Top/Translation.agda`: the map of a function binds the function at the grade q
+| `[UnequalTerms] q != 𝟙` in `Wager.Top.Proofs.arrMapq-typed`
+| FAIL
+
+| `Wager/Top/Translation.agda`: the binder of a source function has the grade `𝟙`
+| `[UnequalTerms] 𝟙 != q` in `Wager.Top.Proofs.trq-typed′`
+| Not run. `agda --safe Wager/Everything.agda` fails.
+
+| All changes removed
+| None
+| PASS, 96 files
+|===
+
+The first test shows that the typing of a coercion in the variant depends on the grade of the 2 binders of the map of a function (DC-8.8).
+
+=== The silenced warning in stages 8 and after
+
+Of the 12 files of Stage 8, 7 have the line `-WnoUnsupportedIndexedMatch`. Of the 5 files of the side item, 3 have the line. For each of these 17 files a test without the line was made: the 10 files that have the line give the warning, and the 7 other files give none.

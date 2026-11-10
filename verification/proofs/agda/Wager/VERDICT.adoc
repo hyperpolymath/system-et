@@ -844,6 +844,13 @@ Process notes:
   One new "source" entry (R27, open coercions), one "specification only" entry (R28) and one "proof-internal" entry (R29). The class of R13 is now "specification only": `T8-Role` uses `EnvLR`.
 * `RULE-DIFF-LEDGER.adoc`: no entry. The extension has 0 new typing rules, 0 new term formers, 0 new type formers and 0 new judgement forms. One rule has a changed text: `t-step` uses the closed carrier through a renaming.
 
+=== Trust base after Stage 8 and the side item
+
+* The trust base does not change: Agda 2.8.0 with `--cubical --safe`, `agda/cubical` v0.9, no `postulate`, no hole, no termination pragma, no positivity pragma. `--guardedness` is on in each file, and no file uses coinduction.
+* The development has 96 files: 79 of stages 1 to 7, 12 of Stage 8 and 5 of the side item.
+* The warning `UnsupportedIndexedMatch` is silenced in 55 of the 96 files: the 45 files of stages 1 to 7, 7 files of Stage 8 and 3 files of the side item. For each of the 17 new files a test without the line was made (`TOOLCHAIN.adoc`).
+* The gate watch of Stage 8 has 11 deliberate defects. Each made the gate fail.
+
 === Effect of Stage 8 on the overall result
 
 The overall result does not change: W does not hold as written, and W holds for the fragment with 2 additions.
@@ -855,3 +862,60 @@ Stage 8 is not a part of the fragment of W. It answers a question about the limi
 * 2 limits stay, and each is checked for the cases that this section names: the unwrap of a newtype at a type variable, and an equality assumption with a type variable.
 
 A third decision is with the owner after Stage 8: the class of R26.
+
+== Side item after Stage 8: is the second addition stronger than necessary?
+
+This section was added after the final verdict. It does not rewrite the overall result. The wording of W is the decision of the owner.
+
+*The question of the owner (2026-11-10, relayed by the parent session).* The second addition is: for a whole program, a grade algebra in which the grade `𝟙` is unrestricted (`𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙`). Is it enough that the algebra has a top grade q, if the translation writes q?
+
+*Answer.* Not for the whole fragment. Yes for the part of the fragment with no elimination of a pair and no `case`.
+The variant of the translation is in `Wager/Top` (DC-8.8). Each statement was frozen (`caa63ce`) before its proof.
+
+[cols="2,1,6",options="header"]
+|===
+| Statement (`Wager.Top.Statements`, `Wager.Top.AffineStatements`) | Status | Evidence and reading
+
+| `Top-Typing-All` (the candidate)
+| REFUTED
+| `Wager.Top.Affine.top-typing-all-fails`. In the algebra `{0, 1, ω}` with q = ω, for the signature `taggedS rep` and the row scheme, the translation of `let (x, y) = (5, 5) in 5` has no type, for each usage vector, each context and each type (`drop-rejected`). ω is a top grade there (`omega-is-top`).
+
+| `Top-Typing`
+| PROVED
+| `Wager.Top.Proofs.top-typing`. For a source signature that passes the role check, the laws of a grade algebra and a top grade q: each source term with no elimination of a pair and no `case` has a typed translation, with the usage q for each variable.
+
+| `Top-Coercion-Typed`, `Top-Coerce-Typed`
+| PROVED
+| `Wager.Top.Proofs.top-coercion-typed`, `top-coerce-typed`. The transformer of a coercion keeps the usage vector, for each q and each grade algebra: no hypothesis on q. The coercion function with the binder grade q needs `𝟙 ≤ q`.
+  The map of a function is not the map of Stage 4 with q for `𝟙`: it binds the function at `𝟙` and the argument at q (DC-8.8).
+
+| `Top-Same-Erasure`, `Top-Behaviour`
+| PROVED
+| `Wager.Top.Proofs.top-same-erasure`, `top-behaviour`. The variant and the translation of Stage 4 have one erasure. The behaviour part of T5 thus holds for the variant, for each term of the fragment.
+
+| `Top-Nominal`
+| PROVED
+| `Wager.Top.Proofs.top-nominal`. T6 for the variant.
+|===
+
+Checked instance in the algebra `{0, 1, ω}` with q = ω (`Wager.Top.Affine`): the function `λx. 5` is typed (`const-typed`). The translation of Stage 4 has no type for it there (`const-rejected`). A coercion function is typed with the binder grade ω (`box-typed`).
+
+*What this says about the second addition.* The second addition has a weaker sufficient form for a part of the fragment: a top grade q, with the translation `trq`, for programs with no elimination of a pair and no `case`. For the whole fragment the weaker form is not sufficient.
+The cause is in the target and not in the translation: the rules `t-letp` and `t-case` bind at the grade `𝟙` (F13, F27).
+
+*Not proved.*
+
+* That the second addition is necessary for the whole fragment. The counterexample is in one algebra.
+* The typing of a program with `letp` or `case` in the variant under the hypotheses of the second addition. This was not tried.
+* T3 and the cross-check of Stage 7 for the variant.
+* A target with a graded pair or a graded `case`. With such a rule the candidate can hold for the whole fragment. This is a proposal and not a result.
+
+[cols="1,8",options="header"]
+|===
+| Id | Finding
+
+| F27
+| A top grade does not replace an unrestricted grade `𝟙` for the whole fragment. The translation can write a top grade q on each arrow and each binder of a function, and a function that drops its argument is then typed in the algebra `{0, 1, ω}` (`const-typed`).
+  The elimination of a pair and `case` bind at `𝟙` by a rule of the target, so a program that drops a component still needs `𝟘 ≤ 𝟙` (`drop-rejected`).
+  The second addition is thus a fact about 2 rules of the target, `t-letp` and `t-case`, and not about the translation of functions.
+|===

@@ -785,3 +785,28 @@ The proof is the fundamental lemma of Stage 2, which is about a type in a contex
 * The statement `T8-Role` uses the definition `EnvLR` of `Wager.Role.Noninterference`, for a variable of each kind. `RoleStatements.agda` imports this definition from a module that also has proofs.
 * `T8-Role-Nominal` has no kinding hypothesis and no hypothesis `Valid`. It says that an instance respects conversion of the argument.
 * The typing judgement of terms does not use the kinding judgement (DC-8.2). The role of a type variable is a property of a type. No typing rule of Stage 8 checks it.
+
+== Side item after Stage 8: a top grade in the place of an unrestricted grade `𝟙`
+
+[[DC-8.8]]
+=== DC-8.8: the variant of the translation with a grade q
+
+*The question of the owner (2026-11-10, relayed by the parent session).* Is the second addition of the verdict, an unrestricted grade `𝟙` (`𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙`), stronger than necessary? The candidate: a top grade q (`∀ r → r ≤ q`) is enough, when the translation writes q.
+
+*Choice.* A variant of the translation in new modules (`Wager/Top`). No module of stages 1 to 8 changes.
+
+* Types: the translation of types of Stage 4, read with q in the place of `𝟙`. `T (τ ⇒ˢ σ)` is `arr q (T τ) (T σ)`. The module `Wager.Trans.Target` is used with the operations `opsq`, which are the operations with q for `𝟙`. `opsq` is used for this reading only: the typing judgement of each statement has the operations of the algebra.
+* Terms: the binder of a source function has the grade q (`trq`).
+* The map of a function in a coercion (`arrMapq`) binds the function at `𝟙` and the argument at q. With q on the two binders, the map of a pair of functions has no typing by the derivation of Stage 4: the map of a pair binds a component at `𝟙`, and a function with the binder grade q then uses the component at `q · 𝟙`. Agda did not check that no other derivation exists.
+
+*Result.* The candidate is FALSE for the whole source fragment, and TRUE for a part of it.
+
+* TRUE: for a top grade q and the laws of a grade algebra, each source term with no elimination of a pair and no `case` has a typed translation with the usage q for each variable (`Top-Typing`). A coercion is typed for each q, with no hypothesis on q (`Top-Coercion-Typed`).
+* FALSE: in the algebra `{0, 1, ω}` with q = ω, the translation of `let (x, y) = (5, 5) in 5` has no type (`Wager.Top.Affine.drop-rejected`, `Top-Typing-All-Fails`).
+
+*The cause.* The rules `t-letp` and `t-case` of Stage 1 bind a component of a pair and the variable of a branch at the grade `𝟙` (finding F13). The translation does not choose this grade. A program that drops such a variable needs `𝟘 ≤ 𝟙`.
+A program that gives such a variable to a function of the variant needs `q ≤ 𝟙`, by the same reading of the rule `t-app`. With a top grade q this makes `𝟙` a top grade, and then `𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙` hold. Agda does not check this second sentence.
+
+*Behaviour and T6.* The variant and the translation of Stage 4 have one erasure (`Top-Same-Erasure`), so the behaviour part of T5 holds for the variant (`Top-Behaviour`). T6 holds for the variant (`Top-Nominal`): the theorem of Stage 5 holds for each set of grade operations.
+
+*Not done.* A target with a graded pair or a graded `case`, in which a component has a grade other than `𝟙`. `VERDICT.adoc` already says that the target has no pair with a graded component. T3 and the cross-check of Stage 7 for the variant. A proof that the condition of `Top-Typing` is necessary.
