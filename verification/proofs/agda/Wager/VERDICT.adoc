@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: verdict
 Status: FINAL, after Stage 7 (2026-11-10). Two decisions are with the owner: the class of the kinding judgement (R1), and the class of the extension of Stage 6, part 2 (R23, R24).
+Stage 8 (2026-11-10) adds sections at the end of this file. No result of stages 1 to 7 changes.
 :toc: left
 :sectnums:
 
@@ -665,3 +666,192 @@ The draft asks the owner for 4 decisions:
 * The candidates are independent. The owner can take a part of the list.
 * W-9 and W-10 are two answers to one question. The owner can keep W-9 as the record of the limit with or without W-10.
 * Nothing in the experiment changes an existing obligation or its status.
+
+== Stage 8: terms with open types
+
+This section and the sections after it were added after the final verdict. They record Stage 8. They change no result above.
+
+*The decision of the owner (2026-11-10).* "Open types now, quantifier next." Stage 8 gives a term of the target a context Δ of type variables. It has no `∀` type former (DC-8.1). Stage 9 is the quantifier. It has a plan and no proof.
+
+*What Stage 8 is.* An extension of the target in separate modules (`Wager/Poly`). A term `Tmᵖ Δ n` has types in Δ, and the judgement `γ ▸ Γ ⊢ᵖ t ∶ A` has the 12 rules of the target judgement with the types in Δ (DC-8.2). A polymorphic program is an open term, and an instance is the term `inst σ t`.
+The 79 modules of stages 1 to 7 keep each definition, each statement and each proof. The 3 index modules have a new section at the end.
+
+=== Status of each statement of Stage 8
+
+Each statement is a type in a statement module of `Wager/Poly`, and `Wager.Statements` gives it a place (`T8-Statements`, `T8-Coercion-Statements`, `T8-Role-Statements`, `T8-Identity-Statements`). `Wager.Proofs` has one inhabitant for each.
+
+[cols="2,1,6",options="header"]
+|===
+| Statement | Status | Evidence and reading
+
+| `T8-Conv`
+| PROVED
+| `Wager.Proofs.t8-conv`. Conversion of types is stable under a substitution of types. For each signature.
+
+| `T8-Inst`
+| PROVED
+| `Wager.Proofs.t8-inst`. Each instance of a typed open term is typed, with the same usage vector. The type and the context are the instances. For each signature, each term signature and each set of grade operations.
+
+| `T8-Closed`
+| PROVED
+| `Wager.Proofs.t8-closed`. A typed term with no type variable is a typed term of the target of stages 1 to 5.
+
+| `T8-Closed-Instance`
+| PROVED
+| `Wager.Proofs.t8-closed-instance`. Each closed instance of a typed open term is a typed term of the target. It is the composition of the 2 statements above.
+
+| `T8-Instance-Progress`, `T8-Instance-Preservation`
+| PROVED
+| `Wager.Proofs.t8-instance-progress`, `t8-instance-preservation`. T0 applies to each closed instance: progress for each set of grade operations, preservation for the laws of a grade algebra.
+
+| `T8-Type-Instance`
+| PROVED
+| `Wager.Proofs.t8-type-instance`. The translation of an open source type commutes with instantiation.
+
+| `T8-Coercion-Typed`
+| PROVED
+| `Wager.Proofs.t8-coercion-typed`. ONE POLYMORPHIC COERCION: the translation of an open coercion is 1 typed open function of the target, at the open types. For each source signature that passes the role check, each state scheme and the laws of a grade algebra.
+
+| `T8-Coercion-Instance`
+| PROVED
+| `Wager.Proofs.t8-coercion-instance`. Each closed instance of that open function is the closed coercion function of Stage 4 (`coerceT`) for the instance of the coercion. The two are equal as terms. For each source signature, each state scheme and each set of grade operations.
+
+| `T8-Ops-Rigid`, `T8-No-Uniform-Unwrap`
+| PROVED (a limit)
+| `Wager.Proofs.t8-ops-rigid`, `t8-no-uniform-unwrap`. Instantiation does not change a trope operation. So no open term is the coercion `N a → body` at two different instances of a type variable a, for a newtype N with a parameter (DC-8.5).
+
+| `T8-Role`
+| PROVED
+| `Wager.Proofs.t8-role`. Noninterference for a type with free type variables: two instantiations that the observer `ρ · γ x` cannot tell apart at each variable x give two instances that the observer ρ cannot tell apart. For each composition table, and for a signature that respects its grades (`Valid`, the hypothesis of T2).
+
+| `T8-Role-Representational`, `T8-Role-Phantom`, `T8-Role-Nominal`
+| PROVED
+| `Wager.Proofs.t8-role-representational`, `t8-role-phantom`, `t8-role-nominal`. The lawful table and one type variable: a grade at most representational respects `≈`; the grade phantom gives one normal form; at the grade nominal an instance respects conversion of the argument.
+
+| `T8-Evidence-Rigid`, `T8-Gadt-Not-Open`
+| PROVED (a limit)
+| `Wager.Proofs.t8-evidence-rigid`, `t8-gadt-not-open`. In the signature of `Wager.Identity.Instance`, no open type with one type variable has the evidence type `Id α B`, or the data type of the GADT program, as its instance at each closed type α (DC-8.6).
+|===
+
+=== The 4 tasks of Stage 8
+
+. *Each closed instance of a typed open term is a typed term of the target, so T0 to T6 apply to it.* Done: `T8-Closed-Instance`. Progress and preservation are restated and proved for an instance. The other theorems are not restated (DC-8.3). T3, T5 and T6 are about the translation of a source program, so they apply to an instance that is such a translation.
+. *One polymorphic coercion.* Done, for the open coercions of DC-8.4: `T8-Coercion-Typed` and `T8-Coercion-Instance`. The example is the coercion from `a → Age` to `a → Int` (`Wager.Examples.Stage8.Open-Coercions.poly`), with its instances at `a := Bool` and at `a := Age`.
+  Not done, with a checked reason: a coercion that unwraps a newtype at a type variable (`T8-No-Uniform-Unwrap`).
+. *The role of a type variable.* Done: `T8-Role`, for each grade of the kinding context.
+. *The GADT program of Stage 6 as 1 open term with 1 open type.* Not done. The checked reason is `T8-Evidence-Rigid` and `T8-Gadt-Not-Open`, with the limits of DC-8.6: one signature, one type variable, a statement about a type. One part of the reason is by inspection of the rule `t-cast`.
+
+=== Checked examples of Stage 8
+
+`Wager.Examples.Stage8`:
+
+* Accepted: the polymorphic identity function `λ x : a. x` has the open type `a → a` (`idᵖ-typed`). Its instance at Int is the identity function at Int (`id-at-int`), a typed term of the target (`id-at-int-typed`), with progress (`id-at-int-progress`).
+* Rejected: the same open term does not have the open type `a → Int` (`id-not-to-int`). The proof uses the instance at Bool and `identity-one-type` of Stage 6.
+* Accepted: the polymorphic coercion from `a → Age` to `a → Int` is typed in the one-point grade algebra (`poly-typed`) and in the algebra `{0, 1, ω}` (`Open-Coercions-In-Affine.poly-typed`). Its instances at Bool and at Age are the 2 closed coercion functions of Stage 4 (`poly-at-bool`, `poly-at-age`).
+* Accepted: an open coercion that unwraps `Tag Int`, a newtype with a parameter at a closed argument (`tag-closed-typed`).
+* Rejected: no open term is the coercion `Tag a → Int` at the 2 instances `a := Int` and `a := Bool` (`no-poly-tag`).
+* Accepted: the open type `a → Proxy a` has the variable at the grade representational, and its instances at Age and at Int are equivalent (`accepted-representational`). The open type `isAge Int` has the variable at the grade phantom, and its instances at Age and at Bool have one normal form (`accepted-phantom`).
+* Rejected: kinding does not accept the grade representational for the variable of `isAge a`, and its instances at Age and at Int are not equivalent (`rejected`).
+* Rejected: no open type with one type variable has the evidence type `Id α Int` at each α (`no-open-evidence`), and none has the data type of the GADT program (`no-open-data`).
+* Accepted: an open type with 3 type variables has the data type at each α, when 2 variables get the 2 evidence types (`three-variables`). It does not give the program (DC-8.6).
+
+=== What Stage 8 changes in the limits of stages 3 to 6
+
+"A type is closed" was a limit of stages 3 to 6 (DC-3.1, DC-6.2). Stage 8 removes a part of it and keeps a part of it.
+
+[cols="3,2,5",options="header"]
+|===
+| Limit of an earlier stage | After Stage 8 | Evidence
+
+| A term of the target has closed types only.
+| Removed, with no quantifier.
+| `Tmᵖ`, `_▸_⊢ᵖ_∶_`, `T8-Inst`, `T8-Closed-Instance`.
+
+| A coercion is between closed types.
+| Removed for a function, a pair and a sum of type variables and closed types. Kept for a newtype at a type variable.
+| `T8-Coercion-Typed`, `T8-Coercion-Instance`; `T8-No-Uniform-Unwrap`.
+
+| T2 is about a closed type function and its argument.
+| Removed: the statement is about a type with free variables.
+| `T8-Role`.
+
+| A source term has no type variable (DC-3.1).
+| Kept.
+| Stage 8 has no source term with a type variable, and no theorem as T5 for one.
+
+| The statement of T7 is about each closed instance of the GADT program, and not about a polymorphic program (DC-6.2).
+| Kept.
+| `T8-Gadt-Not-Open`, DC-8.6.
+
+| There is no quantifier over types.
+| Kept. It is the subject of Stage 9.
+| DC-8.1.
+|===
+
+=== Not proved in Stage 8
+
+* A statement about an open term that does not go through a closed instance. An open term has no reduction relation.
+* The substitution part of T0 for an instance, and T3 for an instance of a polymorphic coercion. Each follows by composition with a proved statement, and Agda does not check a statement of it.
+* A translation of a source program with type variables, and a theorem as T5 for it.
+* An open coercion at a type-level function of a type variable (`F a`), and an open nominal coercion.
+* That a trope operation with type parameters removes the limit of DC-8.5. This is a proposal, not a result.
+* The limit of DC-8.6 for a signature other than `Wager.Identity.Instance`, for more than one type variable, and as a statement about terms.
+* That the typing judgement of Stage 8 respects roles. No typing rule uses the kinding judgement (DC-8.2, DC-8.7).
+* Parametricity. Stage 8 has no logical relation with relation variables. That is a part of Stage 9.
+
+=== Findings of Stage 8
+
+[cols="1,8",options="header"]
+|===
+| Id | Finding
+
+| F22
+| The type syntax, conversion and the noninterference proof of stages 1 and 2 were already about types in a context. Stage 8 needed no new lemma about types other than "conversion is stable under substitution" (`T8-Conv`).
+  The fundamental lemma of Stage 2 gives `T8-Role` with the lemma `eval-sub` of Stage 1.
+
+| F23
+| A trope operation has a closed carrier, and the target of Stage 4 has one unwrap operation for each closed instance of a newtype. So a coercion that unwraps a newtype at a type variable is not 1 open term (`T8-No-Uniform-Unwrap`).
+  The row scheme adds a second cause: the state of `N τ` depends on τ (DC-8.5). The first addition of the overall result (trope states with an index) thus has a cost for polymorphism. Agda checks the first cause and not the second.
+
+| F24
+| The identity family of Stage 6, part 2 is a family of base constants, and a substitution does not change a base constant. An equality with a type variable, such as `a ~ Int`, is not a type of the extension of Stage 6 in a context with the variable a (`T8-Evidence-Rigid`, for one signature).
+  The example of the task of Stage 6, `a ~ Int`, is thus still out of reach after Stage 8 (see F17).
+
+| F25
+| F23 and F24 have one shape: an entry of a signature is indexed by closed types (an operation by its carrier, a constant of the family by 2 types). An open type cannot name such an entry at a type variable.
+  A quantifier alone does not change this. Stage 9 needs a decision on signature entries with type parameters.
+
+| F26
+| No typing rule of the target, of the extension of Stage 6 or of Stage 8 uses the graded kinding judgement. The role of a type variable is a property of a type (`T8-Role`). The typing of a term does not check it.
+  This is by inspection of the 3 judgements. It was true in stages 1 to 7 and was not recorded as a finding.
+|===
+
+=== Changes to theorem statements in Stage 8
+
+None after a statement was put in a statement module.
+
+Process notes:
+
+* The first freeze (`T8-Conv`, `T8-Inst`, `T8-Closed`) was committed (`326d25f`) before its proofs. The first version of the proofs (`a2c9619`) did not type-check: 3 transports had a motive with implicit indices. The repair (`893f830`) names the indices. It changes no statement.
+* The second freeze (14 statements) was committed (`d7f4189`) before its proofs (`f2c8141`). The 3 modules of definitions that the statements name were written before the statements (`Poly/Term`, `Poly/Typing`, `Poly/Coercion`). They have no proof.
+* Lemmas that existed before the statements: the fundamental lemma of Stage 2 and `eval-sub` of Stage 1 (for `T8-Role`), and the typing proof of Stage 4, whose shape the proof of `T8-Coercion-Typed` follows.
+* `T8-Closed-Instance` is the composition of 2 statements that were proved before it was frozen. This is not the order "statement before proof" in substance.
+* The commit `d7f4189` was pushed while the proof gate was red: the MANIFEST did not list the modules of `Wager/Poly`. The 2 earlier commits of the stage were pushed in the same state. The gate is green from the commit that adds the examples and the MANIFEST entries.
+
+=== Ledgers after Stage 8
+
+* `RELATION-LEDGER.adoc`: no ADDED entry. One new "baseline, changed" entry, R26: the typing judgement of the extension of Stage 8 has a context of type variables. The owner asked for the extension, and the owner decides how the entry counts.
+  One new "source" entry (R27, open coercions), one "specification only" entry (R28) and one "proof-internal" entry (R29). The class of R13 is now "specification only": `T8-Role` uses `EnvLR`.
+* `RULE-DIFF-LEDGER.adoc`: no entry. The extension has 0 new typing rules, 0 new term formers, 0 new type formers and 0 new judgement forms. One rule has a changed text: `t-step` uses the closed carrier through a renaming.
+
+=== Effect of Stage 8 on the overall result
+
+The overall result does not change: W does not hold as written, and W holds for the fragment with 2 additions.
+
+Stage 8 is not a part of the fragment of W. It answers a question about the limits of the fragment:
+
+* The target does not need closed types. A term with type variables has the same 12 rules, and each closed instance is a term of the target of stages 1 to 5.
+* A representational coercion can be 1 polymorphic term, when it does not unwrap a newtype at a type variable.
+* 2 limits stay, and each is checked for the cases that this section names: the unwrap of a newtype at a type variable, and an equality assumption with a type variable.
+
+A third decision is with the owner after Stage 8: the class of R26.
