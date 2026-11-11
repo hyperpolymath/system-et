@@ -4,7 +4,9 @@
 -- SPDX-License-Identifier: MPL-2.0
 -- SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 --
--- Stage 8. Proofs of T8-Conv, T8-Inst and T8-Closed.
+-- Stage 8. Proofs of T8-Conv, T8-Inst, T8-Closed, T8-Closed-Instance,
+-- T8-Instance-Progress and T8-Instance-Preservation. The lemmas `sub-⇑`
+-- and `⇑-closed` are also used by `Wager.Poly.CoercionProofs`.
 open import Wager.L1.Signature
 open import Wager.Grade.Algebra
 import Wager.L2.Signature

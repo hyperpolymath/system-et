@@ -483,7 +483,7 @@ Each row is one change, alone. After each change the 2 commands `agda --safe Wag
 
 | All changes removed
 | None
-| PASS. The gate passed with 91 files before the watch. After the watch it ran with the 5 files of the side item: PASS, 96 files.
+| PASS, 91 files. This run was before the watch. The run after the watch had the 5 files of the side item also: see the last row of the next table.
 |===
 
 The second and the third test show that the proof of `T8-Closed` depends on the map `⌊_⌋` and on the text of a rule.
