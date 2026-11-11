@@ -80,3 +80,20 @@ verification/proofs/agda|Wager/Examples/Stage6Identity.agda|gated|Stage 6, part 
 verification/proofs/agda|Wager/Univalent/Model.agda|gated|Stage 7 (optional): the model of target types in the cubical universe, realisers, and the path of a coercion (definitions only)
 verification/proofs/agda|Wager/Univalent/CrossCheck.agda|gated|Stage 7 (optional): the translation of a representational coercion denotes transport along its path, for each source signature, state scheme, grade algebra and interpretation of the base constants
 verification/proofs/agda|Wager/Examples/Stage7.agda|gated|Stage 7 (optional): accepted and rejected closed examples
+verification/proofs/agda|Wager/Poly/Term.agda|gated|Stage 8: terms of the target with open types, instantiation, and the map from a term with no type variable to a target term (definitions only)
+verification/proofs/agda|Wager/Poly/Typing.agda|gated|Stage 8: the typing judgement for terms with open types; each rule is the rule of the target with the types in a context of type variables (definitions only)
+verification/proofs/agda|Wager/Poly/Statements.agda|gated|Stage 8: 6 statements about open terms and their closed instances (types only)
+verification/proofs/agda|Wager/Poly/Proofs.agda|gated|Stage 8: conversion is stable under substitution; each instance of a typed open term is typed; each closed instance is a typed target term, with progress and preservation
+verification/proofs/agda|Wager/Poly/Coercion.agda|gated|Stage 8: open source types, open representational coercions and their translation to 1 open term (definitions only)
+verification/proofs/agda|Wager/Poly/CoercionStatements.agda|gated|Stage 8: 5 statements about coercions at open types (types only)
+verification/proofs/agda|Wager/Poly/CoercionProofs.agda|gated|Stage 8: the open coercion is typed for the laws of a grade algebra; each closed instance is the closed coercion of Stage 4; no open term is the unwrap of a newtype at each instance of a type variable
+verification/proofs/agda|Wager/Poly/RoleStatements.agda|gated|Stage 8: 4 statements about the role of a type variable (types only)
+verification/proofs/agda|Wager/Poly/Role.agda|gated|Stage 8: noninterference for a type with free type variables, for each composition table and a valid signature; the lawful table at 1 variable
+verification/proofs/agda|Wager/Poly/IdentityStatements.agda|gated|Stage 8: 2 statements about the identity family and open types (types only)
+verification/proofs/agda|Wager/Poly/IdentityRigid.agda|gated|Stage 8: in the signature with an identity family, no open type with 1 type variable has the evidence types or the GADT data type as its instances
+verification/proofs/agda|Wager/Examples/Stage8.agda|gated|Stage 8: accepted and rejected examples for open terms, open coercions, the role of a type variable and the identity family
+verification/proofs/agda|Wager/Top/Translation.agda|gated|Side item after Stage 8: the translation of Stage 4 with a grade q on each arrow and each binder of a source function (definitions only)
+verification/proofs/agda|Wager/Top/Statements.agda|gated|Side item after Stage 8: 7 statements about the variant with a grade q; one is the candidate of the owner, to prove or to refute (types only)
+verification/proofs/agda|Wager/Top/AffineStatements.agda|gated|Side item after Stage 8: 2 statements in the algebra {0,1,omega} with q = omega (types only)
+verification/proofs/agda|Wager/Top/Proofs.agda|gated|Side item after Stage 8: a coercion is typed for each q; a term with no pair elimination and no case is typed for a top grade q; one erasure with Stage 4, so T5 behaviour and T6 hold for the variant
+verification/proofs/agda|Wager/Top/Affine.agda|gated|Side item after Stage 8: in {0,1,omega} with q = omega the candidate is false for the whole fragment (checked counterexample); accepted and rejected examples

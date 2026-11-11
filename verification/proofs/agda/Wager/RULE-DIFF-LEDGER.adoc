@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: rule-diff ledger
-Status: Stage 5. *The ledger is empty.*
+Status: Stage 8. *The ledger is empty.*
 :toc: left
 :sectnums:
 
@@ -136,3 +136,51 @@ The other statements of part 2 hold for each set of grade operations.
 == Stage 7
 
 Stage 7 adds no typing rule and no kinding rule to the target calculus. The cross-check is a statement about a model of the target of Stage 4.
+
+== Stage 8
+
+Stage 8 (terms with open types) is an extension of the target calculus, in separate modules (`Wager/Poly`). No rule of the target calculus changes. The extension adds no entry to this ledger.
+
+The evidence is structural, as for the target: `Wager.Poly.Typing` is a module with the parameter `ops : GradeOps (Sig.TG S)`. It takes the operations only. A rule can name a grade only as `𝟘`, as `𝟙`, or as a variable.
+
+The difference between the target and the extension:
+
+[cols="3,1,5",options="header"]
+|===
+| Item | Count | Text
+
+| New judgement forms
+| 0
+| The judgement `_▸_⊢ᵖ_∶_` has the form of the target judgement. Its types are in a context Δ of type variables (R26).
+
+| New typing rules
+| 0
+| The 12 rules of `Wager.L2.Typing`, with the types in Δ. Each rule names the grades that its rule of the target names.
+
+| Changed typing rules
+| 1
+| `t-step`: the carrier of a trope operation is a closed type of the signature, and the rule uses it in Δ through the renaming `⇑`.
+
+| New kinding rules
+| 0
+|
+
+| New conversion rules
+| 0
+| `DefEq` does not change. It is used at the context Δ.
+
+| New type formers
+| 0
+| There is no `∀`. A type variable is in the type syntax of Stage 1.
+
+| New term formers
+| 0
+| `Tmᵖ Δ n` has the 10 formers of `Tm n`. The type of a binder is a type in Δ. There is no type abstraction and no type application.
+
+| New entries of a signature
+| 0
+|
+|===
+
+`T8-Coercion-Typed` and `T8-Instance-Preservation` have the hypothesis `GradeLaws`. The proof of the first uses the laws that the proof of Stage 4 uses (`zero-add`, `one-mul`, `mul-zero`, `add-zero`). The second uses preservation of Stage 1. A hypothesis of a theorem is not a side condition of a rule, so it is not an entry of this ledger.
+The other statements of Stage 8 about terms hold for each set of grade operations.

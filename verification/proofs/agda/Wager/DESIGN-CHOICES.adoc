@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: design choices
-Status: entries of Stage 0 to Stage 5.
+Status: entries of Stage 0 to Stage 8.
 :toc: left
 :sectnums!:
 
@@ -670,3 +670,143 @@ A trope transition (wrap, unwrap) is thus an equivalence, and `ua unboxEquiv` is
 * congruence for a newtype gives the path of the body below the wrapper, by the role of the parameter.
 
 The path needs the source role check, as the typing of a translated coercion does (T3).
+
+== Stage 8
+
+[[DC-8.1]]
+=== DC-8.1: the owner chose open types first, and the quantifier next
+
+*The decision of the owner (2026-11-10).* "Open types now, quantifier next."
+
+* Stage 8: a term is typed in a context Δ of type variables. There is no `∀` type former.
+* Stage 9: the quantifier. The owner accepts a plan before any proof of Stage 9.
+
+*Choice.* The modules of Stage 8 are in `Wager/Poly` and in `Wager/Examples/Stage8.agda`. No definition, no statement and no proof of the 79 modules of stages 1 to 7 changes.
+The 3 index modules (`Everything.agda`, `Statements.agda`, `Proofs.agda`) get a section for Stage 8 at the end. `VERDICT.adoc` gets new sections, and its results of stages 1 to 7 do not change.
+
+*The reason for the stage.* Each limit of stages 3 to 6 that names "a type is closed" comes from one fact: a term has types `Ty [] ★` only (DC-3.1, DC-6.2). The type syntax of Stage 1 already has type variables, renaming and substitution.
+
+[[DC-8.2]]
+=== DC-8.2: a term with open types, and its typing judgement
+
+*Choice.* `Tmᵖ Δ n` (`Wager.Poly.Term`) is the term syntax of the target with one change: the type of a binder is a type in the context Δ. The judgement `γ ▸ Γ ⊢ᵖ t ∶ A` (`Wager.Poly.Typing`) has the 12 rules of the target judgement, with the types in Δ. No rule is new.
+The rule `t-step` uses the carrier of a trope operation. The carrier is a closed type of the signature, so the rule uses it through `⇑`, the renaming from the empty context.
+
+*Polymorphism without a quantifier.* A polymorphic program is an open term. An instance is the term `inst σ t`, for a substitution σ of types for the type variables. Instantiation is a function of Agda. It is not a term former: the calculus has no type abstraction and no type application.
+`⌊_⌋` maps a term with no type variable to a term of the target of stages 1 to 5.
+
+*Limits.*
+
+* An open term has no reduction relation. Progress and preservation are statements about a closed instance (DC-8.3).
+* A type variable has a kind, and a term uses a type of the kind ★. A term cannot take a type as an argument.
+* The judgement has no kinding premise: a type in a term is a type of `Wager.L1.Syntax`, with its simple kind. The graded kinding judgement is not used by a typing rule. This is the same in stages 1 to 5.
+* `Tmᵖ` has no substitution of terms and no renaming. Stage 8 does not need them.
+
+*Alternative.* A change of `Wager.L2.Term` to a term with a context Δ. This changes the modules of stages 1 to 7. The owner excluded it.
+
+[[DC-8.3]]
+=== DC-8.3: what "T0 to T6 apply to a closed instance" means
+
+*What Agda checks.* `T8-Closed-Instance`: for a typed open term and a substitution σ into the empty context, the term `⌊ inst σ t ⌋` is a typed term of the target, with the same usage vector, at the instance of the type. It is the composition of `T8-Inst` and `T8-Closed`.
+A theorem of stages 1 to 6 that is about each typed target term thus applies to the instance. Two are stated and proved for the instance: progress (`T8-Instance-Progress`, for each set of grade operations) and preservation (`T8-Instance-Preservation`, for the laws of a grade algebra).
+
+*What Agda does not check.*
+
+* The substitution part of T0 is not stated for an instance. It applies by the same composition.
+* T3, T5 and T6 are statements about the translation of a source program. They are not about each target term. They apply to an instance that is the translation of a source program. For an open coercion this is `T8-Coercion-Instance` (DC-8.4). No statement of T3 is restated for an instance.
+* T2 and T4 are statements about types. The statement of T2 for a type with free variables is `T8-Role` (DC-8.7).
+* No statement is about the open term alone: Stage 8 has no theorem "an open term is safe" that does not go through an instance.
+
+[[DC-8.4]]
+=== DC-8.4: open source types and open coercions
+
+*Choice.* An open source type (`OTy Δ`, `Wager.Poly.Coercion`) is a type variable of the kind ★, a closed source type, or a function, a pair or a sum of open source types. An open coercion (`Coᵒ`) is the identity, a closed representational coercion of Stage 3, symmetry, transitivity, or congruence for a function, a pair and a sum.
+The translation `coerceᵒ c` is 1 open term. The transformers have the text of `Wager.Trans.Coercion`, with the types in Δ.
+
+*What Agda checks.*
+
+* `T8-Coercion-Typed`: for a source signature that passes the role check and for the laws of a grade algebra, `coerceᵒ c` has the open type `Tᵒ θ → Tᵒ φ`, with the usage vector `0ᵘ`. The laws are needed for the same reason as in Stage 4: the map of a function is a β-redex, and its usage vector is equal to the usage vector of its argument by the laws.
+* `T8-Coercion-Instance`: for an instantiation ρ of the source and a substitution of the target that agrees with it, `⌊ inst s (coerceᵒ c) ⌋` and `coerceT (c ⟦ ρ ⟧ᶜ)` are equal as terms. The second term is the coercion function of Stage 4 for the instance of the coercion.
+* `T8-Type-Instance`: the instance of the translation of an open source type is the translation of the instance.
+
+*Limits.*
+
+* A newtype with a parameter can be in an open source type at a closed argument only. `Tag a`, with a type variable a, is not an open source type (DC-8.5).
+* A type-level function at a type variable, `F a`, is not an open source type. The target has the type `papp F (var x)`. Stage 8 does not translate to it.
+* An open coercion has no nominal part other than a closed nominal coercion below `c-sub`. There is no coercion variable.
+* There is no open source term and no translation of one. T5 is not stated for a program with type variables.
+* `Agrees` is a hypothesis about the type variables of the kind ★. The statement says nothing about a type variable of another kind, and an open source type has none.
+
+[[DC-8.5]]
+=== DC-8.5: a trope operation has a closed carrier
+
+*The fact.* A trope operation of a signature has one closed carrier type (`Wager.L2.Signature.TSig.carrier : Op → Ty [] ★`). In the target of Stage 4, the unwrap of `N τ` is the operation `(unwrap , N , τ)`: one operation for each closed source type τ (DC-4.3).
+Instantiation of types does not change an operation: `inst σ (step o t)` is `step o (inst σ t)`.
+
+*What Agda checks.* `T8-Ops-Rigid`: each closed instance of an open term has the list of operations of the open term. `T8-No-Uniform-Unwrap`: if one open term has the coercion function `N τ₁ → body` at one instantiation and the coercion function `N τ₂ → body` at another instantiation, then τ₁ and τ₂ are one source type.
+So the coercion `N a → body`, for a newtype N with a parameter and a type variable a, is not 1 open term of Stage 8. This holds for each source signature and each state scheme, the two-state scheme also: the cause is the closed carrier.
+
+*A second cause, for the row scheme.* The state of `N τ` is the index of τ (DC-4.1). It depends on the argument. A type with a type variable as the argument has no single state. Agda does not check a statement about this cause.
+
+*What can remove the limit.* A trope operation with type parameters: one operation `unwrap N` with a carrier in a context of type variables, and a rule `t-step` that instantiates it. This changes `TSig` and the rule `t-step`. It is not done. It is an input for the plan of Stage 9.
+
+[[DC-8.6]]
+=== DC-8.6: the GADT program of Stage 6 is not 1 open term with 1 open type
+
+*The task.* The GADT program of Stage 6 as 1 open term with 1 open type, in the identity extension, or a checked reason why not.
+
+*Result.* Not done as 1 open term. The reason has a checked part and a part by inspection.
+
+*The checked part.* The identity family is a family of base constants, `Id A B`, for two closed types (DC-6.5). A substitution of types does not change a base constant.
+In the signature of `Wager.Identity.Instance`, no open type with one type variable has the evidence type `Id α B` as its instance at each closed type α (`T8-Evidence-Rigid`), and none has the data type of the GADT program as its instance at each α (`T8-Gadt-Not-Open`). "Instance" is up to conversion.
+The data type of the statement is the data type of the example of Stage 6 (`Wager.Examples.Stage8.Identity-Family.same-data`).
+
+*The part by inspection.* An open type with 3 type variables has the data type at each α, when the two other variables get the two evidence types (`three-variables`, checked). This does not give the program. The rule `t-cast` needs evidence of a type of the form `base (Id A B)`. A term of the type of a type variable is not such evidence, so the cast of the program has no typing with this open type. Agda does not check this sentence: Stage 8 has no identity extension with open types.
+
+*Limits of the checked part.*
+
+* One signature. Agda checked no other signature with an identity family. A signature with an inspection primitive that gives a constant of the family is not excluded.
+* One type variable, of the kind ★.
+* The statement is about a type. It is not a statement "no open term is the program".
+
+*What can remove the limit.* An identity type that is a type former with two type arguments, so that `Id a Int` is a type in a context with the variable a. The type language of Stage 1 has unary constants only. This changes `Ty`. It is not done. It is an input for the plan of Stage 9.
+
+[[DC-8.7]]
+=== DC-8.7: the role of a type variable
+
+*Choice.* The role of a type variable is its grade in the kinding context: `γ ⊢ᵏ A` gives the type A a usage vector γ for its type variables (DC-1.3, R1).
+`T8-Role` is noninterference for A: let two closed instantiations give each variable x two types that the observer `ρ · γ x` cannot tell apart. Then the observer ρ cannot tell the two instances of A apart. It holds for each composition table and each signature that respects its grades (`Valid`, as in T2).
+The proof is the fundamental lemma of Stage 2, which is about a type in a context, and the lemma `eval-sub` of Stage 1.
+
+*The readable forms.* For the lawful table and one variable: `T8-Role-Representational`, `T8-Role-Phantom`, `T8-Role-Nominal`.
+
+*Notes.*
+
+* The statement `T8-Role` uses the definition `EnvLR` of `Wager.Role.Noninterference`, for a variable of each kind. `RoleStatements.agda` imports this definition from a module that also has proofs.
+* `T8-Role-Nominal` has no kinding hypothesis and no hypothesis `Valid`. It says that an instance respects conversion of the argument.
+* The typing judgement of terms does not use the kinding judgement (DC-8.2). The role of a type variable is a property of a type. No typing rule of Stage 8 checks it.
+
+== Side item after Stage 8: a top grade in the place of an unrestricted grade `𝟙`
+
+[[DC-8.8]]
+=== DC-8.8: the variant of the translation with a grade q
+
+*The question of the owner (2026-11-10, relayed by the parent session).* Is the second addition of the verdict, an unrestricted grade `𝟙` (`𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙`), stronger than necessary? The candidate: a top grade q (`∀ r → r ≤ q`) is enough, when the translation writes q.
+
+*Choice.* A variant of the translation in new modules (`Wager/Top`). No module of stages 1 to 8 changes.
+
+* Types: the translation of types of Stage 4, read with q in the place of `𝟙`. `T (τ ⇒ˢ σ)` is `arr q (T τ) (T σ)`. The module `Wager.Trans.Target` is used with the operations `opsq`, which are the operations with q for `𝟙`. `opsq` is used for this reading only: the typing judgement of each statement has the operations of the algebra.
+* Terms: the binder of a source function has the grade q (`trq`).
+* The map of a function in a coercion (`arrMapq`) binds the function at `𝟙` and the argument at q. With q on the two binders, the map of a pair of functions has no typing by the derivation of Stage 4: the map of a pair binds a component at `𝟙`, and a function with the binder grade q then uses the component at `q · 𝟙`. Agda did not check that no other derivation exists.
+
+*Result.* The candidate is FALSE for the whole source fragment, and TRUE for a part of it.
+
+* TRUE: for a top grade q and the laws of a grade algebra, each source term with no elimination of a pair and no `case` has a typed translation with the usage q for each variable (`Top-Typing`). A coercion is typed for each q, with no hypothesis on q (`Top-Coercion-Typed`).
+* FALSE: in the algebra `{0, 1, ω}` with q = ω, the translation of `let (x, y) = (5, 5) in 5` has no type (`Wager.Top.Affine.drop-rejected`, `Top-Typing-All-Fails`).
+
+*The cause.* The rules `t-letp` and `t-case` of Stage 1 bind a component of a pair and the variable of a branch at the grade `𝟙` (finding F13). The translation does not choose this grade. A program that drops such a variable needs `𝟘 ≤ 𝟙`.
+A program that gives such a variable to a function of the variant needs `q ≤ 𝟙`, by the same reading of the rule `t-app`. With a top grade q this makes `𝟙` a top grade, and then `𝟘 ≤ 𝟙` and `𝟙 + 𝟙 ≤ 𝟙` hold. Agda does not check this second sentence.
+
+*Behaviour and T6.* The variant and the translation of Stage 4 have one erasure (`Top-Same-Erasure`), so the behaviour part of T5 holds for the variant (`Top-Behaviour`). T6 holds for the variant (`Top-Nominal`): the theorem of Stage 5 holds for each set of grade operations.
+
+*Not done.* A target with a graded pair or a graded `case`, in which a component has a grade other than `𝟙`. `VERDICT.adoc` already says that the target has no pair with a graded component. T3 and the cross-check of Stage 7 for the variant. A proof that the condition of `Top-Typing` is necessary.

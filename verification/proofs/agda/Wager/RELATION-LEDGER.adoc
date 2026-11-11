@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 = Wager: relation ledger
-Status: Stage 7 (the last stage). Each stage added its entries in the same commit as its rules.
+Status: Stage 8. Each stage added its entries in the same commit as its rules, or in the commit of its records.
 :toc: left
 :sectnums:
 
@@ -23,7 +23,8 @@ Each entry has one class:
 
 An ADDED entry counts against the wager. *Stages 1 to 5 and Stage 6, part 1 have no ADDED entry.*
 Stage 6, part 2 has 2 entries with no class (R23, R24). The task says that the owner decides how they count.
-The ledger has one "baseline, changed" entry (R1). The owner decides how it counts.
+The ledger has one "baseline, changed" entry for the target calculus (R1). The owner decides how it counts.
+Stage 8 has no ADDED entry. It has one "baseline, changed" entry (R26): the typing judgement of the extension of Stage 8 has a context of type variables. The owner asked for this extension (DC-8.1), and the owner decides how it counts.
 
 == Judgement forms of the target calculus
 
@@ -115,8 +116,9 @@ The ledger has one "baseline, changed" entry (R1). The owner decides how it coun
 
 | R13
 | `LR`, `EnvLR` in `Wager.Role.Noninterference` (Stage 2)
-| proof-internal
+| proof-internal in stages 2 to 7; specification only since Stage 8
 | The logical relation on closed values, indexed by the role of the observer.
+  Since Stage 8 the statement `T8-Role` uses `EnvLR` (DC-8.7). No rule uses it.
 |===
 
 == Relations of the source calculus and of the erased calculus (Stage 3)
@@ -245,9 +247,45 @@ The statements of T7, part 2 use the evaluation of untyped terms (R16) and obser
 |===
 
 `⟦_⟧`, `pathOf` and `unboxEquiv` (`Wager.Univalent.Model`) are a function, a path and an equivalence. They are not relations.
+== Stage 8 (terms with open types)
+
+Stage 8 is an extension in separate modules (`Wager/Poly`). No judgement and no relation of stages 1 to 7 changes.
+
+[cols="1,3,2,5",options="header"]
+|===
+| Id | Agda identifier | Class | Notes
+
+| R26
+| `_▸_⊢ᵖ_∶_` in `Wager.Poly.Typing`
+| baseline, changed
+| The typing judgement for a term with open types. It has the form of R4 (`Γ ⊢ᵣ t : A` of 00-notation), and the types are in a context Δ of type variables. This is the change.
+  It is a new Agda data type (DC-8.2), with the 12 rules of R4. No rule is new. The only relation between types in a rule is `DefEq` (rule `t-conv`), at the context Δ.
+  R4 does not change. With no type variable, R26 gives R4 (`T8-Closed`).
+  The owner asked for the extension (DC-8.1). The owner decides how the entry counts.
+
+| R27
+| `Coᵒ` in `Wager.Poly.Coercion`
+| source
+| Representational coercions between open source types. Each instance is a coercion of R14 (`_⟦_⟧ᶜ`). The target has no such relation: the translation of an open coercion is a term (`coerceᵒ`).
+
+| R28
+| `Agrees` in `Wager.Poly.Coercion`
+| specification only
+| A substitution of the target agrees with an instantiation of the source. It is a hypothesis of `T8-Type-Instance` and of `T8-Coercion-Instance`. No rule uses it.
+
+| R29
+| `TyTrᵖ`, `IsoTypedᵖ`, `SemTyᵖ`, `Nat`, `NatIso` in `Wager.Poly.CoercionProofs`
+| proof-internal
+| A typed transformer of open terms, and a pair of transformers that agree on each instance.
+|===
+
+`inst`, `⌊_⌋`, `⇑`, `Tᵒ`, `_⟦_⟧`, `coIᵒ`, `coerceᵒ`, `opsOf` and `opsOfᵖ` are functions. They are not relations.
+The statements about the identity family (`T8-Evidence-Rigid`, `T8-Gadt-Not-Open`) use `DefEq` (R2) and no other relation.
+
 == What is absent
 
 * The target calculus has no coercion relation and no cast judgement. The coercion relation `Co` (R14) is in the source calculus only. The translation of Stage 4 makes each representational coercion a term of the target, with no new judgement.
 * Representational equivalence exists as "specification only" (R11). It is not a judgement of the calculus.
 * There is no subtyping relation between types.
 * The extension of Stage 6, part 2 has no equality judgement with assumptions and no cast judgement. It has a term former (`cast`) and a rule of the typing judgement (R23).
+* Stage 8 has no quantifier over types, no type abstraction and no type application. Instantiation is a function of Agda (`inst`). It is not a judgement.
