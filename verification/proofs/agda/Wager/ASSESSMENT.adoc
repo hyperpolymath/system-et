@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Wager: assessment
+Status: an assessment, not a result. Written on 2026-11-10 by the session that did stages 5 to 7. `VERDICT.adoc` is the authority for what Agda checked. If this file and the verdict disagree, the verdict is correct.
+:sectnums:
+
+== Purpose
+
+After the final verdict, the owner asked 4 questions: how far the wager got, what each repository can use, what work stays, and if the experiment was worth the time.
+The answers were given in a chat on 2026-11-10. This file records them, so that a later session can read them.
+The section "The result" says again what the verdict says. Each other section is a judgement of the session, not a checked statement.
+
+== The result
+
+W does not hold as written. W holds for the fragment with 2 additions.
+
+. A newtype with a parameter needs trope states with an index, not 2 states.
+. A whole program needs a grade algebra in which the grade `𝟙` is unrestricted. A coercion alone is typed in each grade algebra.
+
+Agda has one program for each addition that shows why the addition is necessary. Other results:
+
+* *Stage 6, part 2.* With an identity family, a local equality assumption is a variable at the grade `𝟘`, and the erasure of the proofs in casts is sound. The cost: equality evidence is a term. The verdict gives the facts for each answer to the question "does this add a relation?", and does not decide.
+* *Stage 7.* A translated coercion computes `transport` along a path that is made with `ua`.
+* *2 limits that the proofs showed.* The behaviour proof of Stage 6, part 2 does not use the grade. The erasure removes the evidence of a cast only, not evidence that is stored as data.
+
+The development has 79 modules, no `postulate`, and a gate watch for each stage.
+
+== What each repository can use
+
+[cols="1,5",options="header"]
+|===
+| Repository | Of substance
+
+| system-et
+| The draft ADR in `VERDICT.adoc`. `docs/theory/07-tropes.adoc` needs states with an index. The model has preservation and progress for trope transitions. That is evidence toward ET-12. It is not a proof of ET-12.
+
+| anytype
+| Its rule set, as modelled here, is type-safe for each grade algebra (T0). It needs 2 things: a validity check for the entries of a signature (the hypothesis `Valid` of T2), and trope states with an index (the change of T5).
+
+| affinescript
+| Little today. A text search of the compiler (`lib/`) found no newtype feature. Later it can use the design for zero-cost wrappers and for erased equality evidence.
+
+| Face languages
+| Nothing direct. A face adds no semantics.
+|===
+
+== Remaining work, in priority order
+
+. *The 4 decisions of the draft ADR* (owner): the kinding judgement, trope states with an index, the identity family, and which prover counts.
+. *Theory, type variables.* Each limit of stages 3 to 6 comes from closed types. The session judged this the step with the most value.
+. *Theory, ET-12* with states that have an index.
+. *Engineering in anytype:* the 2 items of the table.
+. *One reference calculus.* 4 formal tracks in the estate (Lean, Agda, Coq, Idris2) describe neighbouring calculi, and no proof connects them.
+. *Estate items*, state on 2026-11-10:
+** The quarantine in gitbot-fleet blocks the dispatch of the 3 recipes of this session (SonarQube token guard, invalid `e2e.yml`, SPDX lint rule).
+** The hole scanner of mathesis counts the word "admit" in a comment. This session did not repair it.
+** The name of this repository is `systemet` in some places and `system-et` in others.
+
+Repaired on 2026-11-10, after the assessment: the estate template has the token guard for SonarQube, and its SPDX lint rule stops at an indented workflow body.
+
+== Was the experiment worth the time?
+
+On the idea: yes. The question had an answer that Agda can check, and the answer was not a plain yes. It corrected the theory in 3 places: the trope states, the role table, and the validity condition.
+
+On the process: partly. A large part of the session went to CI drift. Each of the CI failures had a repair in the estate template; the repository had an old copy.
+
+The main risk is breadth. `docs/status/PROOF-STATUS.adoc` marks ET-1, ET-2, ET-4 and ET-5 as mechanised, each with a limit, and the other obligations as open. anytype is at the scaffolding stage. `docs/PROOF-NEEDS.adoc` of affinescript calls its real lift "the bulk of the remaining work".
+The wager helps the claim of the theory. It does not help to ship AffineScript v1. The session recommended that the owner choose one of those 2 goals for the next month.
