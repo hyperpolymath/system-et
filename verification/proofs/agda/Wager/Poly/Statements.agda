@@ -34,8 +34,11 @@ T8-Inst = ∀ {Δ Δ' n} (σ : TySub Δ' Δ) {γ : Usage n} {Γ : Cxᵖ Δ n}
           γ ▸ (λ i → sub σ (Γ i)) ⊢ᵖ inst σ t ∶ sub σ A
 
 -- T8-Closed. A typed term with no type variable is a typed term of the
--- target calculus of stages 1 to 5. So T0 to T6 apply to each closed
--- instance of an open term.
+-- target calculus of stages 1 to 5. A theorem about each typed target
+-- term, such as T0, thus applies to each closed instance of an open
+-- term, under its own hypotheses. T3, T5 and T6 are about the
+-- translation of a source program, and T2 and T4 are about types
+-- (DESIGN-CHOICES.adoc, DC-8.3). The statement below did not change.
 T8-Closed : Type
 T8-Closed = ∀ {n} {γ : Usage n} {Γ : Cxᵖ [] n} {t : Tmᵖ [] n} {A : Ty [] ★} →
             γ ▸ Γ ⊢ᵖ t ∶ A → γ ▸ Γ ⊢ ⌊ t ⌋ ∶ A
