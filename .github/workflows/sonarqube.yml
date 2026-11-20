@@ -62,6 +62,6 @@ jobs:
           fetch-depth: 0   # full history for accurate new-code detection
       - name: SonarQube Scan
         if: steps.cfg.outputs.configured == 'true'
-        uses: SonarSource/sonarqube-scan-action@v8.4.1
+        uses: SonarSource/sonarqube-scan-action@v8.5.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
