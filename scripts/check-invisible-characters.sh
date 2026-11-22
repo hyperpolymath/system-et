@@ -46,7 +46,7 @@ if [[ ${#findings[@]} -gt 0 ]]; then
       echo '## Invisible-character scan — blocked'
       echo
       echo "Found **${#findings[@]}** affected file(s):"
-      for file in "${findings[@]}"; do printf -- '- `%q`\n' "$file"; done
+      for file in "${findings[@]}"; do printf -- "- \`%q\`\n" "$file"; done
     } >> "$GITHUB_STEP_SUMMARY"
   fi
   exit 1

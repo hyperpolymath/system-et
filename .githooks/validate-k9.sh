@@ -228,13 +228,13 @@ validate_k9() {
             #      closed in one line, never reaching the ^[[:space:]]+ check on
             #      a subsequent iteration.)
             if [[ "$line" =~ ^[[:space:]]+name[[:space:]]*= ]] || \
-               [[ "$line" =~ [[:space:]]name[[:space:]]*= ]]; then
+                [[ "$line" =~ [[:space:]]name[[:space:]]*= ]]; then
                 has_pedigree_name=true
             fi
 
             # Check for version field
             if [[ "$line" =~ ^[[:space:]]+(version|schema_version)[[:space:]]*= ]] || \
-               [[ "$line" =~ [[:space:]](version|schema_version)[[:space:]]*= ]]; then
+                [[ "$line" =~ [[:space:]](version|schema_version)[[:space:]]*= ]]; then
                 has_pedigree_version=true
             fi
 
