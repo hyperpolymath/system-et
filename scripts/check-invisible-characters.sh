@@ -39,13 +39,14 @@ done < "$tmp/candidates"
 mapfile -d '' -t findings < "$tmp/findings"
 if [[ ${#findings[@]} -gt 0 ]]; then
   echo "::error::invisible-character scan found ${#findings[@]} file(s) with prohibited characters"
-  printf '  %s\n' "${findings[@]}"
+  # %q keeps control characters on one line; the fixed prefix keeps paths as data.
+  printf '  file: %q\n' "${findings[@]}"
   if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
     {
       echo '## Invisible-character scan — blocked'
       echo
       echo "Found **${#findings[@]}** affected file(s):"
-      for file in "${findings[@]}"; do printf -- '- `%s`\n' "$file"; done
+      for file in "${findings[@]}"; do printf -- '- `%q`\n' "$file"; done
     } >> "$GITHUB_STEP_SUMMARY"
   fi
   exit 1

@@ -21,7 +21,7 @@ for format in a2ml k9.ncl; do
   set -e
   [[ $status -ne 0 ]] || { echo "FAIL: invalid $format fixture passed" >&2; exit 1; }
   grep -Fq '%0A%3A%3Aerror%3A%3Aforged-command' "$tmp/$format.log"
-  if grep -Fqx '::error::forged-command' "$tmp/$format.log"; then
+  if grep -Fqx "::error::forged-command.$format" "$tmp/$format.log"; then
     echo "FAIL: $format file path injected a workflow command" >&2
     exit 1
   fi

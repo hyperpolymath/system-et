@@ -5,7 +5,7 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 scanner="$root/scripts/check-invisible-characters.sh"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
-mkdir -p "$tmp/clean" "$tmp/dirty"
+mkdir -p "$tmp/clean" "$tmp/dirty" "$tmp/forged"
 printf 'ordinary text\n' > "$tmp/clean/ok.adoc"
 printf 'ordinary source\n' > "$tmp/clean/ok.rs"
 bash "$scanner" "$tmp/clean" > "$tmp/clean.log"
@@ -19,6 +19,19 @@ if bash "$scanner" "$tmp/dirty" > "$tmp/dirty.log" 2>&1; then
 fi
 grep -Fq 'found 1 file(s)' "$tmp/dirty.log"
 grep -Fq 'bad.rs' "$tmp/dirty.log"
+
+forged="$tmp/forged/ordinary"$'\n'"::warning::forged-command.rs"$'\n'"::stop-commands::forged.rs"
+printf 'a\302\240b\n' > "$forged"
+if GITHUB_STEP_SUMMARY="$tmp/summary" bash "$scanner" "$tmp/forged" > "$tmp/forged.log" 2>&1; then
+  echo 'FAIL: scanner missed the finding in a file with a newline in its name' >&2
+  exit 1
+fi
+grep -Fq '::warning::forged-command.rs' "$tmp/forged.log"
+if [[ "$(grep -E '^[[:space:]]*(::|##\[)' "$tmp/forged.log")" != '::error::invisible-character scan found 1 file(s) with prohibited characters' ]] ||
+   grep -Eq '^[[:space:]]*(::|##\[)' "$tmp/summary"; then
+  echo 'FAIL: file path injected a workflow command' >&2
+  exit 1
+fi
 
 if bash "$scanner" "$tmp/missing" > "$tmp/missing.log" 2>&1; then
   echo 'FAIL: scanner accepted a missing scan root' >&2

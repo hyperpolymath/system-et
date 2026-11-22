@@ -146,7 +146,7 @@ jobs:
           if [ -f ".well-known/groove/manifest.json" ]; then
             HAS_MANIFEST="true"
             # Validate the manifest JSON
-            if ! jq -e 'type == "object" and (.service_id | type == "string" and length > 0)' .well-known/groove/manifest.json >/dev/null; then
+            if ! jq -es 'length == 1 and (.[0] | type == "object" and (.service_id | type == "string" and length > 0))' .well-known/groove/manifest.json >/dev/null; then
               echo "::error file=.well-known/groove/manifest.json::Groove manifest must be a JSON object with a non-empty service_id"
               exit 1
             fi

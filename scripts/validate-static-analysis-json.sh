@@ -16,7 +16,7 @@ fail() {
 case "$mode" in hypatia|assail|bridge) ;; *) fail "unknown report mode: $mode" ;; esac
 [[ -n "$file" && -s "$file" ]] || fail "missing or empty report: ${file:-<unset>}"
 command -v jq >/dev/null 2>&1 || fail "jq is required; no report was evaluated"
-jq -e . "$file" >/dev/null 2>&1 || fail "invalid JSON in $file"
+jq -es 'length == 1' "$file" >/dev/null 2>&1 || fail "invalid JSON in $file"
 [[ -n "$output" ]] || fail "GITHUB_OUTPUT is not set"
 
 write_findings_counts() {
@@ -60,8 +60,8 @@ case "$mode" in
     jq -e '
       type == "object" and .schema_version == "2.6" and
       (.coverage | type == "object" and .status == "complete" and
-       (.candidate_files | type == "number" and . >= 0) and
-       (.analyzed_files | type == "number" and . >= 0)) and
+       (.candidate_files | type == "number" and isfinite and . >= 0 and floor == .) and
+       (.analyzed_files | type == "number" and isfinite and . > 0 and floor == .)) and
       (.weak_points | type == "array") and
       all(.weak_points[];
         type == "object" and
@@ -86,12 +86,17 @@ case "$mode" in
       printf 'bridge_status=not_applicable\n' >> "$output"
     else
       jq -e '
-        type == "object" and
-        (.schema_version | type == "string" and length > 0) and
+        def classified($kind): [.cves[] | select(.classification == $kind)] | length;
+        type == "object" and .schema_version == "0.3.0" and
         (.vulnerability_data | IN("queried", "no-dependencies")) and
         (.cves | type == "array") and
         ([.mitigated, .unmitigable, .concatenative, .informational] |
-          all(.[]; type == "number" and . >= 0 and floor == .))
+          all(.[]; type == "number" and isfinite and . >= 0 and floor == .)) and
+        all(.cves[]; type == "object" and
+          (.classification | IN("mitigable", "unmitigable", "informational"))) and
+        .mitigated == classified("mitigable") and
+        .unmitigable == classified("unmitigable") and
+        .informational == classified("informational")
       ' "$file" >/dev/null || fail "expected online or confirmed no-dependencies Patch Bridge report"
       printf 'bridge_status=completed\n' >> "$output"
       {
