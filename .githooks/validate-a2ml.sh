@@ -285,6 +285,8 @@ validate_a2ml() {
     # --- Check 4: Section heading syntax ---
     # Validate that [section] headings are well-formed (no unclosed brackets)
     line_num=0
+    # report_issue uses the path as a label and writes only to stdout.
+    # shellcheck disable=SC2094
     while IFS= read -r line; do
         line_num=$((line_num + 1))
         # Lines starting with [ should have a matching ]

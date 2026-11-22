@@ -46,7 +46,7 @@ case "$mode" in
       all(.[];
         type == "object" and
         (.severity | type == "string" and
-         IN("critical", "high", "medium", "low", "info", "informational")) and
+          IN("critical", "high", "medium", "low", "info", "informational")) and
         (.file | type == "string") and
         ((.reason? // .message? // .type?) | type == "string" and length > 0)
       )
@@ -60,8 +60,8 @@ case "$mode" in
     jq -e '
       type == "object" and .schema_version == "2.6" and
       (.coverage | type == "object" and .status == "complete" and
-       (.candidate_files | type == "number" and isfinite and . >= 0 and floor == .) and
-       (.analyzed_files | type == "number" and isfinite and . > 0 and floor == .)) and
+        (.candidate_files | type == "number" and isfinite and . >= 0 and floor == .) and
+        (.analyzed_files | type == "number" and isfinite and . > 0 and floor == .)) and
       (.weak_points | type == "array") and
       all(.weak_points[];
         type == "object" and

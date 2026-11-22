@@ -28,7 +28,7 @@ if GITHUB_STEP_SUMMARY="$tmp/summary" bash "$scanner" "$tmp/forged" > "$tmp/forg
 fi
 grep -Fq '::warning::forged-command.rs' "$tmp/forged.log"
 if [[ "$(grep -E '^[[:space:]]*(::|##\[)' "$tmp/forged.log")" != '::error::invisible-character scan found 1 file(s) with prohibited characters' ]] ||
-   grep -Eq '^[[:space:]]*(::|##\[)' "$tmp/summary"; then
+    grep -Eq '^[[:space:]]*(::|##\[)' "$tmp/summary"; then
   echo 'FAIL: file path injected a workflow command' >&2
   exit 1
 fi
