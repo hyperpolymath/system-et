@@ -45,14 +45,14 @@ repos:
         entry: bash .githooks/validate-a2ml.sh
         language: system
         pass_filenames: false
-        files: '\.a2ml$'
+        files: '(\.a2ml$|^\.githooks/validate-a2ml\.sh$)'
 
       - id: validate-k9
         name: Validate K9 contracts
         entry: bash .githooks/validate-k9.sh
         language: system
         pass_filenames: false
-        files: '\.k9(\.ncl)?$'
+        files: '(\.k9(\.ncl)?$|^\.githooks/validate-k9\.sh$)'
 
       # Arrival pack drift: CLAUDE.md must stay in sync with a2ml.
       - id: validate-claude-md
