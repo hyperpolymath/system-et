@@ -1,0 +1,156 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= CI Gate Safety Register
+:revdate: 2026-11-22
+
+This register records the CI controls reviewed for this change. *Safe* means the
+check has a bounded, explicit subject; missing tools, invalid output and API or
+scanner errors cannot turn into a pass; and a green result means the stated
+check actually ran. An advisory or not-applicable result is not a pass for a
+mandatory check.
+
+== Scope and GitHub visibility
+
+The repository has no open pull requests at the time of this review, so there
+was no open PR checklist or check list to update. GitHub branch-protection API
+access returned HTTP 403 (`Resource not accessible by integration`); required
+contexts could not be read or changed. The latest historical `Static Analysis
+Gate` and `Dogfood Gate` runs in the available run list were green, but that
+alone did not establish that their tools had run or their output had been
+validated.
+
+== Decisions
+
+== Trust boundary still open
+
+The changed jobs use the pull-request checkout. A pull request that can change a
+workflow or one of its scripts can change the check implementation too; these
+local changes improve honest-run correctness but do not make the check's own
+source tamper-proof. The central suite's current tamper guard protects its
+`ci-gate*` paths, not this repository's `static-analysis-gate.yml` or
+`dogfood-gate.yml`. We could not inspect this repository's active ruleset or
+required contexts (the branch-protection API returned 403), so no claim is made
+that code-owner review or required checks close this trust boundary. The checks
+below are therefore *implementation-hardened, not yet qualified as an
+independent security boundary*.
+
+
+[cols="2,2,1,4",options="header"]
+|===
+|Workflow / control |Classification |State |Safety decision
+
+|`static-analysis-gate.yml` — panic-attack
+|Blocking on critical; advisory annotations below threshold
+|*Changed; live CI pending*
+|Builds from a fixed full commit, checks out that exact commit, uses the pinned
+Rust toolchain and lockfile, and runs the documented machine-readable command.
+The previous latest-release URL could return no asset and silently skip. Missing
+source/compiler, incomplete coverage, scanner failure, malformed or unknown
+report schema now fails. The validator understands the pinned `AssailReport`
+2.6 object (`weak_points`, PascalCase severities, complete coverage), rather
+than treating it as a findings array. Suppressed entries remain in the saved
+report but do not count toward blocking thresholds, as the scanner contract
+specifies.
+
+|`static-analysis-gate.yml` — Hypatia
+|Blocking on critical; advisory annotations below threshold
+|*Changed; live CI pending*
+|Builds at a fixed full commit with the committed dependency lock; clone,
+build, or scan failures are fatal. A finding array must have recognized
+severity, source file and description for every item. No empty-array fallback
+or zero-count substitution remains. Untrusted annotation fields are escaped.
+
+|`static-analysis-gate.yml` — Patch Bridge
+|Advisory and conditionally applicable
+|*Changed; live CI pending*
+|The scanner supports four named lockfile kinds; no supported tracked lockfile
+now produces an explicit `not_applicable` receipt, not a fabricated clean
+report. Applicable scans use the fixed panic-attack build, fail on command or
+schema errors, and reject `offline-unavailable` output. Unmitigable CVEs are
+still a human-review warning, not a blocking policy; the step is named
+accordingly.
+
+|`static-analysis-gate.yml` — finding deposit
+|Required evidence aggregation
+|*Changed; live CI pending*
+|The collector now checks out the validator and refuses missing or malformed
+scanner artifacts instead of manufacturing `[]` or zero-count Bridge data.
+The unified report consumes the actual AssailReport `weak_points` list.
+
+|`dogfood-gate.yml` — A2ML / K9
+|Required when applicable
+|*Changed; local checks pass*
+|A missing A2ML manifest fails for this repository. Config-bearing repositories
+with no K9 contracts fail; absence of covered configuration is explicitly
+not-applicable. Both existing validators pass locally (103 A2ML files, 17 K9
+files; A2ML reported six SPDX warnings).
+
+|`dogfood-gate.yml` — invisible-character scanner
+|Blocking
+|*Changed; local negative and positive controls pass*
+|Moved the scan to a tested helper. A no-match exit from `grep` is handled as a
+normal clean file, but grep/find errors fail; findings now fail the check. It
+reports paths without emitting unescaped user-controlled workflow annotations.
+
+|`dogfood-gate.yml` — Groove manifest
+|Conditional
+|*Changed; live CI pending*
+|A present manifest must be a JSON object with non-empty `service_id`; malformed
+or structurally incomplete JSON fails instead of emitting an annotation and
+continuing. No manifest is not applicable unless a service is detected; the
+existing missing-endpoint recommendation remains advisory.
+
+|`dogfood-gate.yml` — energy manifest and scorecard
+|Advisory / optional
+|*Existing; not a required assurance claim*
+|These signals remain informational. A missing optional energy manifest does
+not certify energy compliance; the summary score is not a security or build
+verdict.
+
+|`.githooks/validate-a2ml.sh`, `.githooks/validate-k9.sh` annotations
+|Output safety
+|*Changed; syntax and local validators pass*
+|Null-delimited file discovery handles newlines; file names and messages are
+escaped for GitHub workflow-command delimiters before annotation emission.
+
+|`quality.yml` — static report, invisible scan and annotation controls
+|Regression controls
+|*Added; local tests pass*
+|Positive and negative JSON/report controls, invisible-character fixtures, and
+newline-based workflow-command injection controls run in the quality job. The
+separate EditorConfig action still has `continue-on-error: true`; it is advisory
+and must not be counted as a required gate until that is removed and the action
+is witnessed failing on bad input.
+
+|`proven-cicd-and-workflows` `CI/gate` reusable
+|Not adopted
+|*Not qualified for this consumer*
+|The upstream suite's own README says its operational Idris2/GitHub adapter is
+unpromoted after a duplicate-field false-pass was reproduced, and its required
+profile for `hyperpolymath/system-et` is absent. Its documented
+`Assurance.Verdict` kernel is a pure decision model; the unverified adapter,
+observation admission and completeness are outside the proof. Calling that
+workflow or copying its profile would not make this consumer safe. No new
+Idris2 gate was invented here because there is no proven operational adapter
+that can bind GitHub's real run evidence to the kernel without trusting the
+same unverified boundary.
+|===
+
+== Verification performed locally
+
+* `bash tests/static-analysis-json.sh` — pass; positive cases and malformed,
+  missing, unknown-severity, incomplete-coverage, and offline cases.
+* `bash tests/check-invisible-characters.sh` — pass; clean and NBSP fixtures,
+  plus missing-root failure.
+* `bash tests/workflow-annotation-escaping.sh` — pass; crafted newline filenames
+  cannot inject GitHub workflow commands through A2ML/K9 annotations.
+* `bash scripts/check-invisible-characters.sh .` — pass; repository clean.
+* `bash .githooks/validate-a2ml.sh` — pass (six warnings; see above).
+* `bash .githooks/validate-k9.sh` — pass (17 files, zero warnings).
+* YAML parsing, Bash syntax and `git diff --check` — pass.
+
+The workspace has no `rustup`/`cargo` installation, so the two upstream scanner
+builds and the end-to-end GitHub Actions run were not executed locally. The
+changed gates remain *live-CI pending*, not certified safe, until their pinned
+builds, real scan outputs, artifact round-trip and failure controls are
+witnessed on the PR head. The Idris2 assurance kernel is intentionally not
+represented as evidence for that unverified runtime boundary.

@@ -62,9 +62,27 @@ WARNINGS=0
 # ---------------------------------------------------------------------------
 # Usage: annotate <level> <file> <line> <message>
 #   level: error | warning | notice
+escape_data() {
+    local value="$1"
+    value="${value//'%'/'%25'}"
+    value="${value//$'\r'/'%0D'}"
+    value="${value//$'\n'/'%0A'}"
+    printf '%s' "$value"
+}
+
+escape_property() {
+    local value
+    value="$(escape_data "$1")"
+    value="${value//':'/'%3A'}"
+    value="${value//','/'%2C'}"
+    printf '%s' "$value"
+}
+
 annotate() {
     local level="$1" file="$2" line="$3" message="$4"
-    echo "::${level} file=${file},line=${line}::${message}"
+    printf '::%s file=%s,line=%s::%s\n' \
+        "$level" "$(escape_property "$file")" \
+        "$(escape_property "$line")" "$(escape_data "$message")"
 }
 
 # ---------------------------------------------------------------------------
@@ -288,8 +306,11 @@ echo "::group::A2ML Manifest Validation"
 echo "Scanning ${SCAN_PATH} for .a2ml files..."
 echo ""
 
-# Find all .a2ml files, excluding .git directory
-mapfile -t a2ml_candidates < <(find "$SCAN_PATH" -name '*.a2ml' -not -path '*/.git/*' -type f | sort)
+# Null-delimited discovery preserves unusual paths; a broken find/sort must fail.
+discovery_tmp="$(mktemp)"
+trap 'rm -f "$discovery_tmp"' EXIT
+find "$SCAN_PATH" -name '*.a2ml' -not -path '*/.git/*' -type f -print0 | sort -z > "$discovery_tmp"
+mapfile -d '' -t a2ml_candidates < "$discovery_tmp"
 
 # Apply paths-ignore filter
 a2ml_files=()
@@ -319,7 +340,7 @@ echo "Found ${#a2ml_files[@]} .a2ml file(s)"
 echo ""
 
 for file in "${a2ml_files[@]}"; do
-    echo "  Validating: ${file}"
+    printf '  Validating: %s\n' "$(escape_data "$file")"
     validate_a2ml "$file"
 done
 

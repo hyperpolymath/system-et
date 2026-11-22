@@ -40,11 +40,11 @@ jobs:
           COUNT=$(find . \( -name '*.a2ml' -o -name '*.deed' \) -not -path './.git/*' | wc -l)
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
           if [ "$COUNT" -eq 0 ]; then
-            echo "::warning::No .a2ml/.deed manifest files found. Every RSR repo should have a repo deed (<reponame>_chora.deed); legacy 0-AI-MANIFEST.a2ml accepted mid-migration — standards #837"
+            echo "::error::No .a2ml/.deed manifests found; this repository requires machine-readable manifests."
+            exit 1
           fi
 
       - name: Validate A2ML manifests
-        if: steps.detect.outputs.count > 0
         run: bash .githooks/validate-a2ml.sh
       - name: Write summary
         run: |
@@ -53,9 +53,7 @@ jobs:
             cat <<'EOF' >> "$GITHUB_STEP_SUMMARY"
           ## A2ML Validation
 
-          :warning: **No .a2ml/.deed manifest files found.** Every RSR-compliant repo should have a repo deed (`<reponame>_chora.deed`) at its root.
-
-          Copy it from [rsr-template-repo](https://github.com/hyperpolymath/rsr-template-repo).
+          **Blocked:** no .a2ml/.deed manifests were found, but this repository requires machine-readable manifests.
           EOF
           else
             echo "## A2ML Validation" >> "$GITHUB_STEP_SUMMARY"
@@ -85,7 +83,11 @@ jobs:
           echo "k9_count=$COUNT" >> "$GITHUB_OUTPUT"
           echo "config_count=$CONFIG_COUNT" >> "$GITHUB_OUTPUT"
           if [ "$COUNT" -eq 0 ] && [ "$CONFIG_COUNT" -gt 0 ]; then
-            echo "::warning::Found $CONFIG_COUNT config files but no K9 contracts. Run k9iser to generate contracts."
+            echo "::error::Found $CONFIG_COUNT config files but no K9 contracts; contract coverage is required."
+            exit 1
+          fi
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::notice::No K9 files and no covered configs; K9 check is not applicable."
           fi
 
       - name: Validate K9 contracts
@@ -95,13 +97,11 @@ jobs:
         run: |
           K9_COUNT="${{ steps.detect.outputs.k9_count }}"
           CFG_COUNT="${{ steps.detect.outputs.config_count }}"
-          if [ "$K9_COUNT" -eq 0 ]; then
+          if [ "$K9_COUNT" -eq 0 ] && [ "$CFG_COUNT" -eq 0 ]; then
             cat <<'EOF' >> "$GITHUB_STEP_SUMMARY"
           ## K9 Contract Validation
 
-          :warning: **No .a2ml/.deed manifest files found.** Every RSR-compliant repo should have a repo deed (`<reponame>_chora.deed`) at its root.
-
-          Generate contracts with: `k9iser generate .`
+          Not applicable: no covered configuration files are present.
           EOF
           else
             echo "## K9 Contract Validation" >> "$GITHUB_STEP_SUMMARY"
@@ -121,58 +121,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
 
-      - name: Scan for invisible characters
-        id: lint
-        run: |
-          # Inline invisible character detection (from empty-linter's core patterns).
-          # Checks for: zero-width spaces, zero-width joiners, BOM, soft hyphens,
-          # non-breaking spaces, null bytes, and other invisible Unicode in source files.
-          set +e
-          PATTERNS='(*UTF)[\x00-\x08\x0B\x0C\x0E-\x1F\x{a0}\x{ad}\x{200b}-\x{200f}\x{202a}-\x{202f}\x{2060}\x{2066}-\x{2069}\x{feff}]'
-          find "$GITHUB_WORKSPACE" \
-            -not -path '*/.git/*' -not -path '*/node_modules/*' \
-            -not -path '*/.deno/*' -not -path '*/target/*' \
-            -not -path '*/_build/*' -not -path '*/deps/*' \
-            -not -path '*/external_corpora/*' -not -path '*/.lake/*' \
-            -type f \( -name '*.rs' -o -name '*.ex' -o -name '*.exs' -o -name '*.res' \
-              -o -name '*.js' -o -name '*.ts' -o -name '*.json' -o -name '*.toml' \
-              -o -name '*.yml' -o -name '*.yaml' -o -name '*.md' -o -name '*.adoc' \
-              -o -name '*.idr' -o -name '*.zig' -o -name '*.v' -o -name '*.jl' \
-              -o -name '*.gleam' -o -name '*.hs' -o -name '*.ml' -o -name '*.sh' \) \
-            -exec grep -alP "$PATTERNS" {} + > /tmp/empty-lint-results.txt
-          EL_EXIT=$?
-          set -e
-
-          FINDINGS=$(wc -l < /tmp/empty-lint-results.txt 2>/dev/null || echo 0)
-          echo "findings=$FINDINGS" >> "$GITHUB_OUTPUT"
-          echo "exit_code=$EL_EXIT" >> "$GITHUB_OUTPUT"
-          echo "ready=true" >> "$GITHUB_OUTPUT"
-
-          # Emit annotations for each file with invisible chars
-          while IFS= read -r filepath; do
-            [ -z "$filepath" ] && continue
-            REL_PATH="${filepath#$GITHUB_WORKSPACE/}"
-            echo "::warning file=${REL_PATH}::Invisible Unicode characters detected (zero-width space, BOM, NBSP, etc.)"
-          done < /tmp/empty-lint-results.txt
-
-      - name: Write summary
-        run: |
-          if [ "${{ steps.lint.outputs.ready }}" = "true" ]; then
-            FINDINGS="${{ steps.lint.outputs.findings }}"
-            if [ "$FINDINGS" -gt 0 ] 2>/dev/null; then
-              echo "## Empty-Linter Results" >> "$GITHUB_STEP_SUMMARY"
-              echo "" >> "$GITHUB_STEP_SUMMARY"
-              echo "Found **${FINDINGS}** invisible character issue(s). See annotations above." >> "$GITHUB_STEP_SUMMARY"
-            else
-              echo "## Empty-Linter Results" >> "$GITHUB_STEP_SUMMARY"
-              echo "" >> "$GITHUB_STEP_SUMMARY"
-              echo ":white_check_mark: No invisible character issues found." >> "$GITHUB_STEP_SUMMARY"
-            fi
-          else
-            echo "## Empty-Linter" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "Skipped: empty-linter not available." >> "$GITHUB_STEP_SUMMARY"
-          fi
+      - name: Enforce invisible-character policy
+        run: bash scripts/check-invisible-characters.sh .
 
   # ---------------------------------------------------------------------------
   # Job 4: Groove manifest check (for repos that should expose services)
@@ -196,11 +146,9 @@ jobs:
           if [ -f ".well-known/groove/manifest.json" ]; then
             HAS_MANIFEST="true"
             # Validate the manifest JSON
-            if ! jq empty .well-known/groove/manifest.json 2>/dev/null; then
-              echo "::error file=.well-known/groove/manifest.json::Invalid JSON in Groove manifest"
-            else
-              SVC_ID=$(jq -r '.service_id // "unknown"' .well-known/groove/manifest.json)
-              echo "service_id=$SVC_ID" >> "$GITHUB_OUTPUT"
+            if ! jq -e 'type == "object" and (.service_id | type == "string" and length > 0)' .well-known/groove/manifest.json >/dev/null; then
+              echo "::error file=.well-known/groove/manifest.json::Groove manifest must be a JSON object with a non-empty service_id"
+              exit 1
             fi
           fi
 
