@@ -20,15 +20,18 @@ fi
 grep -Fq 'found 1 file(s)' "$tmp/dirty.log"
 grep -Fq 'bad.rs' "$tmp/dirty.log"
 
-forged="$tmp/forged/ordinary"$'\n'"::warning::forged-command.rs"$'\n'"::stop-commands::forged.rs"
+forged="$tmp/forged/ordinary"$'\n'"::warning::forged-command.rs"$'\n'"::stop-commands::forged"$'\n'"##[warning]legacy.rs"
 printf 'a\302\240b\n' > "$forged"
 if GITHUB_STEP_SUMMARY="$tmp/summary" bash "$scanner" "$tmp/forged" > "$tmp/forged.log" 2>&1; then
   echo 'FAIL: scanner missed the finding in a file with a newline in its name' >&2
   exit 1
 fi
 grep -Fq '::warning::forged-command.rs' "$tmp/forged.log"
-if [[ "$(grep -E '^[[:space:]]*(::|##\[)' "$tmp/forged.log")" != '::error::invisible-character scan found 1 file(s) with prohibited characters' ]] ||
-    grep -Eq '^[[:space:]]*(::|##\[)' "$tmp/summary"; then
+grep -Eq '^  file: .*legacy\.rs' "$tmp/forged.log"
+if [[ "$(wc -l < "$tmp/forged.log")" -ne 2 ||
+      "$(grep -E '^[[:space:]]*::' "$tmp/forged.log")" != '::error::invisible-character scan found 1 file(s) with prohibited characters' ]] ||
+    grep -Eq '^[[:space:]]*::' "$tmp/summary" ||
+    grep -Fq '##[' "$tmp/forged.log" "$tmp/summary"; then
   echo 'FAIL: file path injected a workflow command' >&2
   exit 1
 fi

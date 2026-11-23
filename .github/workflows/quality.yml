@@ -43,6 +43,8 @@ jobs:
         run: bash tests/static-analysis-json.sh
       - name: Invisible-character scanner controls
         run: bash tests/check-invisible-characters.sh
+      - name: K9 pedigree validation controls
+        run: bash tests/validate-k9.sh
       - name: Workflow annotation escaping controls
         run: bash tests/workflow-annotation-escaping.sh
   docs:

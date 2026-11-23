@@ -39,14 +39,20 @@ done < "$tmp/candidates"
 mapfile -d '' -t findings < "$tmp/findings"
 if [[ ${#findings[@]} -gt 0 ]]; then
   echo "::error::invisible-character scan found ${#findings[@]} file(s) with prohibited characters"
-  # %q keeps control characters on one line; the fixed prefix keeps paths as data.
-  printf '  file: %q\n' "${findings[@]}"
+  # The runner searches anywhere on the line for the legacy prefix.
+  # Encode it before using %q to keep control characters on one line.
+  rendered=()
+  for file in "${findings[@]}"; do
+    printf -v path '%q' "${file//"##["/"%23%23%5B"}"
+    rendered+=("$path")
+  done
+  printf '  file: %s\n' "${rendered[@]}"
   if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
     {
       echo '## Invisible-character scan — blocked'
       echo
       echo "Found **${#findings[@]}** affected file(s):"
-      printf -- "- \`%q\`\n" "${findings[@]}"
+      printf -- "- \`%s\`\n" "${rendered[@]}"
     } >> "$GITHUB_STEP_SUMMARY"
   fi
   exit 1
