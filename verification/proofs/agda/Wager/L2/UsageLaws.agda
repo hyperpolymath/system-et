@@ -133,4 +133,3 @@ private
 -- The matrix of weakening.
 ⊛-wk : (γ : Usage n) → γ ⊛ (λ i → unit (suc i)) ≡ γ ▹ 𝟘
 ⊛-wk γ = ⊛-shift γ unit ∙ cong (_▹ 𝟘) (⊛-id γ)
-

@@ -13,6 +13,8 @@ repos:
       - id: check-yaml
       - id: check-json
       - id: check-toml
+        # This template has an unquoted numeric placeholder; the local hook renders it.
+        exclude: '^container/stapeln/manifest\.toml$'
       - id: check-merge-conflict
       - id: detect-private-key
       - id: check-added-large-files
@@ -39,6 +41,14 @@ repos:
 
   - repo: local
     hooks:
+      - id: validate-stapeln-manifest
+        name: Validate rendered Stapeln manifest
+        entry: python3 .githooks/validate-stapeln-manifest.py
+        language: system
+        pass_filenames: false
+        args: [container/stapeln/manifest.toml]
+        files: '^(container/stapeln/manifest\.toml|\.githooks/validate-stapeln-manifest\.py)$'
+
       # The Dogfood Gate uses these validators. They discover their own inputs.
       - id: validate-a2ml
         name: Validate A2ML manifests

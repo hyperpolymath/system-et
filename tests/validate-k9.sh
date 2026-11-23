@@ -10,7 +10,7 @@ check_pedigree() {
   local expected="$1" message="$2" status=0
   shift 2
   printf 'K9!\n# SPDX-License-Identifier: MPL-2.0\n%s' "$*" > "$tmp/input/fixture.k9.ncl"
-  INPUT_STRICT=true INPUT_PATH="$tmp/input" INPUT_PATHS_IGNORE= GITHUB_OUTPUT=/dev/null \
+  INPUT_STRICT=true INPUT_PATH="$tmp/input" INPUT_PATHS_IGNORE='' GITHUB_OUTPUT=/dev/null \
     bash "$root/.githooks/validate-k9.sh" > "$tmp/result" || status=$?
   if [[ "$status" != "$expected" ]] || ! grep -Fq "$message" "$tmp/result"; then
     cat "$tmp/result" >&2

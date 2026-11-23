@@ -28,13 +28,11 @@ ports = ["8080:8080"]
 
 # Environment variables passed into the container at startup.
 # These override defaults in the Containerfile ENV directives.
-environment = {
-  RUST_LOG = "info",                  # Rust log level (trace, debug, info, warn, error)
-  APP_HOST = "[::]",                  # Listen on all interfaces (IPv4 + IPv6)
-  APP_PORT = "8080",                  # Internal container port
-  APP_LOG_FORMAT = "json",            # Structured logging for selur/vordr
-  APP_DATA_DIR = "/data",             # Persistent data directory (matches VOLUME)
-}
+environment.RUST_LOG = "info"                  # Rust log level (trace, debug, info, warn, error)
+environment.APP_HOST = "[::]"                  # Listen on all interfaces (IPv4 + IPv6)
+environment.APP_PORT = "8080"                  # Internal container port
+environment.APP_LOG_FORMAT = "json"            # Structured logging for selur/vordr
+environment.APP_DATA_DIR = "/data"             # Persistent data directory (matches VOLUME)
 
 # Bind-mount a named volume for persistent data.
 # Format: "volume-name:/container/path"
@@ -60,12 +58,10 @@ ports = ["4000:4000"]
 
 # The worker connects to the Rust API over the internal selur network.
 # Service names resolve as hostnames within the compose network.
-environment = {
-  API_URL = "http://rust-api:8080/api/v1",   # Internal service discovery
-  MIX_ENV = "prod",                           # Elixir release mode
-  APP_LOG_FORMAT = "json",                    # Match structured logging format
-  POOL_SIZE = "10",                           # DB connection pool size
-}
+environment.API_URL = "http://rust-api:8080/api/v1"   # Internal service discovery
+environment.MIX_ENV = "prod"                           # Elixir release mode
+environment.APP_LOG_FORMAT = "json"                    # Match structured logging format
+environment.POOL_SIZE = "10"                           # DB connection pool size
 
 # depends_on ensures the Rust API starts before the worker.
 # Note: This only waits for the container to start, not for the health check.
@@ -90,17 +86,15 @@ image = "ghcr.io/hyperpolymath/svalinn:latest.ctp"
 # External-facing ports: HTTPS (443) and HTTP->HTTPS redirect (80).
 ports = ["443:443", "80:80"]
 
-environment = {
-  # Backend routing: svalinn proxies to internal services.
-  SVALINN_BACKEND = "http://rust-api:8080",
-  SVALINN_WORKER_BACKEND = "http://elixir-worker:4000",
+# Backend routing: svalinn proxies to internal services.
+environment.SVALINN_BACKEND = "http://rust-api:8080"
+environment.SVALINN_WORKER_BACKEND = "http://elixir-worker:4000"
 
-  # Policy file: mounted from the svalinn-config volume.
-  SVALINN_POLICY_FILE = "/etc/svalinn/gatekeeper.yaml",
+# Policy file: mounted from the svalinn-config volume.
+environment.SVALINN_POLICY_FILE = "/etc/svalinn/gatekeeper.yaml"
 
-  # Auto-provision TLS certificates (Let's Encrypt).
-  SVALINN_TLS_AUTO = "true",
-}
+# Auto-provision TLS certificates (Let's Encrypt).
+environment.SVALINN_TLS_AUTO = "true"
 
 # Mount .gatekeeper.yaml as read-only policy configuration.
 volumes = ["svalinn-config:/etc/svalinn:ro"]

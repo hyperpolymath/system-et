@@ -173,13 +173,13 @@ missing="$(comm -23 <(printf '%s\n' "$listed") <(printf '%s\n' "$found") || true
 
 if [ -n "${unlisted//[[:space:]]/}" ]; then
   echo "FAIL: .$EXT proofs on disk but absent from $MANIFEST_FILE:"
-  printf '  %s\n' $unlisted
+  printf '  %s\n' "${unlisted//$'\n'/$'\n  '}"
   echo "      List each as 'gated' or 'quarantine'; new proofs are gated by default."
   fails=$((fails + 1))
 fi
 if [ -n "${missing//[[:space:]]/}" ]; then
   echo "FAIL: MANIFEST lists modules that do not exist (stale entries):"
-  printf '  %s\n' $missing
+  printf '  %s\n' "${missing//$'\n'/$'\n  '}"
   fails=$((fails + 1))
 fi
 [ -z "${unlisted//[[:space:]]/}${missing//[[:space:]]/}" ] && \
