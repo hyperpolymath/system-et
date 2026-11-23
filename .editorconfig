@@ -69,3 +69,25 @@ indent_size = 2
 indent_style = space
 indent_size = 4
 
+# Prose, legal text and proofs use alignment within paragraphs and expressions.
+[*.{md,adoc,agda,lean}]
+indent_size = unset
+
+[LICENSES/CC-BY-SA-4.0.txt]
+indent_size = unset
+
+[docs/legal/EXHIBIT-{A-ETHICAL-USE,B-QUANTUM-SAFE}.txt]
+indent_size = unset
+
+# Embedded shell/JQ and aligned template data use a different indent width.
+[{Justfile,.machine_readable/contractiles/Justfile,.github/scripts/classify-issue.jq}]
+indent_size = unset
+
+[.github/workflows/{label-triage,labels,openssf-compliance,secret-scanner}.yml]
+indent_size = unset
+
+[{scripts/scan-dangerous.sh,scripts/validate-template.sh,tests/e2e/template_instantiation_test.sh}]
+indent_size = unset
+
+[{.machine_readable/contractiles/trust/Trustfile.a2ml,machine-readable-design/canonical-directory-structure/Trustfile.a2ml,.machine_readable/contractiles/intend/intend.k9.ncl,systemet_chora.deed,verification/proofs/lean4/lake-manifest.json}]
+indent_size = unset

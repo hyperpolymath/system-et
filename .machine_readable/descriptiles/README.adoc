@@ -27,4 +27,3 @@ Source .scm files should be removed after successful transpilation.
 
 - [A2ML Repository Template](https://github.com/hyperpolymath/standards/blob/main/A2ML-REPO-TEMPLATE.adoc)
 - [6A2 Format Family](https://github.com/hyperpolymath/standards#a2ml-format-family-7-formats)
-

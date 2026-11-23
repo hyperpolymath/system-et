@@ -17,6 +17,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC2034 # Used by the example preflight below.
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 PASS=0
@@ -32,6 +33,7 @@ bold()  { printf '\033[1m%s\033[0m\n' "$*"; }
 # ─── Assertion helpers ───────────────────────────────────────────────
 
 # check <label> <expected-substring> <actual>
+# shellcheck disable=SC2317 # Called by the examples when enabled.
 check() {
     local name="$1" expected="$2" actual="$3"
     if echo "$actual" | grep -q "$expected"; then
@@ -44,6 +46,7 @@ check() {
 }
 
 # check_status <label> <expected-http-status> <actual-http-status>
+# shellcheck disable=SC2317 # Called by the examples when enabled.
 check_status() {
     local name="$1" expected="$2" actual="$3"
     if [ "$actual" = "$expected" ]; then
@@ -56,6 +59,7 @@ check_status() {
 }
 
 # skip <label> <reason>
+# shellcheck disable=SC2317 # Called by the examples when enabled.
 skip_test() {
     yellow "  SKIP: $1 ($2)"
     SKIP=$((SKIP + 1))
