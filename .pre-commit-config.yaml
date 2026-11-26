@@ -43,11 +43,11 @@ repos:
     hooks:
       - id: validate-stapeln-manifest
         name: Validate rendered Stapeln manifest
-        entry: python3 .githooks/validate-stapeln-manifest.py
+        entry: bash .githooks/validate-stapeln-manifest.sh
         language: system
         pass_filenames: false
         args: [container/stapeln/manifest.toml]
-        files: '^(container/stapeln/manifest\.toml|\.githooks/validate-stapeln-manifest\.py)$'
+        files: '^(container/stapeln/manifest\.toml|\.githooks/validate-stapeln-manifest\.sh)$'
 
       # The Dogfood Gate uses these validators. They discover their own inputs.
       - id: validate-a2ml
