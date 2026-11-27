@@ -11,7 +11,10 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+      # devcontainer.json is JSONC by specification, not strict JSON.
+      # Separate JSONC-aware validation is required for this path.
       - id: check-json
+        exclude: '^\.devcontainer/devcontainer\.json$'
       - id: check-toml
         # This template has an unquoted numeric placeholder; the local hook renders it.
         exclude: '^container/stapeln/manifest\.toml$'
