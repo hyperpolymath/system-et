@@ -28,4 +28,3 @@ When multiple agents may write to A2ML files concurrently:
 3. Write updated file with new [provenance] metadata
 4. Release by removing lock file
 5. On conflict: re-read and retry if git-sha-at-read does not match HEAD
-

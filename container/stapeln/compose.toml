@@ -25,15 +25,13 @@ version = "1.0"
 # ============================================================================
 
 # Primary application service
-[services.{{SERVICE_NAME}}]
+[services."{{SERVICE_NAME}}"]
 image = "{{REGISTRY}}/{{SERVICE_NAME}}:latest.ctp"
 ports = ["{{PORT}}:{{PORT}}"]
-environment = {
-  APP_HOST = "[::]",
-  APP_PORT = "{{PORT}}",
-  APP_LOG_FORMAT = "json",
-  APP_DATA_DIR = "/data",
-}
+environment.APP_HOST = "[::]"
+environment.APP_PORT = "{{PORT}}"
+environment.APP_LOG_FORMAT = "json"
+environment.APP_DATA_DIR = "/data"
 volumes = ["{{SERVICE_NAME}}-data:/data"]
 restart = "always"
 healthcheck = { test = "curl -sf http://localhost:{{PORT}}/health", interval = "30s", timeout = "5s", retries = 3 }
@@ -44,13 +42,11 @@ healthcheck = { test = "curl -sf http://localhost:{{PORT}}/health", interval = "
 [services.rokur]
 image = "ghcr.io/hyperpolymath/rokur:latest.ctp"
 ports = ["8081:8081"]
-environment = {
-  ROKUR_BACKEND = "http://{{SERVICE_NAME}}:{{PORT}}",
-  ROKUR_LISTEN = "[::]:8081",
-  ROKUR_REQUIRED_SECRETS = "",
-  ROKUR_AUDIT_LOG = "/var/log/rokur/audit.jsonl",
-  ROKUR_LOG_FORMAT = "json",
-}
+environment.ROKUR_BACKEND = "http://{{SERVICE_NAME}}:{{PORT}}"
+environment.ROKUR_LISTEN = "[::]:8081"
+environment.ROKUR_REQUIRED_SECRETS = ""
+environment.ROKUR_AUDIT_LOG = "/var/log/rokur/audit.jsonl"
+environment.ROKUR_LOG_FORMAT = "json"
 volumes = ["rokur-audit:/var/log/rokur"]
 depends_on = ["{{SERVICE_NAME}}"]
 restart = "always"
@@ -61,11 +57,9 @@ healthcheck = { test = "curl -sf http://localhost:8081/health", interval = "30s"
 [services.svalinn]
 image = "ghcr.io/hyperpolymath/svalinn:latest.ctp"
 ports = ["443:443", "80:80"]
-environment = {
-  SVALINN_BACKEND = "http://rokur:8081",
-  SVALINN_POLICY_FILE = "/etc/svalinn/gatekeeper.yaml",
-  SVALINN_TLS_AUTO = "true",
-}
+environment.SVALINN_BACKEND = "http://rokur:8081"
+environment.SVALINN_POLICY_FILE = "/etc/svalinn/gatekeeper.yaml"
+environment.SVALINN_TLS_AUTO = "true"
 volumes = ["svalinn-config:/etc/svalinn:ro"]
 depends_on = ["rokur"]
 restart = "always"
@@ -75,7 +69,7 @@ healthcheck = { test = "curl -sf http://localhost:80/health", interval = "30s", 
 # Volumes
 # ============================================================================
 
-[volumes.{{SERVICE_NAME}}-data]
+[volumes."{{SERVICE_NAME}}-data"]
 driver = "local"
 
 [volumes.rokur-audit]

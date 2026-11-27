@@ -35,9 +35,18 @@ jobs:
       - name: Check for large files
         run: |
           find . -type f -size +1M -not -path "./.git/*" | head -10 || echo "No large files"
-      - name: EditorConfig check
+      # Advisory only: continue-on-error means this result is never a gate.
+      - name: EditorConfig advisory (non-blocking)
         uses: editorconfig-checker/action-editorconfig-checker@v3.0.0
         continue-on-error: true
+      - name: Static-analysis report contract regressions
+        run: bash tests/static-analysis-json.sh
+      - name: Invisible-character scanner controls
+        run: bash tests/check-invisible-characters.sh
+      - name: K9 pedigree validation controls
+        run: bash tests/validate-k9.sh
+      - name: Workflow annotation escaping controls
+        run: bash tests/workflow-annotation-escaping.sh
   docs:
     runs-on: ubuntu-latest
     timeout-minutes: 15

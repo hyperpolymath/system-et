@@ -16,26 +16,12 @@ repos:
       - id: check-json
         exclude: '^\.devcontainer/devcontainer\.json$'
       - id: check-toml
+        # This template has an unquoted numeric placeholder; the local hook renders it.
+        exclude: '^container/stapeln/manifest\.toml$'
       - id: check-merge-conflict
       - id: detect-private-key
       - id: check-added-large-files
         args: ['--maxkb=1024']
-
-  # Use the checked-in validators also run by the Dogfood Gate.
-  - repo: local
-    hooks:
-      - id: validate-a2ml
-        name: Validate A2ML manifests
-        entry: bash .githooks/validate-a2ml.sh
-        language: system
-        pass_filenames: false
-        files: '\.a2ml$'
-      - id: validate-k9
-        name: Validate K9 contracts
-        entry: bash .githooks/validate-k9.sh
-        language: system
-        pass_filenames: false
-        files: '\.k9(\.ncl)?$'
 
   # --- Shell linting ---
   - repo: https://github.com/shellcheck-py/shellcheck-py
@@ -56,9 +42,32 @@ repos:
     hooks:
       - id: gitleaks
 
-  # --- Arrival pack drift: CLAUDE.md must stay in sync with a2ml ---
   - repo: local
     hooks:
+      - id: validate-stapeln-manifest
+        name: Validate rendered Stapeln manifest
+        entry: bash .githooks/validate-stapeln-manifest.sh
+        language: system
+        pass_filenames: false
+        args: [container/stapeln/manifest.toml]
+        files: '^(container/stapeln/manifest\.toml|\.githooks/validate-stapeln-manifest\.sh)$'
+
+      # The Dogfood Gate uses these validators. They discover their own inputs.
+      - id: validate-a2ml
+        name: Validate A2ML manifests
+        entry: bash .githooks/validate-a2ml.sh
+        language: system
+        pass_filenames: false
+        files: '(\.a2ml$|^\.githooks/validate-a2ml\.sh$)'
+
+      - id: validate-k9
+        name: Validate K9 contracts
+        entry: bash .githooks/validate-k9.sh
+        language: system
+        pass_filenames: false
+        files: '(\.k9(\.ncl)?$|^\.githooks/validate-k9\.sh$)'
+
+      # Arrival pack drift: CLAUDE.md must stay in sync with a2ml.
       - id: validate-claude-md
         name: CLAUDE.md arrival pack in sync with a2ml
         entry: bash .machine_readable/arrival-pack/verify.sh

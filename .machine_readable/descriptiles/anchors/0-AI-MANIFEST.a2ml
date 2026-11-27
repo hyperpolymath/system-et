@@ -18,4 +18,3 @@ Each version represents a specific recalibration point.
 - Multiple versions with different dates are permitted
 - No other A2ML files in this directory
 - Single source of truth for anchor documents
-

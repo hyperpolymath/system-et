@@ -40,7 +40,13 @@ a step-level action with a record in `actions.lock`.
 * `sonarqube.yml` — SonarCloud (shell / JS surface; see `sonar-project.properties`).
   With no `SONAR_TOKEN` secret, the job says that the scan is not configured
   and passes. The SonarCloud app still analyses each pull request.
-* `static-analysis-gate.yml` — panic-attack + Hypatia gate (see above).
+* `static-analysis-gate.yml` — panic-attack + Hypatia critical-finding gate,
+  with validated scanner receipts (see `docs/ci-gates/REGISTER.adoc`). Both
+  scanner sources are full-commit pinned and scanner/build/schema failures are
+  fatal; the collector refuses to invent empty reports. Patch Bridge is an
+  explicitly advisory, conditional triage signal, not a blocking security
+  status. This gate is still awaiting a live Actions run of its pinned builds.
 
 Each targets a different language/surface; together they cover what no single
-analyser does.
+analyser does. A green status is only evidence for the specifically documented
+threshold and applicable scan scope; it is not a proof of absence of all bugs.

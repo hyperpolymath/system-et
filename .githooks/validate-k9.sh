@@ -64,9 +64,27 @@ VALID_LEVELS="kennel yard hunt"
 # ---------------------------------------------------------------------------
 # Helper: emit GitHub annotation
 # ---------------------------------------------------------------------------
+escape_data() {
+    local value="$1"
+    value="${value//'%'/'%25'}"
+    value="${value//$'\r'/'%0D'}"
+    value="${value//$'\n'/'%0A'}"
+    printf '%s' "$value"
+}
+
+escape_property() {
+    local value
+    value="$(escape_data "$1")"
+    value="${value//':'/'%3A'}"
+    value="${value//','/'%2C'}"
+    printf '%s' "$value"
+}
+
 annotate() {
     local level="$1" file="$2" line="$3" message="$4"
-    echo "::${level} file=${file},line=${line}::${message}"
+    printf '::%s file=%s,line=%s::%s\n' \
+        "$level" "$(escape_property "$file")" \
+        "$(escape_property "$line")" "$(escape_data "$message")"
 }
 
 # ---------------------------------------------------------------------------
@@ -98,13 +116,9 @@ normalise_level() {
     raw="${raw#*=}"              # Remove everything before =
     raw="${raw//\"/}"            # Remove double quotes
     raw="${raw//\'/}"            # Remove single quotes (Nickel tick)
-    raw="${raw//,/}"             # Remove trailing commas
-    raw="${raw## }"              # Trim leading space
-    raw="${raw%% }"              # Trim trailing space
-    raw="${raw%%#*}"             # Remove inline comments
-    raw="${raw## }"              # Trim again
-    raw="${raw%% }"
-    echo "${raw,,}"             # Lowercase
+    raw="${raw#"${raw%%[![:space:]]*}"}"  # Trim leading whitespace
+    raw="${raw%"${raw##*[![:space:]]}"}"  # Trim trailing whitespace
+    echo "${raw,,}"                       # Lowercase
 }
 
 # ---------------------------------------------------------------------------
@@ -165,77 +179,54 @@ validate_k9() {
     local in_pedigree=false
     local pedigree_depth=0
 
+    # Split each line at record delimiters outside quoted strings. A comment
+    # ends the line, so its contents cannot count as assignments or braces.
+    local segment_re='^(([^"#,{}]|"([^"\\]|\\.)*")*)([#{},]|$)'
+    local field_re='^[[:space:]]*(name|version|schema_version|leash|security_level|signature|signature_required)[[:space:]]*=(.*)$'
+    local remaining segment delimiter
+
     line_num=0
-    while IFS= read -r line; do
+    while IFS= read -r line || [[ -n "$line" ]]; do
         line_num=$((line_num + 1))
 
-        # Detect pedigree block start. Note: do NOT `continue` here — the
-        # `pedigree = {` line itself contains the opening brace that
-        # establishes the block. Falling through to the brace counter
-        # below makes depth start at 1, so a subsequent `security = {…},`
-        # closing brace correctly takes depth to 1 (not 0), keeping us
-        # inside the pedigree block when later fields (name/version/leash)
-        # are checked. Previously the `continue` skipped this opening
-        # brace, depth started at 0, and the first nested block's close
-        # prematurely terminated the validator's view of the pedigree —
-        # making `pedigree.metadata.name` invisible.
         if [[ "$line" =~ ^[[:space:]]*pedigree[[:space:]]*= ]]; then
             has_pedigree=true
             in_pedigree=true
             pedigree_depth=0
-            # fall through
         fi
 
         if [[ "$in_pedigree" == "true" ]]; then
-            # Track brace depth to know when pedigree block ends
-            local opens closes
-            opens="${line//[^\{]/}"
-            closes="${line//[^\}]/}"
-            pedigree_depth=$(( pedigree_depth + ${#opens} - ${#closes} ))
+            remaining="$line"
+            while [[ -n "$remaining" && "$remaining" =~ $segment_re ]]; do
+                segment="${BASH_REMATCH[1]}"
+                delimiter="${BASH_REMATCH[4]}"
+                remaining="${remaining:"${#BASH_REMATCH[0]}"}"
 
-            if [[ $pedigree_depth -le 0 && "$has_pedigree" == "true" ]]; then
-                # Check this final line too before leaving
-                :
-            fi
+                if [[ "$segment" =~ $field_re ]]; then
+                    case "${BASH_REMATCH[1]}" in
+                        name) has_pedigree_name=true ;;
+                        version|schema_version) has_pedigree_version=true ;;
+                        leash|security_level)
+                            has_security_level=true
+                            security_level_value="$(normalise_level "$segment")"
+                            security_level_line=$line_num
+                            ;;
+                        signature|signature_required) has_signature_field=true ;;
+                    esac
+                fi
 
-            # Check for name field within pedigree.metadata or pedigree directly.
-            # Two patterns cover both multi-line and single-line pedigrees:
-            #   1. ^[[:space:]]+name[[:space:]]*= — the normal multi-line case where
-            #      `name = "..."` appears on its own indented line.
-            #   2. [[:space:]]name[[:space:]]*= — inline within a single-line
-            #      pedigree assignment such as:
-            #        pedigree = component_pedigree & { name = "foo" }
-            #      (root cause: developer-ecosystem@baab1534 — single-line form
-            #      was missed entirely because the pedigree block opened and
-            #      closed in one line, never reaching the ^[[:space:]]+ check on
-            #      a subsequent iteration.)
-            if [[ "$line" =~ ^[[:space:]]+name[[:space:]]*= ]] || \
-               [[ "$line" =~ [[:space:]]name[[:space:]]*= ]]; then
-                has_pedigree_name=true
-            fi
-
-            # Check for version field
-            if [[ "$line" =~ ^[[:space:]]+(version|schema_version)[[:space:]]*= ]] || \
-               [[ "$line" =~ [[:space:]](version|schema_version)[[:space:]]*= ]]; then
-                has_pedigree_version=true
-            fi
-
-            # Check for security level (leash field)
-            if [[ "$line" =~ ^[[:space:]]+(leash|security_level)[[:space:]]*= ]]; then
-                has_security_level=true
-                security_level_value="$(normalise_level "$line")"
-                security_level_line=$line_num
-            fi
-
-            # Check for signature fields
-            if [[ "$line" =~ ^[[:space:]]+(signature|signature_required)[[:space:]]*= ]]; then
-                has_signature_field=true
-            fi
-
-            # End of pedigree block
-            if [[ $pedigree_depth -le 0 && "$has_pedigree" == "true" && "$line" == *"}"* ]]; then
-                in_pedigree=false
-            fi
+                case "$delimiter" in
+                    '{') pedigree_depth=$((pedigree_depth + 1)) ;;
+                    '}')
+                        pedigree_depth=$((pedigree_depth - 1))
+                        if [[ $pedigree_depth -le 0 ]]; then
+                            in_pedigree=false
+                            break
+                        fi
+                        ;;
+                    '#'|'') break ;;
+                esac
+            done
         fi
 
         # Also check for signature fields outside pedigree (top-level)
@@ -295,8 +286,11 @@ echo "::group::K9 Configuration Validation"
 echo "Scanning ${SCAN_PATH} for K9 files (.k9, .k9.ncl)..."
 echo ""
 
-# Find all K9 files, excluding .git directory
-mapfile -t k9_candidates < <(find "$SCAN_PATH" \( -name '*.k9' -o -name '*.k9.ncl' \) -not -path '*/.git/*' -type f | sort)
+# Null-delimited discovery preserves unusual paths; a broken find/sort must fail.
+discovery_tmp="$(mktemp)"
+trap 'rm -f "$discovery_tmp"' EXIT
+find "$SCAN_PATH" \( -name '*.k9' -o -name '*.k9.ncl' \) -not -path '*/.git/*' -type f -print0 | sort -z > "$discovery_tmp"
+mapfile -d '' -t k9_candidates < "$discovery_tmp"
 
 # Apply paths-ignore filter
 k9_files=()
@@ -326,7 +320,7 @@ echo "Found ${#k9_files[@]} K9 file(s)"
 echo ""
 
 for file in "${k9_files[@]}"; do
-    echo "  Validating: ${file}"
+    printf '  Validating: %s\n' "$(escape_data "$file")"
     validate_k9 "$file"
 done
 
